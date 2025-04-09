@@ -45,7 +45,7 @@ public class Main {
 
             accueilPanel.setBuyerAction(e -> {
                 String email = JOptionPane.showInputDialog("Email :");
-                String password = JOptionPane.showInputDialog("Mot de passe :");
+                String password = JOptionPane.showInputDialog("Mot de passe 1:");
 
                 auth.registerBuyer(email, password);
                 JOptionPane.showMessageDialog(mainFrame, "Compte acheteur créé !");
