@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-public class LoginPanel extends JPanel {
+public class ConnexionLabel extends JPanel {
     private JTextField emailField;
-    private JPasswordField passwordField;
+    private JPasswordField mdpField;
     private JButton loginBtn;
     private JButton backBtn;
 
-    public LoginPanel() {
+    public ConnexionLabel() {
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -18,10 +18,10 @@ public class LoginPanel extends JPanel {
         title.setFont(new Font("Arial", Font.BOLD, 18));
 
         JLabel emailLabel = new JLabel("Email :");
-        JLabel passwordLabel = new JLabel("Mot de passe :");
+        JLabel mdpLabel = new JLabel("Mot de passe :");
 
         emailField = new JTextField(20);
-        passwordField = new JPasswordField(20);
+        mdpField = new JPasswordField(20);
 
         loginBtn = new JButton("Se connecter");
         backBtn = new JButton("← Retour");
@@ -37,9 +37,9 @@ public class LoginPanel extends JPanel {
         add(emailField, gbc);
 
         gbc.gridx = 0; gbc.gridy++;
-        add(passwordLabel, gbc);
+        add(mdpLabel, gbc);
         gbc.gridx = 1;
-        add(passwordField, gbc);
+        add(mdpField, gbc);
 
         gbc.gridy++;
         gbc.gridx = 0;
@@ -52,8 +52,8 @@ public class LoginPanel extends JPanel {
         return emailField.getText();
     }
 
-    public String getPassword() {
-        return new String(passwordField.getPassword());
+    public String getMdp() {
+        return new String(mdpField.getPassword());
     }
 
     public void setLoginAction(ActionListener l) {

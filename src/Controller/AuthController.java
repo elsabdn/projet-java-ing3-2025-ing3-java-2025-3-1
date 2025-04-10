@@ -1,8 +1,8 @@
 package Controller;
 
-import Modele.Buyer;
-import Modele.Seller;
-import Modele.User;
+import Modele.Acheteur;
+import Modele.Vendeur;
+import Modele.Utilisateur;
 import Database.DatabaseManager;
 
 public class AuthController {
@@ -12,24 +12,24 @@ public class AuthController {
         this.db = db;
     }
 
-    public User login(String email, String password) {
-        return db.getUsers().stream()
-                .filter(user -> user.getEmail().equals(email) && user.getPassword().equals(password))
+    public Utilisateur connexion(String email, String mdp) {
+        return db.getUtilisateurs().stream()
+                .filter(utilisateur -> utilisateur.getEmail().equals(email) && utilisateur.getMdp().equals(mdp))
                 .findFirst()
                 .orElse(null);
     }
 
-    public Buyer registerBuyer(String email, String password) {
-        int id = db.generateUserId();
-        Buyer buyer = new Buyer(id, email, password);
-        db.addUser(buyer);
+    public Acheteur registerAcheteur(String email, String mdp) {
+        int id = db.generateUtilisateurId();
+        Acheteur buyer = new Acheteur(id, email, mdp);
+        db.addUtilisateur(buyer);
         return buyer;
     }
 
-    public Seller registerSeller(String email, String password) {
-        int id = db.generateUserId();
-        Seller seller = new Seller(id, email, password);
-        db.addUser(seller);
-        return seller;
+    public Vendeur registerVendeur(String email, String mdp) {
+        int id = db.generateUtilisateurId();
+        Vendeur vendeur = new Vendeur(id, email, mdp);
+        db.addUtilisateur(vendeur);
+        return vendeur;
     }
 }

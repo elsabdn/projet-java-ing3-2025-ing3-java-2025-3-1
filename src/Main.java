@@ -3,11 +3,11 @@
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 import Controller.AuthController;
-import Controller.CartController;
-import Controller.ProductController;
+import Controller.PanierController;
+import Controller.ProduitController;
 import Database.DatabaseManager;
 import Modele.*;
-import Modele.Buyer;
+import Modele.Acheteur;
 import Vue.advanced.*;
 
 import javax.swing.*;
@@ -17,21 +17,22 @@ public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // Initialisation
+            Acheteur acheteur1 = new Acheteur(1, "acheteur@example.com", "motdepasse");
             DatabaseManager db = new DatabaseManager();
             AuthController auth = new AuthController(db);
-            ProductController productController = new ProductController(db);
-            CartController cartController = new CartController();
+            ProduitController produitController = new ProduitController(db);
+            PanierController panierController = new PanierController(acheteur1);
 
             // Fenêtre principale avec navigation
             MainFrame mainFrame = new MainFrame();
 
             // Panneaux
             AccueilPanel accueilPanel = new AccueilPanel();
-            LoginPanel loginPanel = new LoginPanel();
+            ConnexionLabel connexionLabel = new ConnexionLabel();
 
             // Ajout des panneaux à la fenêtre
             mainFrame.addPanel(accueilPanel, "accueil");
-            mainFrame.addPanel(loginPanel, "login");
+            mainFrame.addPanel(connexionLabel, "connexion");
 
             // Affichage accueil
             mainFrame.showPanel("accueil");
@@ -40,72 +41,72 @@ public class Main {
             // === Navigation depuis Accueil ===
 
             accueilPanel.setLoginAction(e -> {
-                mainFrame.showPanel("login");
+                mainFrame.showPanel("connexion");
             });
 
-            accueilPanel.setBuyerAction(e -> {
+            accueilPanel.setAcheteurAction(e -> {
                 String email = JOptionPane.showInputDialog("Email :");
-                String password = JOptionPane.showInputDialog("Mot de passe 1:");
+                String mdp = JOptionPane.showInputDialog("Mot de passe:");
 
-                auth.registerBuyer(email, password);
+                auth.registerAcheteur(email, mdp);
                 JOptionPane.showMessageDialog(mainFrame, "Compte acheteur créé !");
             });
 
-            accueilPanel.setSellerAction(e -> {
+            accueilPanel.setVendeurAction(e -> {
                 String email = JOptionPane.showInputDialog("Email :");
-                String password = JOptionPane.showInputDialog("Mot de passe :");
+                String mdp = JOptionPane.showInputDialog("Mot de passe :");
 
-                auth.registerSeller(email, password);
+                auth.registerVendeur(email, mdp);
                 JOptionPane.showMessageDialog(mainFrame, "Compte vendeur créé !");
             });
 
             // === Navigation depuis Login ===
 
-            loginPanel.setBackAction(e -> mainFrame.showPanel("accueil"));
+            connexionLabel.setBackAction(e -> mainFrame.showPanel("accueil"));
 
-            loginPanel.setLoginAction(e -> {
-                String email = loginPanel.getEmail();
-                String password = loginPanel.getPassword();
+            connexionLabel.setLoginAction(e -> {
+                String email = connexionLabel.getEmail();
+                String mdp = connexionLabel.getMdp();
 
-                User user = auth.login(email, password);
-                if (user == null) {
+                Utilisateur utilisateur = auth.connexion(email, mdp);
+                if (utilisateur == null) {
                     JOptionPane.showMessageDialog(mainFrame, "Identifiants incorrects !");
                     return;
                 }
 
-                if (user instanceof Buyer buyer) {
-                    List<Product> products = db.getProducts();
-                    BuyerPanel buyerPanel = new BuyerPanel(products);
-                    mainFrame.addPanel(buyerPanel, "buyer");
+                if (utilisateur instanceof Acheteur acheteur) {
+                    List<Produit> produits = db.getProduits();
+                    AcheteurPanel acheteurPanel = new AcheteurPanel(produits);
+                    mainFrame.addPanel(acheteurPanel, "acheteur");
 
-                    buyerPanel.getRefreshButton().addActionListener(ev -> {
-                        buyerPanel.updateProductList(db.getProducts());
+                    acheteurPanel.getRefreshButton().addActionListener(ev -> {
+                        acheteurPanel.updateProduitList(db.getProduits());
                     });
 
-                    buyerPanel.getViewCartButton().addActionListener(ev -> {
-                        Cart cart = buyer.getCart();
-                        JOptionPane.showMessageDialog(mainFrame, cart.toString(), "Votre panier", JOptionPane.INFORMATION_MESSAGE);
+                    acheteurPanel.getViewPanierButton().addActionListener(ev -> {
+                        Panier panier = acheteur.getPanier();
+                        JOptionPane.showMessageDialog(mainFrame, panier.toString(), "Votre panier", JOptionPane.INFORMATION_MESSAGE);
                     });
 
-                    buyerPanel.getBuyProductButton().addActionListener(ev -> {
+                    acheteurPanel.getBuyProduitButton().addActionListener(ev -> {
                         try {
                             String idStr = JOptionPane.showInputDialog("Entrez l'ID du produit à acheter :");
-                            int productId = Integer.parseInt(idStr);
+                            int produitId = Integer.parseInt(idStr);
 
-                            String qtyStr = JOptionPane.showInputDialog("Quantité :");
-                            int quantity = Integer.parseInt(qtyStr);
+                            String qteStr = JOptionPane.showInputDialog("Quantité :");
+                            int quantite = Integer.parseInt(qteStr);
 
-                            Product productToBuy = db.getProductById(productId);
+                            Produit produitToBuy = db.getProduitById(produitId);
 
-                            if (productToBuy == null) {
+                            if (produitToBuy == null) {
                                 JOptionPane.showMessageDialog(mainFrame, "Produit introuvable.");
                                 return;
                             }
 
-                            boolean success = cartController.addToCart(buyer, productToBuy, quantity);
+                            boolean success = panierController.addToPanier(produitToBuy, quantite);
                             if (success) {
                                 JOptionPane.showMessageDialog(mainFrame, "Produit ajouté au panier !");
-                                buyerPanel.updateProductList(db.getProducts()); // mise à jour affichage
+                                acheteurPanel.updateProduitList(db.getProduits()); // mise à jour affichage
                             } else {
                                 JOptionPane.showMessageDialog(mainFrame, "Stock insuffisant !");
                             }
@@ -114,31 +115,31 @@ public class Main {
                         }
                     });
 
-                    buyerPanel.getCheckoutButton().addActionListener(ev -> {
-                        cartController.checkout(buyer);
+                    acheteurPanel.getCheckoutButton().addActionListener(ev -> {
+                        panierController.checkout(acheteur);
                     });
 
 
-                    mainFrame.showPanel("buyer");
+                    mainFrame.showPanel("acheteur");
 
-                } else if (user instanceof Seller seller) {
-                    SellerPanel sellerPanel = new SellerPanel(seller);
-                    mainFrame.addPanel(sellerPanel, "seller");
+                } else if (utilisateur instanceof Vendeur vendeur) {
+                    VendeurPanel vendeurPanel = new VendeurPanel(vendeur);
+                    mainFrame.addPanel(vendeurPanel, "vendeur");
 
-                    sellerPanel.getRefreshButton().addActionListener(ev -> {
-                        sellerPanel.updateProductList(seller);
+                    vendeurPanel.getRefreshButton().addActionListener(ev -> {
+                        vendeurPanel.updateProduitList(vendeur);
                     });
 
-                    sellerPanel.getAddProductButton().addActionListener(ev -> {
-                        String name = JOptionPane.showInputDialog("Nom du produit :");
-                        double price = Double.parseDouble(JOptionPane.showInputDialog("Prix :"));
-                        int qty = Integer.parseInt(JOptionPane.showInputDialog("Quantité :"));
+                    vendeurPanel.getAddProduitButton().addActionListener(ev -> {
+                        String nom = JOptionPane.showInputDialog("Nom du produit :");
+                        double prix = Double.parseDouble(JOptionPane.showInputDialog("Prix :"));
+                        int qte = Integer.parseInt(JOptionPane.showInputDialog("Quantité :"));
 
-                        productController.addProduct(seller, name, price, qty);
-                        sellerPanel.updateProductList(seller);
+                        produitController.addProduit(vendeur, nom, prix, qte);
+                        vendeurPanel.updateProduitList(vendeur);
                     });
 
-                    mainFrame.showPanel("seller");
+                    mainFrame.showPanel("vendeur");
                 }
             });
         });
