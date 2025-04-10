@@ -6,8 +6,8 @@ import java.awt.event.ActionListener;
 
 public class Accueil extends JFrame {
     private JButton loginButton;
-    private JButton registerBuyerButton;
-    private JButton registerSellerButton;
+    private JButton registerAcheteurButton;
+    private JButton registerVendeurButton;
 
     public Accueil() {
         setTitle("Accueil");
@@ -16,24 +16,24 @@ public class Accueil extends JFrame {
         setLocationRelativeTo(null);
 
         loginButton = new JButton("Se connecter");
-        registerBuyerButton = new JButton("Créer compte acheteur");
-        registerSellerButton = new JButton("Créer compte vendeur");
+        registerAcheteurButton = new JButton("Créer compte acheteur");
+        registerVendeurButton = new JButton("Créer compte vendeur");
 
         setLayout(new GridLayout(3, 1));
         add(loginButton);
-        add(registerBuyerButton);
-        add(registerSellerButton);
+        add(registerAcheteurButton);
+        add(registerVendeurButton);
     }
 
     public void setLoginAction(ActionListener listener) {
         loginButton.addActionListener(listener);
     }
 
-    public void setRegisterBuyerAction(ActionListener listener) {
-        registerBuyerButton.addActionListener(listener);
+    public void setRegisterAcheteurAction(ActionListener listener) {
+        registerAcheteurButton.addActionListener(listener);
     }
 
-    public void setRegisterSellerAction(ActionListener listener) {
-        registerSellerButton.addActionListener(listener);
+    public void setRegisterVendeurAction(ActionListener listener) {
+        registerVendeurButton.addActionListener(listener);
     }
 }

@@ -1,58 +1,58 @@
 package Database;
 
-import Modele.User;
-import Modele.Product;
+import Modele.Utilisateur;
+import Modele.Produit;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class DatabaseManager {
-    private List<User> users;
-    private List<Product> products;
+    private List<Utilisateur> utilisateurs;
+    private List<Produit> produits;
 
-    private AtomicInteger userIdCounter;
-    private AtomicInteger productIdCounter;
+    private AtomicInteger utilisateurIdCounter;
+    private AtomicInteger produitIdCounter;
 
     public DatabaseManager() {
-        users = new ArrayList<>();
-        products = new ArrayList<>();
-        userIdCounter = new AtomicInteger(1);
-        productIdCounter = new AtomicInteger(1);
+        utilisateurs = new ArrayList<>();
+        produits = new ArrayList<>();
+        utilisateurIdCounter = new AtomicInteger(1);
+        produitIdCounter = new AtomicInteger(1);
     }
 
-    // === USERS ===
-    public void addUser(User user) {
-        users.add(user);
+    // === UTILISATEURS ===
+    public void addUtilisateur(Utilisateur utilisateur) {
+        utilisateurs.add(utilisateur);
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<Utilisateur> getUtilisateurs() {
+        return utilisateurs;
     }
 
-    public int generateUserId() {
-        return userIdCounter.getAndIncrement();
+    public int generateUtilisateurId() {
+        return utilisateurIdCounter.getAndIncrement();
     }
 
-    // === PRODUCTS ===
-    public void addProduct(Product product) {
-        products.add(product);
+    // === PRODUITS ===
+    public void addProduit(Produit produit) {
+        produits.add(produit);
     }
 
-    public void removeProduct(Product product) {
-        products.remove(product);
+    public void removeProduit(Produit produit) {
+        produits.remove(produit);
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<Produit> getProduits() {
+        return produits;
     }
 
-    public int generateProductId() {
-        return productIdCounter.getAndIncrement();
+    public int generateProduitId() {
+        return produitIdCounter.getAndIncrement();
     }
 
-    public Product getProductById(int id) {
-        for (Product p : products) {
+    public Produit getProduitById(int id) {
+        for (Produit p : produits) {
             if (p.getId() == id) {
                 return p;
             }
