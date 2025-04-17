@@ -2,30 +2,25 @@ package Controller;
 
 import Modele.Produit;
 import Modele.Vendeur;
-import Database.DatabaseManager;
+import DAO.ProduitDAO;
 
 import java.util.List;
 
 public class ProduitController {
-    private DatabaseManager db;
-
-    public ProduitController(DatabaseManager db) {
-        this.db = db;
-    }
+    private ProduitDAO produitDAO = new ProduitDAO();
 
     public List<Produit> getAllProduits() {
-        return db.getProduits();
+        return produitDAO.getAll();
     }
 
     public void addProduit(Vendeur vendeur, String name, double price, int quantite) {
-        int id = db.genererIdProduit();
-        Produit produit = new Produit(id, name, price, quantite, vendeur);
+        Produit produit = new Produit(0, name, price, quantite, vendeur);
         vendeur.addProduit(produit);
-        db.addProduit(produit);
+        produitDAO.ajouter(produit);
     }
 
     public void removeProduit(Vendeur vendeur, Produit produit) {
         vendeur.removeProduit(produit);
-        db.removeProduit(produit);
+        produitDAO.supprimer(produit);
     }
 }

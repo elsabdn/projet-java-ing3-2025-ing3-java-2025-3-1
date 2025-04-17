@@ -1,7 +1,11 @@
+
+//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
+// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
 import Controller.AuthController;
 import Controller.PanierController;
 import Controller.ProduitController;
-import Database.DatabaseManager;
+import DAO.DatabaseManager;
 import Modele.*;
 import Modele.Acheteur;
 import Vue.advanced.*;
@@ -15,8 +19,8 @@ public class Main {
             // Initialisation
             Acheteur acheteur1 = new Acheteur(1, "acheteur@example.com", "motdepasse");
             DatabaseManager db = new DatabaseManager();
-            AuthController auth = new AuthController(db);
-            ProduitController produitController = new ProduitController(db);
+            AuthController auth = new AuthController();
+            ProduitController produitController = new ProduitController();
             PanierController panierController = new PanierController(acheteur1);
 
             // Fenêtre principale avec navigation
@@ -112,7 +116,7 @@ public class Main {
                     });
 
                     acheteurPanel.getCheckoutButton().addActionListener(ev -> {
-                        panierController.checkout(acheteur);
+                        panierController.checkout();
                     });
 
 
@@ -141,3 +145,4 @@ public class Main {
         });
     }
 }
+

@@ -6,6 +6,9 @@ public class Produit {
     private double prix;
     private int quantite;
     private Vendeur vendeur;
+    private boolean promoEnGros;
+    private int seuilGros;
+    private double prixGros;
 
     public Produit(int id, String nom, double prix, int quantite, Vendeur vendeur) {
         this.id = id;
