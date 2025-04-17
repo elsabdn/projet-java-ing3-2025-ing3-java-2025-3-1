@@ -22,11 +22,11 @@ public class PanierVue extends JFrame {
         for (Panier.Item item : panier.getItems()) {
             Produit p = item.getProduit();
             int qte = item.getQuantite();
-            panierArea.append(p.getName() + " x" + qte + "\n");
+            panierArea.append(p.getNom() + " x" + qte + "\n");
         }
 
 
-        totalLabel.setText("Total : " + panier.getTotalPrice() + "€");
+        totalLabel.setText("Total : " + panier.getPrixTot() + "€");
 
         setLayout(new BorderLayout());
         add(new JScrollPane(panierArea), BorderLayout.CENTER);

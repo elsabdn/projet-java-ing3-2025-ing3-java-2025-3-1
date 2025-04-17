@@ -20,14 +20,14 @@ public class AuthController {
     }
 
     public Acheteur registerAcheteur(String email, String mdp) {
-        int id = db.generateUtilisateurId();
+        int id = db.genererIdUtilisateur();
         Acheteur buyer = new Acheteur(id, email, mdp);
         db.addUtilisateur(buyer);
         return buyer;
     }
 
     public Vendeur registerVendeur(String email, String mdp) {
-        int id = db.generateUtilisateurId();
+        int id = db.genererIdUtilisateur();
         Vendeur vendeur = new Vendeur(id, email, mdp);
         db.addUtilisateur(vendeur);
         return vendeur;

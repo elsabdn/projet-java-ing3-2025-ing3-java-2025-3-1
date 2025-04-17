@@ -51,10 +51,10 @@ public class Panier {
         items.clear();
     }
 
-    public double getTotalPrice() {
+    public double getPrixTot() {
         double total = 0.0;
         for (Item item : items) {
-            total += item.getProduit().getPrice() * item.getQuantite();
+            total += item.getProduit().getPrix() * item.getQuantite();
         }
         return total;
     }

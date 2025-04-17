@@ -47,7 +47,7 @@ public class AcheteurPanel extends JPanel {
     public void updateProduitList(List<Produit> produits) {
         produitArea.setText("");
         for (Produit p : produits) {
-            produitArea.append("🆔 " + p.getId() + " | " + p.getName() + " - " + p.getPrice() + "€ (Stock: " + p.getQuantite() + ")\n");
+            produitArea.append("🆔 " + p.getId() + " | " + p.getNom() + " - " + p.getPrix() + "€ (Stock: " + p.getQuantite() + ")\n");
         }
     }
 

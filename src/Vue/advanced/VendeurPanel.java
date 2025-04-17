@@ -37,7 +37,7 @@ public class VendeurPanel extends JPanel {
     public void updateProduitList(Vendeur vendeur) {
         produitListArea.setText("");
         vendeur.getProduitList().forEach(p -> {
-            produitListArea.append("🆔 " + p.getId() + " | " + p.getName() + " - " + p.getPrice() + "€ (Stock: " + p.getQuantite() + ")\n");
+            produitListArea.append("🆔 " + p.getId() + " | " + p.getNom() + " - " + p.getPrix() + "€ (Stock: " + p.getQuantite() + ")\n");
         });
     }
 

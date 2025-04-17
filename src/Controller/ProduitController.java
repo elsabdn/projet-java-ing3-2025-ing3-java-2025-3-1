@@ -18,7 +18,7 @@ public class ProduitController {
     }
 
     public void addProduit(Vendeur vendeur, String name, double price, int quantite) {
-        int id = db.generateProduitId();
+        int id = db.genererIdProduit();
         Produit produit = new Produit(id, name, price, quantite, vendeur);
         vendeur.addProduit(produit);
         db.addProduit(produit);

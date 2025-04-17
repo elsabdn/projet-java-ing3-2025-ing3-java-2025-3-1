@@ -2,15 +2,15 @@ package Modele;
 
 public class Produit {
     private int id;
-    private String name;
-    private double price;
+    private String nom;
+    private double prix;
     private int quantite;
     private Vendeur vendeur;
 
-    public Produit(int id, String name, double price, int quantite, Vendeur vendeur) {
+    public Produit(int id, String nom, double prix, int quantite, Vendeur vendeur) {
         this.id = id;
-        this.name = name;
-        this.price = price;
+        this.nom = nom;
+        this.prix = prix;
         this.quantite = quantite;
         this.vendeur = vendeur;
     }
@@ -19,12 +19,17 @@ public class Produit {
     public int getId() {
         return id;
     }
-    public String getName() {
-        return name;
+
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public double getPrice() {
-        return price;
+    public String getNom() {
+        return nom;
+    }
+
+    public double getPrix() {
+        return prix;
     }
 
     public int getQuantite() {

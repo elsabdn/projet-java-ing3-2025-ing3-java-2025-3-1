@@ -19,7 +19,7 @@ public class VendeurTabDeBordVue extends JFrame {
 
         for (Produit p : vendeur.getProduitList()) {
             produitListArea.append(
-                    String.format("%s - %.2f€ - Qté: %d\n", p.getName(), p.getPrice(), p.getQuantite())
+                    String.format("%s - %.2f€ - Qté: %d\n", p.getNom(), p.getPrix(), p.getQuantite())
             );
         }
 

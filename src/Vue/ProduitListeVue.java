@@ -20,7 +20,7 @@ public class ProduitListeVue extends JFrame {
         for (Produit p : produits) {
             produitArea.append(
                     String.format("ID: %d | %s | %.2f€ | Qté: %d\n",
-                            p.getId(), p.getName(), p.getPrice(), p.getQuantite())
+                            p.getId(), p.getNom(), p.getPrix(), p.getQuantite())
             );
         }
 

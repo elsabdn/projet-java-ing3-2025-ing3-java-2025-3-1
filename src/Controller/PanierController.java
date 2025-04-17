@@ -33,7 +33,7 @@ public class PanierController {
             produit.setQuantite(produit.getQuantite() - quantite); // déduction stock
             return true;
         } else {
-            System.out.println("Stock insuffisant pour " + produit.getName());
+            System.out.println("Stock insuffisant pour " + produit.getNom());
             return false;
         }
     }
@@ -46,7 +46,7 @@ public class PanierController {
 
     public double calculateTotal(Acheteur acheteur) {
 
-        return acheteur.getPanier().getTotalPrice();
+        return acheteur.getPanier().getPrixTot();
     }
 
     public void checkout(Acheteur acheteur) {
@@ -58,7 +58,7 @@ public class PanierController {
         }
 
         double total = panier.getItems().stream()
-                .mapToDouble(item -> item.getProduit().getPrice() * item.getQuantite())
+                .mapToDouble(item -> item.getProduit().getPrix() * item.getQuantite())
                 .sum();
 
         int confirm = JOptionPane.showConfirmDialog(null,
@@ -92,12 +92,12 @@ public class PanierController {
 
         double total = 0.0;
         for (Panier.Item item : acheteur.getPanier().getItems()) {
-            double sub = item.getProduit().getPrice() * item.getQuantite();
+            double sub = item.getProduit().getPrix() * item.getQuantite();
             total += sub;
             sb.append("- ")
-                    .append(item.getProduit().getName())
+                    .append(item.getProduit().getNom())
                     .append(" x").append(item.getQuantite())
-                    .append(" @ ").append(item.getProduit().getPrice()).append(" €")
+                    .append(" @ ").append(item.getProduit().getPrix()).append(" €")
                     .append(" = ").append(String.format("%.2f", sub)).append(" €\n");
         }
 
