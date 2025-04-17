@@ -10,6 +10,7 @@ public class Produit {
     private int seuilGros;
     private double prixGros;
 
+
     public Produit(int id, String nom, double prix, int quantite, Vendeur vendeur) {
         this.id = id;
         this.nom = nom;
@@ -45,5 +46,16 @@ public class Produit {
 
     public void setQuantite(int quantite) {
         this.quantite = quantite; }
+    public boolean isPromoEnGros() {
+        return promoEnGros;
+    }
+
+    public int getSeuilGros() {
+        return seuilGros;
+    }
+
+    public double getPrixGros() {
+        return prixGros;
+    }
 
 }
