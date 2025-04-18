@@ -60,30 +60,37 @@ public class AcheteurPanel extends JPanel {
     // Créer une carte de produit avec informations
     private JPanel createProductCard(Produit produit) {
         JPanel card = new JPanel();
-        card.setLayout(new BorderLayout());
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS)); // Utiliser BoxLayout pour une disposition verticale
         card.setBackground(new Color(248, 187, 208)); // Fond pastel
         card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        card.setPreferredSize(new Dimension(200, 150));
+        card.setPreferredSize(new Dimension(200, 180));
 
         JLabel nameLabel = new JLabel(produit.getNom());
         nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         nameLabel.setForeground(Color.BLACK);
+
+        JLabel idLabel = new JLabel("ID: " + produit.getId());  // Ajouter l'ID du produit
+        idLabel.setFont(new Font("Arial", Font.ITALIC, 12));  // Police italique pour l'ID
+        idLabel.setAlignmentX(Component.CENTER_ALIGNMENT);  // Centrer l'ID
+        idLabel.setForeground(Color.BLACK);
 
         JLabel priceLabel = new JLabel("Prix: " + produit.getPrix() + "€");
         priceLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        priceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        priceLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         priceLabel.setForeground(Color.BLACK);
 
         JLabel stockLabel = new JLabel("Stock: " + produit.getQuantite());
         stockLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        stockLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        stockLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Centrer le texte du stock
         stockLabel.setForeground(Color.BLACK);
 
         // Ajouter les informations dans la carte
-        card.add(nameLabel, BorderLayout.NORTH);
-        card.add(priceLabel, BorderLayout.CENTER);
-        card.add(stockLabel, BorderLayout.SOUTH);
+        card.add(nameLabel);
+        card.add(idLabel);
+        card.add(priceLabel);
+        card.add(stockLabel);
+
 
         return card;
     }
