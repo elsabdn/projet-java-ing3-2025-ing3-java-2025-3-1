@@ -33,6 +33,8 @@ public class Panier {
         return items;
     }
 
+
+
     public void addItem(Produit produit, int quantite) {
         for (Item item : items) {
             if (item.getProduit().equals(produit)) {
@@ -58,4 +60,25 @@ public class Panier {
         }
         return total;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Contenu du panier:\n");
+
+        if (items.isEmpty()) {
+            sb.append("Le panier est vide.\n");
+        } else {
+            for (Item item : items) {
+                sb.append(item.getProduit().getNom())
+                        .append(" x").append(item.getQuantite())
+                        .append(" @ ").append(item.getProduit().getPrix())
+                        .append("€\n");
+            }
+        }
+
+        sb.append("\nTotal: ").append(getPrixTot()).append("€");
+        return sb.toString();
+    }
+
 }

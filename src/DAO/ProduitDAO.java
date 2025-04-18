@@ -69,4 +69,21 @@ public class ProduitDAO {
             e.printStackTrace();
         }
     }
+
+    public void mettreAJourProduit(Produit produit) {
+        String sql = "UPDATE produit SET quantite = ? WHERE id = ?";
+
+        try (Connection conn = ConnexionBDD.getConnexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, produit.getQuantite());
+            stmt.setInt(2, produit.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

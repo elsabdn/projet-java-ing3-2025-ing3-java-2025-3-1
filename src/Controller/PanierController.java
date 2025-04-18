@@ -5,6 +5,7 @@ import Modele.Panier;
 import Modele.Produit;
 import DAO.CommandeDAO;
 import DAO.PanierDAO;
+import DAO.ProduitDAO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,7 @@ public class PanierController {
     private final Acheteur acheteur;
     private final PanierDAO panierDAO = new PanierDAO();
     private final CommandeDAO commandeDAO = new CommandeDAO();
+    private final ProduitDAO produitDAO = new ProduitDAO();
 
     public PanierController(Acheteur acheteur) {
         this.acheteur = acheteur;
@@ -23,10 +25,31 @@ public class PanierController {
         if (produit.getQuantite() >= quantite) {
             acheteur.getPanier().addItem(produit, quantite);
             produit.setQuantite(produit.getQuantite() - quantite);
+            produitDAO.mettreAJourProduit(produit);
             panierDAO.ajouterItem(acheteur.getId(), produit, quantite);
             return true;
         }
         return false;
+    }
+
+    // Méthode pour afficher le contenu du panier
+    public void afficherPanier(Acheteur acheteur) {
+        // Charge les produits dans le panier de l'acheteur
+        panierDAO.chargerPanier(acheteur);
+
+        // Récupère le panier de l'acheteur
+        Panier panier = acheteur.getPanier();
+
+        // Vérifie si le panier est vide ou non
+        if (panier.getItems().isEmpty()) {
+            System.out.println("Le panier est vide.");
+        } else {
+            // Si le panier n'est pas vide, affiche les produits
+            System.out.println("Contenu du panier :");
+            for (Panier.Item item : panier.getItems()) {
+                System.out.println("Produit: " + item.getProduit().getNom() + ", Quantité: " + item.getQuantite());
+            }
+        }
     }
 
     public void checkout() {
