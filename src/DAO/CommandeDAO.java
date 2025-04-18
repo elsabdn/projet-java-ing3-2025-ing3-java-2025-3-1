@@ -1,9 +1,14 @@
 package DAO;
 
+import Modele.Commande;
 import Modele.Panier;
+import Modele.Produit;
+import Modele.Vendeur;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class CommandeDAO {
 
@@ -47,4 +52,47 @@ public class CommandeDAO {
             e.printStackTrace();
         }
     }
+    public List<Commande> getCommandesByUtilisateurId(int utilisateurId) {
+        List<Commande> commandes = new ArrayList<>();
+        String sqlCommandes = "SELECT * FROM commande WHERE utilisateur_id = ?";
+        String sqlItems = "SELECT ci.*, p.nom, p.prix, p.vendeur_id FROM commande_item ci " +
+                "JOIN produit p ON ci.produit_id = p.id WHERE ci.commande_id = ?";
+
+        try (Connection conn = ConnexionBDD.getConnexion();
+             PreparedStatement stmtCmd = conn.prepareStatement(sqlCommandes)) {
+
+            stmtCmd.setInt(1, utilisateurId);
+            ResultSet rsCmd = stmtCmd.executeQuery();
+
+            while (rsCmd.next()) {
+                int commandeId = rsCmd.getInt("id");
+                double montant = rsCmd.getDouble("montant_total");
+
+                List<Panier.Item> items = new ArrayList<>();
+                try (PreparedStatement stmtItems = conn.prepareStatement(sqlItems)) {
+                    stmtItems.setInt(1, commandeId);
+                    ResultSet rsItems = stmtItems.executeQuery();
+                    while (rsItems.next()) {
+                        Produit p = new Produit(
+                                rsItems.getInt("produit_id"),
+                                rsItems.getString("nom"),
+                                rsItems.getDouble("prix"),
+                                0,
+                                new Vendeur(rsItems.getInt("vendeur_id"), "", "")
+                        );
+                        int quantite = rsItems.getInt("quantite");
+                        items.add(new Panier.Item(p, quantite));
+                    }
+                }
+
+                commandes.add(new Commande(commandeId, montant, items));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return commandes;
+    }
+
 }
