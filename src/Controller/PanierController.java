@@ -36,9 +36,21 @@ public class PanierController {
             return;
         }
 
-        double total = panier.getPrixTot();
+        // ✅ Nouveau calcul du total avec gestion du prix en gros
+        double total = 0.0;
+        for (Panier.Item item : panier.getItems()) {
+            Produit p = item.getProduit();
+            int qte = item.getQuantite();
+
+            if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                total += p.getPrixGros() * qte;
+            } else {
+                total += p.getPrix() * qte;
+            }
+        }
+
         int confirm = JOptionPane.showConfirmDialog(null,
-                "Total : " + total + " €\nConfirmer l'achat ?", "Paiement",
+                "Total : " + String.format("%.2f", total) + " €\nConfirmer l'achat ?", "Paiement",
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
@@ -61,12 +73,23 @@ public class PanierController {
 
         double total = 0.0;
         for (Panier.Item item : acheteur.getPanier().getItems()) {
-            double sub = item.getProduit().getPrix() * item.getQuantite();
-            total += sub;
-            sb.append("- ").append(item.getProduit().getNom())
-                    .append(" x").append(item.getQuantite())
-                    .append(" @ ").append(item.getProduit().getPrix()).append(" €")
-                    .append(" = ").append(String.format("%.2f", sub)).append(" €\n");
+            Produit produit = item.getProduit();
+            int qte = item.getQuantite();
+
+            double prixUnitaire;
+            if (produit.isPromoEnGros() && qte >= produit.getSeuilGros()) {
+                prixUnitaire = produit.getPrixGros();
+            } else {
+                prixUnitaire = produit.getPrix();
+            }
+
+            double sousTotal = prixUnitaire * qte;
+            total += sousTotal;
+
+            sb.append("- ").append(produit.getNom())
+                    .append(" x").append(qte)
+                    .append(" @ ").append(String.format("%.2f", prixUnitaire)).append(" €")
+                    .append(" = ").append(String.format("%.2f", sousTotal)).append(" €\n");
         }
 
         sb.append("\nTotal : ").append(String.format("%.2f", total)).append(" €");
