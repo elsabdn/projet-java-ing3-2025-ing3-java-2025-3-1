@@ -1,19 +1,16 @@
 package DAO;
 
 import Modele.Acheteur;
-import Modele.Panier;
 import Modele.Produit;
 import Modele.Vendeur;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PanierDAO {
 
     public void chargerPanier(Acheteur acheteur) {
         String sql = """
-        SELECT pi.produit_id, pi.quantite, p.nom, p.prix, p.quantite AS stock, p.vendeur_id
+        SELECT pi.produit_id, pi.quantite, p.nom, p.prix, p.quantite AS stock, p.vendeur_id, p.image_path, p.marque
         FROM panier pa
         JOIN panier_item pi ON pa.id = pi.panier_id
         JOIN produit p ON pi.produit_id = p.id
@@ -27,18 +24,19 @@ public class PanierDAO {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                String imagePath = rs.getString("image_path");
+                String marque = rs.getString("marque");
+
                 Produit produit = new Produit(
                         rs.getInt("produit_id"),
                         rs.getString("nom"),
                         rs.getDouble("prix"),
                         rs.getInt("stock"),
-                        new Vendeur(rs.getInt("vendeur_id"), "", "")
-                );
+                        new Vendeur(rs.getInt("vendeur_id"), "", ""),
+                        imagePath, marque);
                 int quantite = rs.getInt("quantite");
                 acheteur.getPanier().addItem(produit, quantite);
 
-                // Ajoute un print pour vérifier
-                System.out.println("Produit ajouté au panier: " + produit.getNom() + " x " + quantite);
             }
 
         } catch (SQLException e) {

@@ -5,6 +5,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import Vue.advanced.VendeurPanel;
+
 public class DatabaseManager {
     private static final String URL_BDD = "jdbc:mysql://localhost:3306/ecommerce";
     private static final String UTILISATEUR_BDD = "root";
@@ -127,7 +129,7 @@ public class DatabaseManager {
 
     private void chargerPanierPourAcheteur(Acheteur acheteur) {
         // Récupérer le panier de l'acheteur et les produits qu'il contient
-        String requete = "SELECT pi.produit_id, pi.quantite, p.nom, p.prix, p.quantite AS stock, p.vendeur_id " +
+        String requete = "SELECT pi.produit_id, pi.quantite, p.nom, p.prix, p.quantite AS stock, p.vendeur_id, p.image_path, p.marque " +
                 "FROM panier pa " +
                 "JOIN panier_item pi ON pa.id = pi.panier_id " +
                 "JOIN produit p ON pi.produit_id = p.id " +
@@ -144,12 +146,15 @@ public class DatabaseManager {
                     double prix = rs.getDouble("prix");
                     int stock = rs.getInt("stock");
                     int vendeurId = rs.getInt("vendeur_id");
+                    String imagePath = rs.getString("image_path");
+                    String marque = rs.getString("marque");
+
 
                     // Créer un vendeur temporaire (on n'a pas besoin de tous ses détails ici)
                     Vendeur vendeur = new Vendeur(vendeurId, "", "");
 
                     // Créer le produit
-                    Produit produit = new Produit(produitId, nom, prix, stock, vendeur);
+                    Produit produit = new Produit(produitId, nom, prix, stock, vendeur, imagePath, marque);
 
                     // Ajouter au panier
                     acheteur.getPanier().addItem(produit, quantite);
@@ -183,13 +188,15 @@ public class DatabaseManager {
 
     // === PRODUITS ===
     public void addProduit(Produit produit) {
-        String requete = "INSERT INTO produit (nom, prix, quantite, vendeur_id) VALUES (?, ?, ?, ?)";
+        String requete = "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connexion.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, produit.getNom());
             stmt.setDouble(2, produit.getPrix());
             stmt.setInt(3, produit.getQuantite());
             stmt.setInt(4, produit.getVendeur().getId());
+            stmt.setString(5, produit.getImagePath());
+            stmt.setString(6, produit.getMarque());
 
             int lignesAffectees = stmt.executeUpdate();
 
@@ -237,13 +244,15 @@ public class DatabaseManager {
                 double prix = rs.getDouble("prix");
                 int quantite = rs.getInt("quantite");
                 int vendeurId = rs.getInt("vendeur_id");
+                String imagePath = rs.getString("image_path");
+                String marque = rs.getString("marque");
                 String vendeurEmail = rs.getString("email");
 
                 // Créer un vendeur avec les infos disponibles
                 Vendeur vendeur = new Vendeur(vendeurId, vendeurEmail, "");
 
                 // Créer et ajouter le produit
-                Produit produit = new Produit(id, nom, prix, quantite, vendeur);
+                Produit produit = new Produit(id, nom, prix, quantite, vendeur, imagePath, marque);
                 produits.add(produit);
             }
 
@@ -257,7 +266,7 @@ public class DatabaseManager {
 
     private void chargerProduitsPourVendeur(Vendeur vendeur) {
         String requete = "SELECT * FROM produit WHERE vendeur_id = ?";
-
+        VendeurPanel vendeurPanel = new VendeurPanel(vendeur);
         try (PreparedStatement stmt = connexion.prepareStatement(requete)) {
             stmt.setInt(1, vendeur.getId());
 
@@ -267,11 +276,15 @@ public class DatabaseManager {
                     String nom = rs.getString("nom");
                     double prix = rs.getDouble("prix");
                     int quantite = rs.getInt("quantite");
+                    String imagePath = rs.getString("image_path");
+                    String marque = rs.getString("marque");
 
                     // Créer et ajouter le produit à la liste du vendeur
-                    Produit produit = new Produit(id, nom, prix, quantite, vendeur);
+                    Produit produit = new Produit(id, nom, prix, quantite, vendeur, imagePath, marque);
                     vendeur.addProduit(produit);
+
                 }
+                vendeurPanel.updateProduitList(vendeur);
             }
 
         } catch (SQLException e) {
@@ -299,6 +312,43 @@ public class DatabaseManager {
         return idMax + 1;
     }
 
+    public List<Produit> getProduitsParVendeur(int vendeurId) {
+        List<Produit> produits = new ArrayList<>();
+        String requete = "SELECT id, nom, prix, quantite, vendeur_id, image_path, marque FROM produit WHERE vendeur_id = ?";
+
+        try (PreparedStatement stmt = connexion.prepareStatement(requete)) {
+            stmt.setInt(1, vendeurId); // On passe l'ID du vendeur à la requête
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                // Parcours des résultats de la requête et création des objets Produit
+                while (rs.next()) {
+                    int produitId = rs.getInt("id");
+                    String nom = rs.getString("nom");
+                    double prix = rs.getDouble("prix");
+                    int quantite = rs.getInt("quantite");
+                    String imagePath = rs.getString("image_path");
+                    int vendeurIdDb = rs.getInt("vendeur_id");
+                    String marque = rs.getString("marque");
+
+                    // Crée un objet Vendeur
+                    Vendeur vendeur = new Vendeur(vendeurIdDb, "", ""); // Remplacer "" par les informations appropriées pour le vendeur
+
+                    // Création d'un objet Produit à partir des données récupérées
+                    Produit produit = new Produit(produitId, nom, prix, quantite, vendeur, imagePath, marque);
+
+                    // Ajout du produit à la liste des produits
+                    produits.add(produit);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la récupération des produits du vendeur");
+            e.printStackTrace();
+        }
+
+        return produits; // Retourne la liste des produits récupérés
+    }
+
+
     public Produit getProduitById(int id) {
         String requete = "SELECT p.*, u.email FROM produit p JOIN utilisateur u ON p.vendeur_id = u.id WHERE p.id = ?";
 
@@ -311,13 +361,15 @@ public class DatabaseManager {
                     double prix = rs.getDouble("prix");
                     int quantite = rs.getInt("quantite");
                     int vendeurId = rs.getInt("vendeur_id");
+                    String imagePath = rs.getString("image_path");
+                    String marque = rs.getString("marque");
                     String vendeurEmail = rs.getString("email");
 
                     // Créer un vendeur avec les infos disponibles
                     Vendeur vendeur = new Vendeur(vendeurId, vendeurEmail, "");
 
                     // Retourner le produit
-                    return new Produit(id, nom, prix, quantite, vendeur);
+                    return new Produit(id, nom, prix, quantite, vendeur, imagePath, marque);
                 }
             }
 

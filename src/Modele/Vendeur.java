@@ -13,6 +13,8 @@ public class Vendeur extends Utilisateur {
 
     public List<Produit> getProduitList() { return produitList; }
 
+    public void setProduitList(List<Produit> produitList) { this.produitList = produitList;}
+
     public void addProduit(Produit produit) {
         produitList.add(produit);
     }

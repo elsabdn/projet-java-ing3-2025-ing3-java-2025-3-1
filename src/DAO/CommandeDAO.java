@@ -55,7 +55,7 @@ public class CommandeDAO {
     public List<Commande> getCommandesByUtilisateurId(int utilisateurId) {
         List<Commande> commandes = new ArrayList<>();
         String sqlCommandes = "SELECT * FROM commande WHERE utilisateur_id = ?";
-        String sqlItems = "SELECT ci.*, p.nom, p.prix, p.vendeur_id FROM commande_item ci " +
+        String sqlItems = "SELECT ci.*, p.nom, p.prix, p.vendeur_id, p.image_path, p.marque FROM commande_item ci " +
                 "JOIN produit p ON ci.produit_id = p.id WHERE ci.commande_id = ?";
 
         try (Connection conn = ConnexionBDD.getConnexion();
@@ -73,13 +73,15 @@ public class CommandeDAO {
                     stmtItems.setInt(1, commandeId);
                     ResultSet rsItems = stmtItems.executeQuery();
                     while (rsItems.next()) {
+                        String imagePath = rsItems.getString("image_path");
+                        String marque = rsItems.getString("marque");
                         Produit p = new Produit(
                                 rsItems.getInt("produit_id"),
                                 rsItems.getString("nom"),
                                 rsItems.getDouble("prix"),
                                 0,
-                                new Vendeur(rsItems.getInt("vendeur_id"), "", "")
-                        );
+                                new Vendeur(rsItems.getInt("vendeur_id"), "", ""),
+                                imagePath, marque);
                         int quantite = rsItems.getInt("quantite");
                         items.add(new Panier.Item(p, quantite));
                     }
