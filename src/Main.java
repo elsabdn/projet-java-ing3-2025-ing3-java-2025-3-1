@@ -5,13 +5,18 @@
 import Controller.AuthController;
 import Controller.PanierController;
 import Controller.ProduitController;
-import Database.DatabaseManager;
+import DAO.DatabaseManager;
 import Modele.*;
 import Modele.Acheteur;
 import Vue.advanced.*;
 
 import javax.swing.*;
 import java.util.List;
+import java.io.File;  // Pour la classe File
+import javax.swing.filechooser.FileNameExtensionFilter;  // Pour le filtre d'extension de fichier
+import javax.swing.ImageIcon;  // Pour ImageIcon
+import java.awt.Image;  // Pour la classe Image
+
 
 public class Main {
     public static void main(String[] args) {
@@ -19,8 +24,8 @@ public class Main {
             // Initialisation
             Acheteur acheteur1 = new Acheteur(1, "acheteur@example.com", "motdepasse");
             DatabaseManager db = new DatabaseManager();
-            AuthController auth = new AuthController(db);
-            ProduitController produitController = new ProduitController(db);
+            AuthController auth = new AuthController();
+            ProduitController produitController = new ProduitController();
             PanierController panierController = new PanierController(acheteur1);
 
             // Fenêtre principale avec navigation
@@ -116,7 +121,7 @@ public class Main {
                     });
 
                     acheteurPanel.getCheckoutButton().addActionListener(ev -> {
-                        panierController.checkout(acheteur);
+                        panierController.checkout();
                     });
 
 
@@ -131,13 +136,37 @@ public class Main {
                     });
 
                     vendeurPanel.getAddProduitButton().addActionListener(ev -> {
+                        // Demander les informations du produit
                         String nom = JOptionPane.showInputDialog("Nom du produit :");
                         double prix = Double.parseDouble(JOptionPane.showInputDialog("Prix :"));
                         int qte = Integer.parseInt(JOptionPane.showInputDialog("Quantité :"));
+                        String marque = JOptionPane.showInputDialog("Marque :");
 
-                        produitController.addProduit(vendeur, nom, prix, qte);
+                        // Demander à l'utilisateur de choisir une image
+                        JFileChooser fileChooser = new JFileChooser();
+                        fileChooser.setDialogTitle("Choisir une image pour le produit");
+                        fileChooser.setAcceptAllFileFilterUsed(false);
+                        FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "jpeg");
+                        fileChooser.addChoosableFileFilter(filter);
+
+                        int result = fileChooser.showOpenDialog(mainFrame); // mainFrame doit être défini
+                        String imagePath = null;
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            File selectedFile = fileChooser.getSelectedFile();
+                            imagePath = selectedFile.getAbsolutePath();
+                        }
+
+                        // Créer un objet ImageIcon avec l'image sélectionnée
+                        ImageIcon imageIcon = new ImageIcon(imagePath);
+                        Image image = imageIcon.getImage(); // Convertir en Image
+                        Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH); // Redimensionner
+                        ImageIcon scaledIcon = new ImageIcon(scaledImage); // Créer un ImageIcon avec l'image redimensionnée
+
+                        // Ajouter le produit avec l'image
+                        produitController.addProduit(vendeur, nom, prix, qte, imagePath, marque);
                         vendeurPanel.updateProduitList(vendeur);
                     });
+
 
                     mainFrame.showPanel("vendeur");
                 }

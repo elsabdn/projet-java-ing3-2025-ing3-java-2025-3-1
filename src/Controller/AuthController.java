@@ -3,33 +3,24 @@ package Controller;
 import Modele.Acheteur;
 import Modele.Vendeur;
 import Modele.Utilisateur;
-import Database.DatabaseManager;
+import DAO.UtilisateurDAO;
 
 public class AuthController {
-    private DatabaseManager db;
-
-    public AuthController(DatabaseManager db) {
-        this.db = db;
-    }
+    private UtilisateurDAO utilisateurDAO = new UtilisateurDAO();
 
     public Utilisateur connexion(String email, String mdp) {
-        return db.getUtilisateurs().stream()
-                .filter(utilisateur -> utilisateur.getEmail().equals(email) && utilisateur.getMdp().equals(mdp))
-                .findFirst()
-                .orElse(null);
+        return utilisateurDAO.getByEmailAndMdp(email, mdp);
     }
 
     public Acheteur registerAcheteur(String email, String mdp) {
-        int id = db.generateUtilisateurId();
-        Acheteur buyer = new Acheteur(id, email, mdp);
-        db.addUtilisateur(buyer);
-        return buyer;
+        Acheteur acheteur = new Acheteur(0, email, mdp);
+        utilisateurDAO.ajouter(acheteur);
+        return acheteur;
     }
 
     public Vendeur registerVendeur(String email, String mdp) {
-        int id = db.generateUtilisateurId();
-        Vendeur vendeur = new Vendeur(id, email, mdp);
-        db.addUtilisateur(vendeur);
+        Vendeur vendeur = new Vendeur(0, email, mdp);
+        utilisateurDAO.ajouter(vendeur);
         return vendeur;
     }
 }
