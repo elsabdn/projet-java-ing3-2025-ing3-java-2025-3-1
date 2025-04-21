@@ -44,7 +44,7 @@ public class ConnexionLabel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
 
-        JLabel title = new JLabel("🔐 Connexion");
+        JLabel title = new JLabel("Connexion");
         title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(new Color(92, 92, 92));

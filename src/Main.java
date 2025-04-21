@@ -108,7 +108,7 @@ public class Main {
                                 return;
                             }
 
-                            boolean success = panierController.addToPanier(produitToBuy, quantite);
+                            boolean success = panierController.ajouterAuPanier(produitToBuy, quantite);
                             if (success) {
                                 JOptionPane.showMessageDialog(mainFrame, "Produit ajouté au panier !");
                                 acheteurPanel.updateProduitList(db.getProduits()); // mise à jour affichage
@@ -120,9 +120,7 @@ public class Main {
                         }
                     });
 
-                    acheteurPanel.getCheckoutButton().addActionListener(ev -> {
-                        panierController.checkout();
-                    });
+                    ;
 
 
                     mainFrame.showPanel("acheteur");

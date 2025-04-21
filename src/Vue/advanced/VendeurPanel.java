@@ -6,9 +6,12 @@ import Modele.Produit;
 import Vue.advanced.AccueilPanel;
 
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class VendeurPanel extends JPanel {
@@ -39,7 +42,7 @@ public class VendeurPanel extends JPanel {
         timer.start();
 
         // Titre
-        JLabel title = new JLabel("📦 Tableau de bord vendeur");
+        JLabel title = new JLabel("Tableau de bord vendeur");
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setFont(new Font("Arial", Font.BOLD, 20));
         title.setForeground(new Color(92, 92, 92));
@@ -51,10 +54,11 @@ public class VendeurPanel extends JPanel {
         produitDisplayPanel.setLayout(new GridLayout(0, 3, 20, 20)); // 3 colonnes
         produitDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         produitDisplayPanel.setBackground(new Color(245, 245, 245)); // optionnel : fond gris clair
-        JScrollPane scrollPane = new JScrollPane(produitDisplayPanel);
-        add(scrollPane, BorderLayout.CENTER);
 
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(248, 187, 208), 2));
+        JScrollPane scrollPane = new JScrollPane(produitDisplayPanel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Pour un scroll fluide
+
         add(scrollPane, BorderLayout.CENTER);
 
         // Panneau de boutons
@@ -161,6 +165,27 @@ public class VendeurPanel extends JPanel {
         return button;
     }
 
+    public static Image redimensionnerImage(String cheminImage, int largeur, int hauteur) {
+        try {
+            BufferedImage imageOriginale = ImageIO.read(new File(cheminImage));
+            BufferedImage imageRedimensionnee = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D g2d = imageRedimensionnee.createGraphics();
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            g2d.drawImage(imageOriginale, 0, 0, largeur, hauteur, null);
+            g2d.dispose();
+
+            return imageRedimensionnee;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
     public void updateProduitList(Vendeur vendeur) {
         vendeur.setProduitList(produitController.getProduitsParVendeur(vendeur.getId()));
         produitDisplayPanel.removeAll();
@@ -168,22 +193,22 @@ public class VendeurPanel extends JPanel {
         produitDisplayPanel.setLayout(new GridLayout(0, 3, 20, 20)); // 3 colonnes, espaces de 20px
 
         for (Produit p : vendeur.getProduitList()) {
-            JPanel card = new JPanel();
-            card.setLayout(new BorderLayout());
-            card.setPreferredSize(new Dimension(250, 200));
-            card.setMaximumSize(new Dimension(250, 200));  // Forcer la taille maximale
-            card.setMinimumSize(new Dimension(250, 200));  // Forcer la taille minimale
-            card.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
-            card.setBackground(Color.WHITE);
+            JPanel carte = new JPanel();
+            carte.setLayout(new BorderLayout());
+            carte.setPreferredSize(new Dimension(250, 350));
+            carte.setMaximumSize(new Dimension(250, 350));  // Forcer la taille maximale
+            carte.setMinimumSize(new Dimension(250, 350));  // Forcer la taille minimale
+            carte.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
+            carte.setBackground(Color.WHITE);
 
             // 🖼️ Image du produit
             if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-                ImageIcon icon = new ImageIcon(p.getImagePath());
-                Image scaled = icon.getImage().getScaledInstance(180, 120, Image.SCALE_SMOOTH);
-                JLabel imageLabel = new JLabel(new ImageIcon(scaled));
+                Image image = redimensionnerImage(p.getImagePath(), 150, 150);
+                JLabel imageLabel = new JLabel(new ImageIcon(image));
+
                 imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
                 imageLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-                card.add(imageLabel, BorderLayout.NORTH);
+                carte.add(imageLabel, BorderLayout.NORTH);
             }
 
             // 📝 Infos produit
@@ -195,6 +220,10 @@ public class VendeurPanel extends JPanel {
             JLabel nom = new JLabel(p.getNom());
             nom.setFont(new Font("SansSerif", Font.BOLD, 14));
             nom.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            JLabel id = new JLabel("ID : " + p.getId());
+            id.setForeground(new Color(100, 100, 100));
+            id.setAlignmentX(Component.CENTER_ALIGNMENT);
 
             JLabel prix = new JLabel(String.format("%.2f €", p.getPrix()));
             prix.setForeground(new Color(100, 100, 100));
@@ -211,6 +240,8 @@ public class VendeurPanel extends JPanel {
 
             infoPanel.add(nom);
             infoPanel.add(Box.createVerticalStrut(5));
+            infoPanel.add(id);
+            infoPanel.add(Box.createVerticalStrut(5));
             infoPanel.add(prix);
             infoPanel.add(Box.createVerticalStrut(5));
             infoPanel.add(stock);
@@ -218,13 +249,13 @@ public class VendeurPanel extends JPanel {
             infoPanel.add(marque);
 
 
-            card.add(infoPanel, BorderLayout.CENTER);
+            carte.add(infoPanel, BorderLayout.CENTER);
 
             // Panel pour les boutons "Modifier" et "Supprimer"
             JPanel buttonPanel = new JPanel();
             buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
             buttonPanel.setOpaque(false);  // Pour rendre le fond transparent
-            
+
             JButton modifierBtn = createStyledButton("Modifier");
             modifierBtn.setPreferredSize(new Dimension(150, 30)); // Redimensionner le bouton "Modifier"
 
@@ -288,8 +319,8 @@ public class VendeurPanel extends JPanel {
             buttonPanel.add(supprimerBtn);
 
             // Ajouter les boutons sous les informations
-            card.add(buttonPanel, BorderLayout.SOUTH);
-            produitDisplayPanel.add(card);
+            carte.add(buttonPanel, BorderLayout.SOUTH);
+            produitDisplayPanel.add(carte);
 
         }
 
