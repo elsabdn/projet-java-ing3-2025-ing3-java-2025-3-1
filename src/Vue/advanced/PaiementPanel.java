@@ -69,7 +69,7 @@ public class PaiementPanel extends JPanel {
         totalAmountLabel = new JLabel("Montant total: " + String.format("%.2f €", totalAmount));
         totalAmountLabel.setFont(new Font("Arial", Font.BOLD, 18));
         totalAmountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        totalAmountLabel.setForeground(new Color(244, 67, 54));
+        totalAmountLabel.setForeground(new Color(248, 188, 208));
         card.add(totalAmountLabel, gbc);
 
         // Formulaire de carte

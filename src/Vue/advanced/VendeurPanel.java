@@ -1,341 +1,298 @@
 package Vue.advanced;
 
 import Modele.Vendeur;
-import Controller.ProduitController;
 import Modele.Produit;
-import Vue.advanced.AccueilPanel;
-
+import Controller.ProduitController;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class VendeurPanel extends JPanel {
-    private ProduitController produitController;
-    private JPanel produitDisplayPanel;
-    private JButton addProduitBtn;
-    private JButton refreshBtn;
-    private JButton deconnexionBtn;
-    private AccueilPanel accueilPanel;
+    private final ProduitController produitController;
+    private final JPanel produitDisplayPanel;
+    private final JButton addProduitBtn;
+    private final JButton refreshBtn;
+    private final JButton deconnexionBtn;
+    private final MainFrame mainFrame;
     private float opacity = 0.0f;
 
-
-    public VendeurPanel(Vendeur vendeur) {
-        produitController = new ProduitController();
+    public VendeurPanel(Vendeur vendeur, MainFrame mainFrame) {
+        this.produitController = new ProduitController();
+        this.mainFrame = mainFrame;
 
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // Animation de fade-in
-        Timer timer = new Timer(15, e -> {
+        // ─── HEADER : filler à gauche, titre centré, bouton Déconnexion à droite ───
+        deconnexionBtn = createStyledButton("🚪 Déconnexion");
+        deconnexionBtn.setPreferredSize(new Dimension(140, 35));
+        deconnexionBtn.addActionListener(e -> mainFrame.showPanel("accueil"));
+        JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        logoutWrapper.setOpaque(false);
+        logoutWrapper.add(deconnexionBtn);
+
+        Dimension eastSize = logoutWrapper.getPreferredSize();
+        JPanel leftFiller = new JPanel(); leftFiller.setOpaque(false);
+        leftFiller.setPreferredSize(eastSize);
+
+        JLabel title = new JLabel("Tableau de bord vendeur");
+        title.setFont(new Font("Arial", Font.BOLD, 20));
+        title.setForeground(new Color(92, 92, 92));
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        header.add(leftFiller,    BorderLayout.WEST);
+        header.add(title,         BorderLayout.CENTER);
+        header.add(logoutWrapper, BorderLayout.EAST);
+        add(header, BorderLayout.NORTH);
+
+        // ─── FADE‑IN ────────────────────────────────────────────────────────
+        new Timer(15, e -> {
             if (opacity < 1.0f) {
                 opacity += 0.02f;
                 repaint();
             } else {
-                ((Timer) e.getSource()).stop();
+                ((Timer)e.getSource()).stop();
             }
-        });
-        timer.start();
+        }).start();
 
-        // Titre
-        JLabel title = new JLabel("Tableau de bord vendeur");
-        title.setHorizontalAlignment(SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        title.setForeground(new Color(92, 92, 92));
-        title.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(title, BorderLayout.NORTH);
-
-        // Zone de texte avec scroll
-        produitDisplayPanel = new JPanel(); // très important
-        produitDisplayPanel.setLayout(new GridLayout(0, 3, 20, 20)); // 3 colonnes
+        // ─── ZONE PRODUITS DÉFILANTE ───────────────────────────────────────
+        produitDisplayPanel = new JPanel(new GridLayout(0, 3, 20, 20));
         produitDisplayPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        produitDisplayPanel.setBackground(new Color(245, 245, 245)); // optionnel : fond gris clair
+        produitDisplayPanel.setBackground(new Color(245, 245, 245));
+        JScrollPane scroll = new JScrollPane(produitDisplayPanel);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        add(scroll, BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new JScrollPane(produitDisplayPanel);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Pour un scroll fluide
-
-        add(scrollPane, BorderLayout.CENTER);
-
-        // Panneau de boutons
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setOpaque(false);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-
+        // ─── PIED : Ajouter / Rafraîchir ───────────────────────────────────
         addProduitBtn = createStyledButton("➕ Ajouter un produit");
-        refreshBtn = createStyledButton("🔄 Rafraîchir");
-        deconnexionBtn = createStyledButton("🚪 Déconnexion");
+        refreshBtn    = createStyledButton("🔄 Rafraîchir");
+        JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        bottom.setOpaque(false);
+        bottom.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+        bottom.add(addProduitBtn);
+        bottom.add(refreshBtn);
+        add(bottom, BorderLayout.SOUTH);
 
-        bottomPanel.add(addProduitBtn);
-        bottomPanel.add(refreshBtn);
-        bottomPanel.add(deconnexionBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        // Action pour le bouton déconnexion
-        deconnexionBtn.addActionListener(e -> {
-            /// Crée une nouvelle instance de AccueilPanel
-            AccueilPanel accueilPanel = new AccueilPanel();
-
-            // Obtenez la fenêtre principale (JFrame) qui contient ce panneau
-            JFrame fenetre = (JFrame) SwingUtilities.getWindowAncestor(this);
-
-            // Changer le contenu de la fenêtre pour afficher l'AccueilPanel
-            fenetre.setContentPane(accueilPanel);
-
-            // Revalidate et repaint pour que la fenêtre se mette à jour avec le nouvel AccueilPanel
-            fenetre.revalidate();
-            fenetre.repaint();
-            fenetre.setVisible(true);
-
-        });
-
-
-        // Affichage des produits
-        updateProduitList(vendeur);
-
+        // ─── ACTION : ajouter un produit (avec description) ────────────────
         addProduitBtn.addActionListener(ev -> {
-            String nom = JOptionPane.showInputDialog("Nom du produit :");
-            String marque = JOptionPane.showInputDialog("Marque du produit :");
-            double prix = Double.parseDouble(JOptionPane.showInputDialog("Prix :"));
-            int qte = Integer.parseInt(JOptionPane.showInputDialog("Quantité :"));
+            String nom     = JOptionPane.showInputDialog(this, "Nom du produit :");
+            String marque  = JOptionPane.showInputDialog(this, "Marque :");
+            double prix    = Double.parseDouble(
+                    JOptionPane.showInputDialog(this, "Prix (€) :")
+            );
+            int qte        = Integer.parseInt(
+                    JOptionPane.showInputDialog(this, "Quantité :")
+            );
+            String desc    = JOptionPane.showInputDialog(this, "Description :");
 
-            // Demander à l'utilisateur de choisir une image
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Choisir une image pour le produit");
-            fileChooser.setAcceptAllFileFilterUsed(false);
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "jpeg");
-            fileChooser.addChoosableFileFilter(filter);
-
-            int result = fileChooser.showOpenDialog(this);
-            String imagePath = null;
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                imagePath = selectedFile.getAbsolutePath();
+            // Choix de l'image
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Choisir une image pour le produit");
+            fc.setAcceptAllFileFilterUsed(false);
+            fc.addChoosableFileFilter(
+                    new FileNameExtensionFilter("Images", "jpg","png","jpeg")
+            );
+            String imgPath = null;
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                imgPath = fc.getSelectedFile().getAbsolutePath();
             }
 
-            // Ajouter le produit à la base de données, avec le chemin de l'image
-            produitController.addProduit(vendeur, nom, prix, qte, imagePath, marque);
-
-            // Mettre à jour la liste des produits après ajout
+            // Ajout en base (en supposant addProduit accepte maintenant description)
+            produitController.addProduit(vendeur, nom, prix, qte, imgPath, marque, desc);
             updateProduitList(vendeur);
         });
+
+        // ─── ACTION : rafraîchir la liste ──────────────────────────────────
+        refreshBtn.addActionListener(e -> updateProduitList(vendeur));
+
+        // ─── Chargement initial des produits ───────────────────────────────
+        updateProduitList(vendeur);
     }
 
-
-
-
-    // 🎨 Fond dégradé rose
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
-        Color color1 = new Color(253, 243, 247); // #fdf3f7
-        Color color2 = new Color(252, 228, 236); // #fce4ec
-        GradientPaint gp = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
-        g2d.setPaint(gp);
+        Graphics2D g2d = (Graphics2D)g.create();
+        Color c1 = new Color(253, 243, 247);
+        Color c2 = new Color(252, 228, 236);
+        g2d.setPaint(new GradientPaint(0, 0, c1, 0, getHeight(), c2));
         g2d.fillRect(0, 0, getWidth(), getHeight());
         g2d.dispose();
     }
 
-    // 🌸 Boutons pastel stylisés
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("SansSerif", Font.BOLD, 14));
-        button.setBackground(new Color(248, 187, 208)); // #f8bbd0
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(200, 40));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(244, 143, 177)); // #f48fb1
-            }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(248, 187, 208)); // #f8bbd0
-            }
-        });
-
-        return button;
-    }
-
-    public static Image redimensionnerImage(String cheminImage, int largeur, int hauteur) {
-        try {
-            BufferedImage imageOriginale = ImageIO.read(new File(cheminImage));
-            BufferedImage imageRedimensionnee = new BufferedImage(largeur, hauteur, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2d = imageRedimensionnee.createGraphics();
-            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            g2d.drawImage(imageOriginale, 0, 0, largeur, hauteur, null);
-            g2d.dispose();
-
-            return imageRedimensionnee;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
+    /**
+     * Met à jour l’affichage des produits avec image, infos, marque, prix, stock et description.
+     */
     public void updateProduitList(Vendeur vendeur) {
-        vendeur.setProduitList(produitController.getProduitsParVendeur(vendeur.getId()));
         produitDisplayPanel.removeAll();
-
-        produitDisplayPanel.setLayout(new GridLayout(0, 3, 20, 20)); // 3 colonnes, espaces de 20px
+        vendeur.setProduitList(
+                produitController.getProduitsParVendeur(vendeur.getId())
+        );
 
         for (Produit p : vendeur.getProduitList()) {
-            JPanel carte = new JPanel();
-            carte.setLayout(new BorderLayout());
-            carte.setPreferredSize(new Dimension(250, 350));
-            carte.setMaximumSize(new Dimension(250, 350));  // Forcer la taille maximale
-            carte.setMinimumSize(new Dimension(250, 350));  // Forcer la taille minimale
+            JPanel carte = new JPanel(new BorderLayout());
+            carte.setPreferredSize(new Dimension(250, 400));
             carte.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
             carte.setBackground(Color.WHITE);
 
-            // 🖼️ Image du produit
+            // --- Image ---
             if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-                Image image = redimensionnerImage(p.getImagePath(), 150, 150);
-                JLabel imageLabel = new JLabel(new ImageIcon(image));
-
-                imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                imageLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-                carte.add(imageLabel, BorderLayout.NORTH);
+                JLabel imgLbl = new JLabel(
+                        new ImageIcon(redimensionnerImage(p.getImagePath(), 150, 150))
+                );
+                imgLbl.setHorizontalAlignment(SwingConstants.CENTER);
+                imgLbl.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+                carte.add(imgLbl, BorderLayout.NORTH);
             }
 
-            // 📝 Infos produit
+            // --- Infos produit + description ---
             JPanel infoPanel = new JPanel();
-            infoPanel.setBackground(Color.WHITE);
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            infoPanel.setBackground(Color.WHITE);
 
-            JLabel nom = new JLabel(p.getNom());
-            nom.setFont(new Font("SansSerif", Font.BOLD, 14));
-            nom.setAlignmentX(Component.CENTER_ALIGNMENT);
+            JLabel lblNom   = new JLabel(p.getNom());
+            lblNom.setFont(new Font("SansSerif", Font.BOLD, 14));
+            lblNom.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoPanel.add(lblNom);
 
-            JLabel id = new JLabel("ID : " + p.getId());
-            id.setForeground(new Color(100, 100, 100));
-            id.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JLabel prix = new JLabel(String.format("%.2f €", p.getPrix()));
-            prix.setForeground(new Color(100, 100, 100));
-            prix.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JLabel stock = new JLabel("Stock : " + p.getQuantite());
-            stock.setForeground(new Color(150, 150, 150));
-            stock.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JLabel marque = new JLabel("Marque : " + p.getMarque());
-            marque.setForeground(new Color(150, 150, 150));
-            marque.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-            infoPanel.add(nom);
             infoPanel.add(Box.createVerticalStrut(5));
-            infoPanel.add(id);
+            JLabel lblId    = new JLabel("ID : " + p.getId());
+            lblId.setForeground(new Color(100, 100, 100));
+            lblId.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoPanel.add(lblId);
+
             infoPanel.add(Box.createVerticalStrut(5));
-            infoPanel.add(prix);
+            JLabel lblPrix  = new JLabel(String.format("Prix : %.2f €", p.getPrix()));
+            lblPrix.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoPanel.add(lblPrix);
+
             infoPanel.add(Box.createVerticalStrut(5));
-            infoPanel.add(stock);
+            JLabel lblStock = new JLabel("Stock : " + p.getQuantite());
+            lblStock.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoPanel.add(lblStock);
+
             infoPanel.add(Box.createVerticalStrut(5));
-            infoPanel.add(marque);
+            JLabel lblMarque= new JLabel("Marque : " + p.getMarque());
+            lblMarque.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infoPanel.add(lblMarque);
 
+            infoPanel.add(Box.createVerticalStrut(10));
+            // limite à 300 caractères et protège contre null
+            String fullDesc = p.getDescription() != null ? p.getDescription() : "";
+            int maxChars = 100;
+            String shortDesc = fullDesc.length() > maxChars
+                    ? fullDesc.substring(0, maxChars) + "…"
+                    : fullDesc;
+            JTextArea txtDesc = new JTextArea(shortDesc);
 
-            carte.add(infoPanel, BorderLayout.CENTER);
+            txtDesc.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            txtDesc.setLineWrap(true);
+            txtDesc.setWrapStyleWord(true);
+            txtDesc.setEditable(false);
+            txtDesc.setBackground(new Color(245, 245, 245));
+            txtDesc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+            txtDesc.setMaximumSize(new Dimension(230, 80));
+            infoPanel.add(txtDesc);
 
-            // Panel pour les boutons "Modifier" et "Supprimer"
-            JPanel buttonPanel = new JPanel();
-            buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-            buttonPanel.setOpaque(false);  // Pour rendre le fond transparent
+            // --- Boutons Modifier / Supprimer ---
+            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+            btnPanel.setOpaque(false);
 
-            JButton modifierBtn = createStyledButton("Modifier");
-            modifierBtn.setPreferredSize(new Dimension(150, 30)); // Redimensionner le bouton "Modifier"
+            JButton modBtn = createStyledButton("Modifier");
+            modBtn.setPreferredSize(new Dimension(100, 30));
+            modBtn.addActionListener(e -> {
+                // On réutilise la boîte de dialogue
+                ModifierProduitDialog dlg = new ModifierProduitDialog(mainFrame, p);
+                dlg.setVisible(true);
+                if (!dlg.isConfirme()) return;
 
-            modifierBtn.addActionListener(e -> {
-                // Logique de modification (par exemple, demander de nouvelles infos)
-                String newNom = JOptionPane.showInputDialog("Nom du produit :", p.getNom());
-                double newPrix = Double.parseDouble(JOptionPane.showInputDialog("Prix :", p.getPrix()));
-                int newStock = Integer.parseInt(JOptionPane.showInputDialog("Stock :", p.getQuantite()));
-                String newMarque = JOptionPane.showInputDialog("Marque :", p.getMarque());
+                // Récupération des modifications
+                p.setNom(dlg.getNomModifie());
+                p.setPrix(dlg.getPrixModifie());
+                p.setQuantite(dlg.getStockModifie());
+                p.setMarque(dlg.getMarqueModifiee());
+                if (dlg.getCheminImageModifie() != null)
+                    p.setImagePath(dlg.getCheminImageModifie());
+                if (dlg.getDescriptionModifie() != null)
+                    p.setDescription(dlg.getDescriptionModifie());
 
-                // Demander si l'utilisateur veut changer l'image
-                int response = JOptionPane.showConfirmDialog(this,
-                        "Voulez-vous changer l'image du produit ?", "Modification de l'image",
-                        JOptionPane.YES_NO_OPTION);
-
-                String newImagePath = p.getImagePath(); // Garde l'ancien chemin d'image par défaut
-
-                if (response == JOptionPane.YES_OPTION) {
-                    JFileChooser fileChooser = new JFileChooser();
-                    fileChooser.setDialogTitle("Choisir une nouvelle image pour le produit");
-                    fileChooser.setAcceptAllFileFilterUsed(false);
-                    FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "jpeg");
-                    fileChooser.addChoosableFileFilter(filter);
-
-                    int result = fileChooser.showOpenDialog(this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File selectedFile = fileChooser.getSelectedFile();
-                        newImagePath = selectedFile.getAbsolutePath(); // Mettre à jour avec le nouveau chemin
-                    }
-                }
-                // Mettre à jour le produit avec les nouvelles informations
-                p.setNom(newNom);
-                p.setPrix(newPrix);
-                p.setQuantite(newStock);
-                p.setMarque(newMarque);
-                p.setImagePath(newImagePath);
-
-                // Mettre à jour la base de données si nécessaire
                 produitController.updateProduit(p);
-
-                // Recharger la liste des produits
                 updateProduitList(vendeur);
             });
 
-            JButton supprimerBtn = createStyledButton("Supprimer");
-            supprimerBtn.setPreferredSize(new Dimension(150, 30));
-
-            supprimerBtn.addActionListener(e -> {
-                int confirmation = JOptionPane.showConfirmDialog(this,
-                        "Êtes-vous sûr de vouloir supprimer ce produit ?", "Confirmation",
-                        JOptionPane.YES_NO_OPTION);
-
-                if (confirmation == JOptionPane.YES_OPTION) {
-                    // Logique de suppression du produit
-                    produitController.removeProduit(p.getVendeur(), p);
-                    updateProduitList(vendeur); // Recharger la liste des produits
-                }
+            JButton supBtn = createStyledButton("Supprimer");
+            supBtn.setPreferredSize(new Dimension(100, 30));
+            supBtn.addActionListener(e -> {
+                produitController.removeProduit(vendeur, p);
+                updateProduitList(vendeur);
             });
 
-            buttonPanel.add(modifierBtn);
-            buttonPanel.add(supprimerBtn);
+            btnPanel.add(modBtn);
+            btnPanel.add(supBtn);
+            infoPanel.add(Box.createVerticalStrut(10));
+            infoPanel.add(btnPanel);
 
-            // Ajouter les boutons sous les informations
-            carte.add(buttonPanel, BorderLayout.SOUTH);
+            carte.add(infoPanel, BorderLayout.CENTER);
             produitDisplayPanel.add(carte);
-
         }
 
         produitDisplayPanel.revalidate();
         produitDisplayPanel.repaint();
     }
 
-
-
-
-    public JButton getAddProduitButton() {
-        return addProduitBtn;
+    /** Crée un bouton stylisé pastel */
+    private JButton createStyledButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setBackground(new Color(248, 187, 208));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(5, 15, 5, 15));
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(244, 143, 177));
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(248, 187, 208));
+            }
+        });
+        return btn;
     }
 
-    public JButton getRefreshButton() {
-        return refreshBtn;
+    /**
+     * Redimensionne une image depuis un chemin.
+     */
+    public static Image redimensionnerImage(String chemin, int w, int h) {
+        try {
+            BufferedImage orig = ImageIO.read(new File(chemin));
+            BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = resized.createGraphics();
+            g2d.setRenderingHint(
+                    RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
+            );
+            g2d.drawImage(orig, 0, 0, w, h, null);
+            g2d.dispose();
+            return resized;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
+
+    // Getters pour tests ou utilisation extérieure
+    public JButton getAddProduitButton()  { return addProduitBtn; }
+    public JButton getRefreshButton()     { return refreshBtn; }
+    public JButton getDeconnexionButton() { return deconnexionBtn; }
 }
