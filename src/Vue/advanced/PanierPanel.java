@@ -131,7 +131,7 @@ public class PanierPanel extends JPanel {
         lblResume.setFont(new Font("SansSerif", Font.BOLD, 18));
         lblTotal.setBorder(new EmptyBorder(10, 0, 20, 0));
 
-        JButton btnRetour  = createStyledButton("⬅️ Retour aux produits");
+        JButton btnRetour  = createStyledButton("⬅ Retour aux produits");
         JButton btnValider = createStyledButton("Valider la commande");
         Dimension btnSize = new Dimension(300, 40);
         for (JButton b : new JButton[]{btnRetour, btnValider}) {
@@ -222,9 +222,9 @@ public class PanierPanel extends JPanel {
         infos.setBorder(new EmptyBorder(10,10,10,10));
 
         JLabel lblNom   = new JLabel(produit.getNom());
-        JLabel lblPrix  = new JLabel(String.format("%.2f €", produit.getPrix()));
-        JLabel lblStock = new JLabel("Stock : " + produit.getQuantite());
-        JLabel lblQty   = new JLabel("Quantité : " + quantite);
+        JLabel lblPrix  = new JLabel(String.format("%.2f €", produit.getPrix()));
+        JLabel lblStock = new JLabel("Stock : " + produit.getQuantite());
+        JLabel lblQty   = new JLabel("Quantité : " + quantite);
         for (JLabel l : new JLabel[]{lblNom,lblPrix,lblStock,lblQty}) {
             l.setAlignmentX(Component.CENTER_ALIGNMENT);
         }

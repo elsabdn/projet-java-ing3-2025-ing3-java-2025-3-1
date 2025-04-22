@@ -57,7 +57,7 @@ public class HistoriquePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(listeCommandes);
         add(scrollPane, BorderLayout.CENTER);
 
-        JButton retour = new JButton("⬅️ Retour");
+        JButton retour = new JButton("⬅ Retour");
         retour.setFont(new Font("SansSerif", Font.PLAIN, 14));
         retour.addActionListener(e -> {
             MainFrame mainFrame = (MainFrame) SwingUtilities.getWindowAncestor(this);

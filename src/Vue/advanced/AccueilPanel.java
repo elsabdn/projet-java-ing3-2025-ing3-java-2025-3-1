@@ -54,7 +54,7 @@ public class AccueilPanel extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        JLabel logo = new JLabel("🛍️ ShoppingApp");
+        JLabel logo = new JLabel("🛍 ShoppingApp");
         logo.setFont(new Font("Serif", Font.BOLD, 32));
         logo.setHorizontalAlignment(SwingConstants.CENTER);
         logo.setForeground(new Color(92, 92, 92));
@@ -73,7 +73,7 @@ public class AccueilPanel extends JPanel {
             card.add(loginBtn, gbc);
 
             gbc.gridy++;
-            acheteurBtn = createStyledButton("🛍️ Créer un compte acheteur");
+            acheteurBtn = createStyledButton("🛍 Créer un compte acheteur");
             card.add(acheteurBtn, gbc);
 
             gbc.gridy++;
