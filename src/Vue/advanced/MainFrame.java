@@ -43,7 +43,7 @@ public class MainFrame extends JFrame {
         setContentPane(container);
 
         // --- Page d'accueil ---
-        AccueilPanel accueil = new AccueilPanel();
+        AccueilPanel accueil = new AccueilPanel(this);
 
         // --- Connexion utilisateur ---
         accueil.setLoginAction(e -> {

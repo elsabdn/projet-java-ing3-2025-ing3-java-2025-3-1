@@ -1,29 +1,32 @@
 package Vue.advanced;
 
 import Modele.Acheteur;
-import Vue.advanced.HistoriquePanel;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class AccueilPanel extends JPanel {
+    private final MainFrame mainFrame;
     private JButton loginBtn, acheteurBtn, vendeurBtn, historiqueBtn;
     private float opacity = 0.0f;
 
-    public AccueilPanel() {
+    /** Pour la page d’accueil non connecté */
+    public AccueilPanel(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         initUI(null);
     }
 
-    // Constructeur pour un acheteur connecté
-    public AccueilPanel(Acheteur acheteur) {
-        initUI(acheteur);
+    /** Pour la page d’accueil lorsqu’un acheteur est déjà connecté */
+    public AccueilPanel(MainFrame mainFrame, Acheteur acheteurConnecte) {
+        this.mainFrame = mainFrame;
+        initUI(acheteurConnecte);
     }
 
     private void initUI(Acheteur acheteurConnecte) {
         setLayout(new GridBagLayout());
         setOpaque(false);
 
+        // fade‑in
         Timer timer = new Timer(15, e -> {
             if (opacity < 1.0f) {
                 opacity += 0.02f;
@@ -34,39 +37,43 @@ public class AccueilPanel extends JPanel {
         });
         timer.start();
 
+        // carte blanche
         JPanel card = new JPanel() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(new Color(255, 255, 255, Math.min(255, (int)(opacity * 255))));
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                g2.setColor(new Color(255,255,255, Math.min(255,(int)(opacity*255))));
+                g2.fillRoundRect(0,0,getWidth(),getHeight(),30,30);
             }
         };
-        card.setPreferredSize(new Dimension(500, acheteurConnecte == null ? 480 : 540));
+        card.setPreferredSize(new Dimension(500, acheteurConnecte==null?480:540));
         card.setOpaque(false);
         card.setLayout(new GridBagLayout());
-        card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+        card.setBorder(BorderFactory.createEmptyBorder(30,30,30,30));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 0, 15, 0);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.insets = new Insets(15,0,15,0);
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
+        gbc.gridx  = 0;
+        gbc.gridy  = 0;
 
+        // logo
         JLabel logo = new JLabel("🛍 ShoppingApp");
         logo.setFont(new Font("Serif", Font.BOLD, 32));
         logo.setHorizontalAlignment(SwingConstants.CENTER);
-        logo.setForeground(new Color(92, 92, 92));
+        logo.setForeground(new Color(92,92,92));
         card.add(logo, gbc);
 
+        // sous‑titre
         gbc.gridy++;
         JLabel subtitle = new JLabel("Votre boutique en ligne préférée !");
         subtitle.setFont(new Font("Serif", Font.PLAIN, 16));
         subtitle.setHorizontalAlignment(SwingConstants.CENTER);
-        subtitle.setForeground(new Color(120, 120, 120));
+        subtitle.setForeground(new Color(120,120,120));
         card.add(subtitle, gbc);
 
+        // boutons selon statut
         gbc.gridy++;
         if (acheteurConnecte == null) {
             loginBtn = createStyledButton("🔐 Se connecter");
@@ -79,12 +86,14 @@ public class AccueilPanel extends JPanel {
             gbc.gridy++;
             vendeurBtn = createStyledButton("🏪 Créer un compte vendeur");
             card.add(vendeurBtn, gbc);
+
         } else {
             historiqueBtn = createStyledButton("🧾 Mes commandes");
+            // ici on utilise mainFrame pour ouvrir HistoriquePanel
             historiqueBtn.addActionListener(e -> {
-                JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-                topFrame.setContentPane(new HistoriquePanel(acheteurConnecte));
-                topFrame.revalidate();
+                HistoriquePanel hp = new HistoriquePanel(mainFrame, acheteurConnecte);
+                mainFrame.addPanel(hp, "historique");
+                mainFrame.showPanel("historique");
             });
             card.add(historiqueBtn, gbc);
         }
@@ -92,51 +101,38 @@ public class AccueilPanel extends JPanel {
         add(card);
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
-        Color color1 = new Color(253, 243, 247); // #fdf3f7
-        Color color2 = new Color(252, 228, 236); // #fce4ec
-        GradientPaint gp = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
-        g2d.setPaint(gp);
-        g2d.fillRect(0, 0, getWidth(), getHeight());
+        Color c1 = new Color(253,243,247), c2 = new Color(252,228,236);
+        g2d.setPaint(new GradientPaint(0,0,c1,0,getHeight(),c2));
+        g2d.fillRect(0,0,getWidth(),getHeight());
         g2d.dispose();
     }
 
-
     private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new Font("SansSerif", Font.BOLD, 16));
-        button.setBackground(new Color(248, 187, 208)); // #f8bbd0
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(300, 45));
-        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(244, 143, 177)); // #f48fb1
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 16));
+        btn.setBackground(new Color(248,187,208));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(300,45));
+        btn.setBorder(BorderFactory.createEmptyBorder(10,20,10,20));
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(244,143,177));
             }
-
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(248, 187, 208)); // #f8bbd0
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(248,187,208));
             }
         });
-
-        return button;
+        return btn;
     }
 
-    // Actions (uniquement pour accueil non connecté)
-    public void setLoginAction(ActionListener l) {
-        if (loginBtn != null) loginBtn.addActionListener(l);
-    }
-
-    public void setAcheteurAction(ActionListener l) {
-        if (acheteurBtn != null) acheteurBtn.addActionListener(l);
-    }
-
-    public void setVendeurAction(ActionListener l) {
-        if (vendeurBtn != null) vendeurBtn.addActionListener(l);
-    }
+    // Seulment pour la page non‑connectée
+    public void setLoginAction(ActionListener l)    { if (loginBtn    != null) loginBtn.addActionListener(l); }
+    public void setAcheteurAction(ActionListener l){ if (acheteurBtn != null) acheteurBtn.addActionListener(l); }
+    public void setVendeurAction(ActionListener l) { if (vendeurBtn  != null) vendeurBtn.addActionListener(l); }
 }

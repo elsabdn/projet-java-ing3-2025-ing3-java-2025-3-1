@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 public class VendeurPanel extends JPanel {
     private final ProduitController produitController;
@@ -227,6 +228,10 @@ public class VendeurPanel extends JPanel {
                     p.setDescription(dlg.getDescriptionModifie());
 
                 produitController.updateProduit(p);
+                System.out.println("✅ MODIF VENDEUR : promo=" + p.isPromoEnGros()
+                        + " | seuil=" + p.getSeuilGros()
+                        + " | prixGros=" + p.getPrixGros());
+
                 updateProduitList(vendeur);
             });
 
@@ -275,21 +280,34 @@ public class VendeurPanel extends JPanel {
      */
     public static Image redimensionnerImage(String chemin, int w, int h) {
         try {
-            BufferedImage orig = ImageIO.read(new File(chemin));
+            if (chemin == null || chemin.isEmpty()) {
+                throw new IOException("Chemin vide");
+            }
+
+            BufferedImage orig;
+            if (chemin.startsWith("http")) {
+                orig = ImageIO.read(new URL(chemin));
+            } else {
+                orig = ImageIO.read(new File(chemin));
+            }
+
+            if (orig == null) {
+                throw new IOException("Image introuvable ou invalide");
+            }
+
             BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = resized.createGraphics();
-            g2d.setRenderingHint(
-                    RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
-            );
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2d.drawImage(orig, 0, 0, w, h, null);
             g2d.dispose();
             return resized;
+
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+            System.out.println("Erreur chargement image : " + chemin);
+            return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         }
     }
+
 
     // Getters pour tests ou utilisation extérieure
     public JButton getAddProduitButton()  { return addProduitBtn; }

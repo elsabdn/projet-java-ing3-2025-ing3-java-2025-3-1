@@ -106,7 +106,7 @@ public class AcheteurPanel extends JPanel {
                 JOptionPane.showMessageDialog(mainFrame,
                         "😅 Vous n'avez encore rien commandé ! C’est le moment de vous faire plaisir.");
             } else {
-                HistoriquePanel historiquePanel = new HistoriquePanel(acheteur);
+                HistoriquePanel historiquePanel = new HistoriquePanel(mainFrame, acheteur);
                 mainFrame.addPanel(historiquePanel, "historique");
                 mainFrame.showPanel("historique");
             }

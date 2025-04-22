@@ -46,22 +46,24 @@ public class ProduitDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                int id          = rs.getInt("id");
-                String nom      = rs.getString("nom");
-                double prix     = rs.getDouble("prix");
-                int quantite    = rs.getInt("quantite");
-                int vendeurId   = rs.getInt("vendeur_id");
-                String image    = rs.getString("image_path");
-                String marque   = rs.getString("marque");
-                String desc     = rs.getString("description");
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                double prix = rs.getDouble("prix");
+                int quantite = rs.getInt("quantite");
+                int vendeurId = rs.getInt("vendeur_id");
+                String imagePath = rs.getString("image_path");
+                String marque = rs.getString("marque");
+                String description = rs.getString("description");
+
+                boolean promoEnGros = rs.getBoolean("promoEnGros");
+                int seuilGros = rs.getInt("seuilGros");
+                double prixGros = rs.getDouble("prixGros");
 
                 Vendeur vendeur = new Vendeur(vendeurId, "", "");
-                Produit produit = new Produit(id, nom, prix, quantite, vendeur, image, marque, desc);
-
-                // Champs promo
-                produit.setPromoEnGros(rs.getBoolean("promoEnGros"));
-                produit.setSeuilGros(rs.getInt("seuilGros"));
-                produit.setPrixGros(rs.getDouble("prixGros"));
+                Produit produit = new Produit(id, nom, prix, quantite, vendeur, imagePath, marque, description);
+                produit.setPromoEnGros(promoEnGros);
+                produit.setSeuilGros(seuilGros);
+                produit.setPrixGros(prixGros);
 
                 list.add(produit);
             }
