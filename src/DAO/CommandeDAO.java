@@ -1,5 +1,6 @@
 package DAO;
 
+import Modele.Acheteur;
 import Modele.Commande;
 import Modele.Panier;
 import Modele.Produit;
@@ -7,8 +8,9 @@ import Modele.Vendeur;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 public class CommandeDAO {
 
@@ -52,6 +54,7 @@ public class CommandeDAO {
             e.printStackTrace();
         }
     }
+
     public List<Commande> getCommandesByUtilisateurId(int utilisateurId) {
         List<Commande> commandes = new ArrayList<>();
         String sqlCommandes = "SELECT * FROM commande WHERE utilisateur_id = ?";
@@ -97,4 +100,44 @@ public class CommandeDAO {
         return commandes;
     }
 
+    // ✅ Méthode corrigée avec le paramètre acheteur
+    public void enregistrerCommande(List<Produit> produits, int note, Acheteur acheteur) {
+        try (Connection conn = ConnexionBDD.getConnexion()) {
+            String sql = "INSERT INTO commande (utilisateur_id, montant_total, statut, note) VALUES (?, ?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, acheteur.getId()); // ✅ On utilise l'acheteur passé en paramètre
+            double total = produits.stream().mapToDouble(Produit::getPrix).sum();
+            ps.setDouble(2, total);
+            ps.setString(3, "terminee");
+            ps.setInt(4, note);
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            int commandeId = -1;
+            if (rs.next()) {
+                commandeId = rs.getInt(1);
+            }
+
+            // Insertion des produits dans commande_item
+            String sql2 = "INSERT INTO commande_item (commande_id, produit_id, quantite) VALUES (?, ?, ?)";
+            PreparedStatement ps2 = conn.prepareStatement(sql2);
+
+            Map<Integer, Integer> quantites = new HashMap<>();
+            for (Produit p : produits) {
+                quantites.merge(p.getId(), 1, Integer::sum);
+            }
+
+            for (Map.Entry<Integer, Integer> entry : quantites.entrySet()) {
+                ps2.setInt(1, commandeId);
+                ps2.setInt(2, entry.getKey());
+                ps2.setInt(3, entry.getValue());
+                ps2.addBatch();
+            }
+
+            ps2.executeBatch();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

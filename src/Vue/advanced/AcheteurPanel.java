@@ -1,22 +1,22 @@
 package Vue.advanced;
 
+import Modele.Acheteur;
 import Modele.Produit;
+import Modele.Commande;
+import DAO.CommandeDAO;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Panneau affichant la liste des produits pour l’acheteur.
- * Chaque carte est cliquable et ouvre une vue détaillée.
- */
 public class AcheteurPanel extends JPanel {
     private final MainFrame mainFrame;
     private final List<Produit> panier;
@@ -27,12 +27,12 @@ public class AcheteurPanel extends JPanel {
 
     public AcheteurPanel(MainFrame mainFrame, List<Produit> produits) {
         this.mainFrame = mainFrame;
-        this.panier    = new ArrayList<>();
+        this.panier = new ArrayList<>();
 
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── En‑tête : filler à gauche, titre centré, bouton Déconnexion à droite ───
+        // ─── En-tête ──────────────────────────────────────────────
         deconnexionBtn = createStyledButton("🚪 Déconnexion");
         deconnexionBtn.setPreferredSize(new Dimension(140, 35));
         deconnexionBtn.addActionListener(e -> mainFrame.showPanel("accueil"));
@@ -54,12 +54,12 @@ public class AcheteurPanel extends JPanel {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        header.add(leftFiller,       BorderLayout.WEST);
-        header.add(titre,            BorderLayout.CENTER);
-        header.add(logoutWrapper,    BorderLayout.EAST);
+        header.add(leftFiller, BorderLayout.WEST);
+        header.add(titre, BorderLayout.CENTER);
+        header.add(logoutWrapper, BorderLayout.EAST);
         add(header, BorderLayout.NORTH);
 
-        // ─── Grille de produits défilante ───────────────────────────────────
+        // ─── Grille produits ───────────────────────────────────────
         produitPanel = new JPanel(new GridLayout(0, 3, 20, 20));
         produitPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         produitPanel.setBackground(new Color(245, 245, 245));
@@ -68,35 +68,54 @@ public class AcheteurPanel extends JPanel {
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
 
-        // ─── Pied de page : Rafraîchir + Voir le panier ─────────────────────
-        refreshBtn    = createStyledButton("🔄 Rafraîchir");
+        // ─── Bas de page : boutons ────────────────────────────────
+        refreshBtn = createStyledButton("🔄 Rafraîchir");
         viewPanierBtn = createStyledButton("🧺 Voir le panier");
+        JButton historiqueBtn = createStyledButton("📜 Historique");
+
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         bottom.setOpaque(false);
         bottom.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         bottom.add(refreshBtn);
         bottom.add(viewPanierBtn);
+        bottom.add(historiqueBtn);
         add(bottom, BorderLayout.SOUTH);
 
-        // ─── Actions des boutons ───────────────────────────────────────────
+        // ─── Actions des boutons ──────────────────────────────────
         refreshBtn.addActionListener(e -> updateProduitList(produits));
+
         viewPanierBtn.addActionListener(e -> {
-            // On crée un nouveau PanierPanel avec la liste actuelle
             PanierPanel panelPanier = new PanierPanel(mainFrame, panier);
-            // On l’ajoute au CardLayout
             mainFrame.addPanel(panelPanier, "panier");
-            // On affiche ce panneau
             mainFrame.showPanel("panier");
         });
 
+        historiqueBtn.addActionListener(e -> {
+            Acheteur acheteur = mainFrame.getAcheteurConnecte();
 
-        // ─── Chargement initial des produits ────────────────────────────────
+            if (acheteur == null) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "❌ Erreur : aucun utilisateur connecté.");
+                return;
+            }
+
+            CommandeDAO dao = new CommandeDAO();
+            List<Commande> commandes = dao.getCommandesByUtilisateurId(acheteur.getId());
+
+            if (commandes.isEmpty()) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "😅 Vous n'avez encore rien commandé ! C’est le moment de vous faire plaisir.");
+            } else {
+                HistoriquePanel historiquePanel = new HistoriquePanel(acheteur);
+                mainFrame.addPanel(historiquePanel, "historique");
+                mainFrame.showPanel("historique");
+            }
+        });
+
+        // ─── Chargement initial des produits ──────────────────────
         updateProduitList(produits);
     }
 
-    /**
-     * Met à jour la grille et rend chaque carte cliquable pour le détail.
-     */
     public void updateProduitList(List<Produit> produits) {
         produitPanel.removeAll();
         for (Produit p : produits) {
@@ -105,9 +124,7 @@ public class AcheteurPanel extends JPanel {
             carte.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    // Ouvre la page de détail du produit
-                    ProduitDetailPanel detail =
-                            new ProduitDetailPanel(mainFrame, p, panier);
+                    ProduitDetailPanel detail = new ProduitDetailPanel(mainFrame, p, panier);
                     String key = "detail" + p.getId();
                     mainFrame.addPanel(detail, key);
                     mainFrame.showPanel(key);
@@ -119,27 +136,20 @@ public class AcheteurPanel extends JPanel {
         produitPanel.repaint();
     }
 
-    /**
-     * Construit la carte résumé d’un produit.
-     */
     private JPanel creerCarteProduit(Produit p) {
         JPanel carte = new JPanel(new BorderLayout());
         carte.setPreferredSize(new Dimension(250, 300));
         carte.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
         carte.setBackground(Color.WHITE);
 
-        // Image miniature
         if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-            ImageIcon ico = new ImageIcon(
-                    redimensionnerImage(p.getImagePath(), 150, 150)
-            );
+            ImageIcon ico = new ImageIcon(redimensionnerImage(p.getImagePath(), 150, 150));
             JLabel imgLbl = new JLabel(ico);
             imgLbl.setHorizontalAlignment(SwingConstants.CENTER);
             imgLbl.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
             carte.add(imgLbl, BorderLayout.NORTH);
         }
 
-        // Informations succinctes
         JPanel infos = new JPanel();
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
         infos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -164,30 +174,36 @@ public class AcheteurPanel extends JPanel {
         return carte;
     }
 
-    /**
-     * Redimensionne une image depuis un chemin.
-     */
     public static Image redimensionnerImage(String chemin, int w, int h) {
         try {
-            BufferedImage orig = ImageIO.read(new File(chemin));
+            if (chemin == null || chemin.isEmpty()) {
+                throw new IOException("Chemin vide");
+            }
+
+            BufferedImage orig;
+            if (chemin.startsWith("http")) {
+                orig = ImageIO.read(new URL(chemin));
+            } else {
+                orig = ImageIO.read(new File(chemin));
+            }
+
+            if (orig == null) {
+                throw new IOException("Image introuvable ou invalide");
+            }
+
             BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = resized.createGraphics();
-            g2d.setRenderingHint(
-                    RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR
-            );
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2d.drawImage(orig, 0, 0, w, h, null);
             g2d.dispose();
             return resized;
+
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+            System.out.println("Erreur chargement image : " + chemin);
+            return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         }
     }
 
-    /**
-     * Crée un bouton stylisé pastel.
-     */
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -200,6 +216,7 @@ public class AcheteurPanel extends JPanel {
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 btn.setBackground(new Color(244, 143, 177));
             }
+
             public void mouseExited(java.awt.event.MouseEvent e) {
                 btn.setBackground(new Color(248, 187, 208));
             }
@@ -207,7 +224,6 @@ public class AcheteurPanel extends JPanel {
         return btn;
     }
 
-    // Getters pour tests ou utilisation extérieure
-    public JButton getRefreshButton()    { return refreshBtn; }
+    public JButton getRefreshButton() { return refreshBtn; }
     public JButton getViewPanierButton() { return viewPanierBtn; }
 }

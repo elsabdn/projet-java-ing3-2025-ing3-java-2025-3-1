@@ -8,7 +8,7 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * Boîte de dialogue pour modifier un produit, incluant sa description.
+ * Boîte de dialogue pour modifier un produit, incluant sa description et les promotions en gros.
  */
 public class ModifierProduitDialog extends JDialog {
     private boolean confirme = false;
@@ -17,47 +17,46 @@ public class ModifierProduitDialog extends JDialog {
     private JTextField champPrix;
     private JTextField champStock;
     private JTextField champMarque;
-    private JLabel     etiquetteImage;
-    private JTextArea  champDescription;
-    private String     cheminImage;
+    private JLabel etiquetteImage;
+    private JTextArea champDescription;
+    private String cheminImage;
+
+    // Champs ajoutés
+    private JCheckBox promoEnGrosCheckBox;
+    private JTextField seuilGrosField;
+    private JTextField prixGrosField;
 
     public ModifierProduitDialog(JFrame proprietaire, Produit p) {
         super(proprietaire, "Modifier un produit", true);
         setLayout(new BorderLayout(10,10));
-        setSize(450, 480);
+        setSize(450, 620);
         setLocationRelativeTo(proprietaire);
 
-        // ─── Corps du formulaire ──────────────────────────────────────
         JPanel panneauForm = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0;
 
-        // Nom
         panneauForm.add(new JLabel("Nom :"), gbc);
         champNom = new JTextField(p.getNom());
         gbc.gridx = 1; panneauForm.add(champNom, gbc);
 
-        // Prix
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Prix (€) :"), gbc);
         champPrix = new JTextField(String.valueOf(p.getPrix()));
         gbc.gridx = 1; panneauForm.add(champPrix, gbc);
 
-        // Stock
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Stock :"), gbc);
         champStock = new JTextField(String.valueOf(p.getQuantite()));
         gbc.gridx = 1; panneauForm.add(champStock, gbc);
 
-        // Marque
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Marque :"), gbc);
         champMarque = new JTextField(p.getMarque());
         gbc.gridx = 1; panneauForm.add(champMarque, gbc);
 
-        // Image
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Image :"), gbc);
         JPanel panneauImage = new JPanel(new FlowLayout(FlowLayout.LEFT,0,0));
@@ -92,17 +91,49 @@ public class ModifierProduitDialog extends JDialog {
         scrollDesc.setPreferredSize(new Dimension(250, 100));
         gbc.gridx = 1; panneauForm.add(scrollDesc, gbc);
 
+        // Promo en gros
+        gbc.gridx = 0; gbc.gridy++;
+        panneauForm.add(new JLabel("Promo en gros ?"), gbc);
+        gbc.gridx = 1;
+        promoEnGrosCheckBox = new JCheckBox();
+        promoEnGrosCheckBox.setSelected(p.isPromoEnGros());
+        panneauForm.add(promoEnGrosCheckBox, gbc);
+
+        // Seuil
+        gbc.gridx = 0; gbc.gridy++;
+        panneauForm.add(new JLabel("Seuil (quantité) :"), gbc);
+        gbc.gridx = 1;
+        seuilGrosField = new JTextField(String.valueOf(p.getSeuilGros()));
+        panneauForm.add(seuilGrosField, gbc);
+
+        // Prix de gros
+        gbc.gridx = 0; gbc.gridy++;
+        panneauForm.add(new JLabel("Prix de gros (€) :"), gbc);
+        gbc.gridx = 1;
+        prixGrosField = new JTextField(String.valueOf(p.getPrixGros()));
+        panneauForm.add(prixGrosField, gbc);
+
         add(panneauForm, BorderLayout.CENTER);
 
-        // ─── Boutons Valider / Annuler ────────────────────────────────
+        // Boutons
         JPanel panneauActions = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JButton btnValider = new JButton("Valider");
         JButton btnAnnuler = new JButton("Annuler");
 
         btnValider.addActionListener(e -> {
-            confirme = true;
-            setVisible(false);
+            try {
+                // Validation champs promo
+                p.setPromoEnGros(promoEnGrosCheckBox.isSelected());
+                p.setSeuilGros(Integer.parseInt(seuilGrosField.getText().trim()));
+                p.setPrixGros(Double.parseDouble(prixGrosField.getText().trim()));
+
+                confirme = true;
+                setVisible(false);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Seuil ou prix de gros invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
         });
+
         btnAnnuler.addActionListener(e -> setVisible(false));
 
         panneauActions.add(btnValider);
@@ -110,7 +141,6 @@ public class ModifierProduitDialog extends JDialog {
         add(panneauActions, BorderLayout.SOUTH);
     }
 
-    /** Retourne vrai si l’utilisateur a validé le formulaire */
     public boolean isConfirme() {
         return confirme;
     }
@@ -131,7 +161,6 @@ public class ModifierProduitDialog extends JDialog {
         return champMarque.getText().trim();
     }
 
-    /** Chemin de la nouvelle image, ou null si non modifié */
     public String getCheminImageModifie() {
         return cheminImage;
     }
