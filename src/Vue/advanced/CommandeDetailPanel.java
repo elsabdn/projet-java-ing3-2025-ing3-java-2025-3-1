@@ -161,7 +161,7 @@ public class CommandeDetailPanel extends JPanel {
         return card;
     }
 
-    private Image redimensionnerImage(String chemin, int w, int h) {
+    static Image redimensionnerImage(String chemin, int w, int h) {
         if (chemin == null || chemin.isBlank()) return null;
         try {
             BufferedImage orig = ImageIO.read(new File(chemin));

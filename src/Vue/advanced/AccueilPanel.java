@@ -99,6 +99,28 @@ public class AccueilPanel extends JPanel {
         }
 
         add(card);
+
+        // Dans le constructeur ou initUI() d'AccueilPanel(MainFrame mainFrame, Acheteur?):
+        acheteurBtn.addActionListener(e -> {
+            InscriptionPanel p = new InscriptionPanel(
+                    mainFrame,
+                    mainFrame.getAuthController(),
+                    InscriptionPanel.TypeUtilisateur.ACHETEUR
+            );
+            mainFrame.addPanel(p, "inscriptionAcheteur");
+            mainFrame.showPanel("inscriptionAcheteur");
+        });
+
+        vendeurBtn.addActionListener(e -> {
+            InscriptionPanel p = new InscriptionPanel(
+                    mainFrame,
+                    mainFrame.getAuthController(),
+                    InscriptionPanel.TypeUtilisateur.VENDEUR
+            );
+            mainFrame.addPanel(p, "inscriptionVendeur");
+            mainFrame.showPanel("inscriptionVendeur");
+        });
+
     }
 
     @Override
