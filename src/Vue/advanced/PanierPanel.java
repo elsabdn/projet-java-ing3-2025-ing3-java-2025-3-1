@@ -2,6 +2,12 @@ package Vue.advanced;
 
 import Modele.Produit;
 import Controller.ProduitController;
+import Vue.advanced.PaiementPanel;
+import DAO.CommandeDAO;
+import Modele.Acheteur;
+
+
+
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -137,21 +143,38 @@ public class PanierPanel extends JPanel {
         btnRetour.addActionListener(e -> mainFrame.showPanel("acheteur"));
 
         btnValider.addActionListener(e -> {
-            // Calcul du total
             double totalPrix = panier.stream()
                     .mapToDouble(Produit::getPrix)
                     .sum();
-            // Instanciation du panneau de paiement
-            PaiementPanel paiement = new PaiementPanel(totalPrix);
-            // Action "Annuler" : retour au panier
-            paiement.setCancelAction(evt -> mainFrame.showPanel("panier"));
-            // Action "Confirmer le paiement" : par exemple retour à l'accueil
-            paiement.setConfirmPaymentAction(evt -> mainFrame.showPanel("accueil"));
 
-            // On ajoute et on affiche ce nouveau panneau
+            PaiementPanel paiement = new PaiementPanel(totalPrix);
+
+            paiement.setCancelAction(evt -> mainFrame.showPanel("panier"));
+
+            paiement.setConfirmPaymentAction(evt -> {
+                int note = paiement.getNote();
+                if (note < 1 || note > 10) {
+                    JOptionPane.showMessageDialog(mainFrame, "Merci de saisir une note entre 1 et 10.");
+                    return;
+                }
+
+                Acheteur acheteur = mainFrame.getAcheteurConnecte();
+                if (acheteur == null) {
+                    JOptionPane.showMessageDialog(mainFrame, "Erreur : aucun utilisateur connecté.");
+                    return;
+                }
+
+                CommandeDAO dao = new CommandeDAO();
+                dao.enregistrerCommande(panier, note, acheteur);
+
+                JOptionPane.showMessageDialog(mainFrame, "Commande enregistrée avec la note : " + note);
+                mainFrame.showPanel("accueil");
+            });
+
             mainFrame.addPanel(paiement, "paiement");
             mainFrame.showPanel("paiement");
         });
+
 
         resume.add(lblResume);
         resume.add(Box.createVerticalStrut(10));
@@ -175,12 +198,22 @@ public class PanierPanel extends JPanel {
         carte.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
 
         // Image
+        // Image
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
-            Image img = redimensionnerImage(produit.getImagePath(),100,100);
-            JLabel imgLbl = new JLabel(new ImageIcon(img));
-            imgLbl.setBorder(new EmptyBorder(10,10,0,10));
-            carte.add(imgLbl, BorderLayout.WEST);
+            Image img = redimensionnerImage(produit.getImagePath(), 100, 100);
+            if (img != null) {
+                JLabel imgLbl = new JLabel(new ImageIcon(img));
+                imgLbl.setBorder(new EmptyBorder(10, 10, 0, 10));
+                carte.add(imgLbl, BorderLayout.WEST);
+            } else {
+                JLabel imgLbl = new JLabel("Image indisponible");
+                imgLbl.setPreferredSize(new Dimension(100, 100));
+                imgLbl.setHorizontalAlignment(SwingConstants.CENTER);
+                imgLbl.setBorder(new EmptyBorder(10, 10, 0, 10));
+                carte.add(imgLbl, BorderLayout.WEST);
+            }
         }
+
 
         // Infos + quantité
         JPanel infos = new JPanel();
@@ -252,19 +285,27 @@ public class PanierPanel extends JPanel {
         return btn;
     }
 
-    private static Image redimensionnerImage(String path,int w,int h){
-        try{
-            BufferedImage orig = ImageIO.read(new File(path));
-            BufferedImage resized = new BufferedImage(w,h,BufferedImage.TYPE_INT_ARGB);
+    private static Image redimensionnerImage(String path, int w, int h) {
+        try {
+            File imageFile = new File(path);
+            if (!imageFile.exists()) {
+                System.err.println("Image non trouvée : " + path);
+                return null;
+            }
+
+            BufferedImage orig = ImageIO.read(imageFile);
+            BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = resized.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g2.drawImage(orig,0,0,w,h,null);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.drawImage(orig, 0, 0, w, h, null);
             g2.dispose();
             return resized;
-        }catch(IOException ex){
+
+        } catch (IOException ex) {
+            System.err.println("Erreur chargement image : " + path);
             ex.printStackTrace();
             return null;
         }
     }
+
 }

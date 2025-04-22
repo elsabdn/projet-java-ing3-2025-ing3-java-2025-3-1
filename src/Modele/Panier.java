@@ -56,10 +56,20 @@ public class Panier {
     public double getPrixTot() {
         double total = 0.0;
         for (Item item : items) {
-            total += item.getProduit().getPrix() * item.getQuantite();
+            Produit p = item.getProduit();
+            int qte = item.getQuantite();
+
+            if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                int nbLots = qte / p.getSeuilGros();
+                int reste = qte % p.getSeuilGros();
+                total += nbLots * p.getPrixGros() + reste * p.getPrix();
+            } else {
+                total += qte * p.getPrix();
+            }
         }
         return total;
     }
+
 
     @Override
     public String toString() {

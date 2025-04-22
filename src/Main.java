@@ -44,6 +44,7 @@ public class Main {
                 JOptionPane.showMessageDialog(mainFrame, "Compte acheteur créé !");
             });
 
+
             accueilPanel.setVendeurAction(e -> {
                 String email = JOptionPane.showInputDialog(mainFrame, "Email :");
                 String mdp   = JOptionPane.showInputDialog(mainFrame, "Mot de passe :");
@@ -65,6 +66,8 @@ public class Main {
 
                 // --- Si c'est un acheteur ---
                 if (u instanceof Acheteur acheteur) {
+                    mainFrame.setAcheteurConnecte(acheteur); // ✅ ajoute cette ligne
+
                     List<Produit> produits = db.getProduits();
                     AcheteurPanel ap = new AcheteurPanel(mainFrame, produits);
                     mainFrame.addPanel(ap, "acheteur");
@@ -73,11 +76,9 @@ public class Main {
                             ap.updateProduitList(db.getProduits())
                     );
 
-
                     mainFrame.showPanel("acheteur");
-
-                    // --- Si c'est un vendeur ---
-                } else if (u instanceof Vendeur vendeur) {
+                }
+                else if (u instanceof Vendeur vendeur) {
                     VendeurPanel vp = new VendeurPanel(vendeur, mainFrame);
                     mainFrame.addPanel(vp, "vendeur");
 

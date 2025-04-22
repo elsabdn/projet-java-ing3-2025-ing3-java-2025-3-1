@@ -11,6 +11,7 @@ public class PaiementPanel extends JPanel {
     private JTextField cardNameField;
     private JTextField expiryDateField;
     private JTextField cvvField;
+    private JTextField noteField;
     private JButton confirmPaymentBtn;
     private JButton cancelBtn;
     private JLabel totalAmountLabel;
@@ -40,7 +41,7 @@ public class PaiementPanel extends JPanel {
                 g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
             }
         };
-        card.setPreferredSize(new Dimension(500, 480));
+        card.setPreferredSize(new Dimension(500, 520));
         card.setOpaque(false);
         card.setLayout(new GridBagLayout());
         card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -99,16 +100,23 @@ public class PaiementPanel extends JPanel {
         cvvField = new JTextField(3);
         card.add(cvvField, gbc);
 
+        // Champ note
+        gbc.gridx = 0; gbc.gridy++;
+        card.add(new JLabel("Note sur 10 :"), gbc);
+        gbc.gridx = 1;
+        noteField = new JTextField(2);
+        card.add(noteField, gbc);
+
         // Boutons
         gbc.gridy++;
         gbc.gridx = 0;
         cancelBtn = createStyledButton("Annuler");
-        cancelBtn.setBackground(new Color(239, 154, 154)); // Rouge plus clair
+        cancelBtn.setBackground(new Color(239, 154, 154));
         card.add(cancelBtn, gbc);
 
         gbc.gridx = 1;
         confirmPaymentBtn = createStyledButton("Confirmer le paiement");
-        confirmPaymentBtn.setBackground(new Color(129, 199, 132)); // Vert clair
+        confirmPaymentBtn.setBackground(new Color(129, 199, 132));
         card.add(confirmPaymentBtn, gbc);
 
         add(card);
@@ -118,8 +126,8 @@ public class PaiementPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
-        Color color1 = new Color(253, 243, 247); // #fdf3f7
-        Color color2 = new Color(252, 228, 236); // #fce4ec
+        Color color1 = new Color(253, 243, 247);
+        Color color2 = new Color(252, 228, 236);
         GradientPaint gp = new GradientPaint(0, 0, color1, 0, getHeight(), color2);
         g2d.setPaint(gp);
         g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -139,6 +147,7 @@ public class PaiementPanel extends JPanel {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(button.getBackground().darker());
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 button.setBackground(button.getBackground().brighter());
             }
@@ -153,5 +162,13 @@ public class PaiementPanel extends JPanel {
 
     public void setCancelAction(ActionListener l) {
         cancelBtn.addActionListener(l);
+    }
+
+    public int getNote() {
+        try {
+            return Integer.parseInt(noteField.getText().trim());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 }

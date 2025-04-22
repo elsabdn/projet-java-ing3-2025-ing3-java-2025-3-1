@@ -5,7 +5,8 @@ import Modele.Produit;
 import Modele.Utilisateur;
 import Modele.Vendeur;
 import Controller.AuthController;
-import Controller.ProduitController;      // pour récupérer la liste
+import Controller.ProduitController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -14,6 +15,7 @@ public class MainFrame extends JFrame {
     private CardLayout cardLayout;
     private JPanel container;
     private AuthController authController;
+    private Acheteur acheteurConnecte; // ✅ Pour mémoriser l'utilisateur connecté
 
     public MainFrame() {
         setTitle("🛒 Shopping App");
@@ -21,7 +23,6 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // --- 1) AuthController + CardLayout + container ---
         authController = new AuthController();
 
         cardLayout = new CardLayout();
@@ -41,10 +42,10 @@ public class MainFrame extends JFrame {
         container.setOpaque(false);
         setContentPane(container);
 
-        // --- 2) Création et enregistrement de l’AccueilPanel ---
+        // --- Page d'accueil ---
         AccueilPanel accueil = new AccueilPanel();
 
-        // 2.1) Se connecter
+        // --- Connexion utilisateur ---
         accueil.setLoginAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
@@ -59,9 +60,8 @@ public class MainFrame extends JFrame {
                 VendeurPanel vp = new VendeurPanel((Vendeur) u, this);
                 addPanel(vp, "vendeur");
                 showPanel("vendeur");
-
-            } else { // Acheteur connecté
-                // On récupère la liste des produits
+            } else {
+                setAcheteurConnecte((Acheteur) u); // ✅ Stockage de l'acheteur connecté
                 List<Produit> produits = new ProduitController().getAllProduits();
                 AcheteurPanel ap = new AcheteurPanel(this, produits);
                 addPanel(ap, "acheteur");
@@ -69,32 +69,29 @@ public class MainFrame extends JFrame {
             }
         });
 
-        // 2.2) Nouvelle inscription Acheteur
+        // --- Inscription acheteur ---
         accueil.setAcheteurAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Acheteur a   = authController.registerAcheteur(email, mdp);
-
+            setAcheteurConnecte(a); // ✅ Stockage après inscription
             List<Produit> produits = new ProduitController().getAllProduits();
             AcheteurPanel ap = new AcheteurPanel(this, produits);
             addPanel(ap, "acheteur");
             showPanel("acheteur");
         });
 
-        // 2.3) Nouvelle inscription Vendeur
+        // --- Inscription vendeur ---
         accueil.setVendeurAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Vendeur v    = authController.registerVendeur(email, mdp);
-
             VendeurPanel vp = new VendeurPanel(v, this);
             addPanel(vp, "vendeur");
             showPanel("vendeur");
         });
 
         addPanel(accueil, "accueil");
-
-        // --- 3) Affichage initial ---
         showPanel("accueil");
         setVisible(true);
     }
@@ -105,14 +102,21 @@ public class MainFrame extends JFrame {
         showPanel("panier");
     }
 
-
-    /** Ajoute un JPanel au CardLayout sous l’identifiant name */
     public void addPanel(JPanel panel, String name) {
         container.add(panel, name);
     }
 
-    /** Affiche le panneau enregistré sous l’identifiant name */
     public void showPanel(String name) {
         cardLayout.show(container, name);
     }
+
+    // ✅ Getter et setter pour l'acheteur connecté
+    public Acheteur getAcheteurConnecte() {
+        return acheteurConnecte;
+    }
+
+    public void setAcheteurConnecte(Acheteur acheteurConnecte) {
+        this.acheteurConnecte = acheteurConnecte;
+    }
+
 }

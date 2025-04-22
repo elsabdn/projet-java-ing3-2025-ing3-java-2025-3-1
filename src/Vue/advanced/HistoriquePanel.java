@@ -19,23 +19,37 @@ public class HistoriquePanel extends JPanel {
 
         setLayout(new BorderLayout());
 
-        JLabel titre = new JLabel("Historique de vos commandes", SwingConstants.CENTER);
+        JLabel titre = new JLabel("📜 Historique de vos commandes", SwingConstants.CENTER);
         titre.setFont(new Font("Arial", Font.BOLD, 18));
         add(titre, BorderLayout.NORTH);
 
         List<Commande> commandes = commandeDAO.getCommandesByUtilisateurId(acheteur.getId());
         DefaultListModel<String> model = new DefaultListModel<>();
 
-        for (Commande c : commandes) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Commande #").append(c.getId()).append(" - Total : ").append(c.getMontant()).append("€\n");
-            for (Panier.Item item : c.getItems()) {
-                sb.append("• ").append(item.getProduit().getNom())
-                        .append(" x").append(item.getQuantite())
-                        .append(" @ ").append(item.getProduit().getPrix()).append("€\n");
+        if (commandes.isEmpty()) {
+            model.addElement("🛑 Vous n’avez rien commandé encore… Qu’attendez-vous ?");
+        } else {
+            for (Commande c : commandes) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("🧾 Commande #").append(c.getId())
+                        .append(" - Total : ").append(String.format("%.2f", c.getMontant())).append("€");
+
+                // Affichage de la note si elle existe
+                if (c.getNote() > 0) {
+                    sb.append(" - Note : ").append(c.getNote()).append("/10");
+                }
+
+                sb.append("\n");
+
+                for (Panier.Item item : c.getItems()) {
+                    sb.append("   • ").append(item.getProduit().getNom())
+                            .append(" x").append(item.getQuantite())
+                            .append(" @ ").append(String.format("%.2f", item.getProduit().getPrix())).append("€\n");
+                }
+
+                sb.append("\n");
+                model.addElement(sb.toString());
             }
-            sb.append("\n");
-            model.addElement(sb.toString());
         }
 
         JList<String> listeCommandes = new JList<>(model);
@@ -43,12 +57,15 @@ public class HistoriquePanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(listeCommandes);
         add(scrollPane, BorderLayout.CENTER);
 
-        JButton retour = new JButton("Retour");
+        JButton retour = new JButton("⬅️ Retour");
+        retour.setFont(new Font("SansSerif", Font.PLAIN, 14));
         retour.addActionListener(e -> {
-            JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            topFrame.setContentPane(new AccueilPanel(acheteur));
-            topFrame.revalidate();
+            MainFrame mainFrame = (MainFrame) SwingUtilities.getWindowAncestor(this);
+            mainFrame.showPanel("acheteur");
         });
-        add(retour, BorderLayout.SOUTH);
+        JPanel btnPanel = new JPanel();
+        btnPanel.setBackground(new Color(255, 255, 255, 0));
+        btnPanel.add(retour);
+        add(btnPanel, BorderLayout.SOUTH);
     }
 }
