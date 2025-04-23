@@ -43,7 +43,7 @@ public class MainFrame extends JFrame {
         setContentPane(container);
 
         // --- Page d'accueil ---
-        AccueilPanel accueil = new AccueilPanel();
+        AccueilPanel accueil = new AccueilPanel(this);
 
         // --- Connexion utilisateur ---
         accueil.setLoginAction(e -> {
@@ -110,6 +110,22 @@ public class MainFrame extends JFrame {
         cardLayout.show(container, name);
     }
 
+    public void showAcheteurHome() {
+        Acheteur a = getAcheteurConnecte();
+        List<Produit> produits = new ProduitController().getAllProduits();
+        AcheteurPanel ap = new AcheteurPanel(this, produits);
+        addPanel(ap, "acheteur");
+        showPanel("acheteur");
+    }
+
+    /** Affiche l’accueil Vendeur une fois connecté/inscrit */
+    public void showVendeurHome(Vendeur v) {
+        VendeurPanel vp = new VendeurPanel(v, this);
+        addPanel(vp, "vendeur");
+        showPanel("vendeur");
+    }
+
+
     // ✅ Getter et setter pour l'acheteur connecté
     public Acheteur getAcheteurConnecte() {
         return acheteurConnecte;
@@ -117,6 +133,10 @@ public class MainFrame extends JFrame {
 
     public void setAcheteurConnecte(Acheteur acheteurConnecte) {
         this.acheteurConnecte = acheteurConnecte;
+    }
+
+    public AuthController getAuthController() {
+        return authController;
     }
 
 }

@@ -8,7 +8,8 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * Boîte de dialogue pour modifier un produit, incluant sa description et les promotions en gros.
+ * Boîte de dialogue pour modifier un produit, incluant sa description et les promotions en gros,
+ * avec des boutons stylés en rose pastel.
  */
 public class ModifierProduitDialog extends JDialog {
     private boolean confirme = false;
@@ -21,7 +22,7 @@ public class ModifierProduitDialog extends JDialog {
     private JTextArea champDescription;
     private String cheminImage;
 
-    // Champs ajoutés
+    // Champs promo en gros
     private JCheckBox promoEnGrosCheckBox;
     private JTextField seuilGrosField;
     private JTextField prixGrosField;
@@ -32,38 +33,45 @@ public class ModifierProduitDialog extends JDialog {
         setSize(450, 620);
         setLocationRelativeTo(proprietaire);
 
+        // ===== FORMULAIRE =====
         JPanel panneauForm = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0;
 
+        // Nom
         panneauForm.add(new JLabel("Nom :"), gbc);
         champNom = new JTextField(p.getNom());
         gbc.gridx = 1; panneauForm.add(champNom, gbc);
 
+        // Prix
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Prix (€) :"), gbc);
         champPrix = new JTextField(String.valueOf(p.getPrix()));
         gbc.gridx = 1; panneauForm.add(champPrix, gbc);
 
+        // Stock
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Stock :"), gbc);
         champStock = new JTextField(String.valueOf(p.getQuantite()));
         gbc.gridx = 1; panneauForm.add(champStock, gbc);
 
+        // Marque
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Marque :"), gbc);
         champMarque = new JTextField(p.getMarque());
         gbc.gridx = 1; panneauForm.add(champMarque, gbc);
 
+        // Image
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Image :"), gbc);
         JPanel panneauImage = new JPanel(new FlowLayout(FlowLayout.LEFT,0,0));
         etiquetteImage = new JLabel(
                 p.getImagePath() != null ? new File(p.getImagePath()).getName() : "Aucune"
         );
-        JButton choisirImage = new JButton("Choisir...");
+        JButton choisirImage = createStyledButton("Choisir…");
+        choisirImage.setFont(choisirImage.getFont().deriveFont(Font.PLAIN, 12f));
         choisirImage.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setDialogTitle("Sélectionner une image");
@@ -99,30 +107,28 @@ public class ModifierProduitDialog extends JDialog {
         promoEnGrosCheckBox.setSelected(p.isPromoEnGros());
         panneauForm.add(promoEnGrosCheckBox, gbc);
 
-        // Seuil
+        // Seuil gros
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Seuil (quantité) :"), gbc);
-        gbc.gridx = 1;
         seuilGrosField = new JTextField(String.valueOf(p.getSeuilGros()));
-        panneauForm.add(seuilGrosField, gbc);
+        gbc.gridx = 1; panneauForm.add(seuilGrosField, gbc);
 
-        // Prix de gros
+        // Prix gros
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Prix de gros (€) :"), gbc);
-        gbc.gridx = 1;
         prixGrosField = new JTextField(String.valueOf(p.getPrixGros()));
-        panneauForm.add(prixGrosField, gbc);
+        gbc.gridx = 1; panneauForm.add(prixGrosField, gbc);
 
         add(panneauForm, BorderLayout.CENTER);
 
-        // Boutons
+        // ===== BOUTONS =====
         JPanel panneauActions = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton btnValider = new JButton("Valider");
-        JButton btnAnnuler = new JButton("Annuler");
+        JButton btnValider = createStyledButton("Valider");
+        JButton btnAnnuler = createStyledButton("Annuler");
 
         btnValider.addActionListener(e -> {
             try {
-                // Validation champs promo
+                // Validation des champs numériques
                 p.setPromoEnGros(promoEnGrosCheckBox.isSelected());
                 p.setSeuilGros(Integer.parseInt(seuilGrosField.getText().trim()));
                 p.setPrixGros(Double.parseDouble(prixGrosField.getText().trim()));
@@ -130,10 +136,13 @@ public class ModifierProduitDialog extends JDialog {
                 confirme = true;
                 setVisible(false);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Seuil ou prix de gros invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Seuil ou prix de gros invalide",
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE
+                );
             }
         });
-
         btnAnnuler.addActionListener(e -> setVisible(false));
 
         panneauActions.add(btnValider);
@@ -141,31 +150,32 @@ public class ModifierProduitDialog extends JDialog {
         add(panneauActions, BorderLayout.SOUTH);
     }
 
-    public boolean isConfirme() {
-        return confirme;
+    /** Style pastel rose pour les boutons */
+    private JButton createStyledButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setBackground(new Color(248, 187, 208));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(244, 143, 177));
+            }
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(248, 187, 208));
+            }
+        });
+        return btn;
     }
 
-    public String getNomModifie() {
-        return champNom.getText().trim();
-    }
-
-    public double getPrixModifie() {
-        return Double.parseDouble(champPrix.getText().trim());
-    }
-
-    public int getStockModifie() {
-        return Integer.parseInt(champStock.getText().trim());
-    }
-
-    public String getMarqueModifiee() {
-        return champMarque.getText().trim();
-    }
-
-    public String getCheminImageModifie() {
-        return cheminImage;
-    }
-
-    public String getDescriptionModifie() {
-        return champDescription.getText().trim();
-    }
+    // ===== GETTERS =====
+    public boolean isConfirme()           { return confirme; }
+    public String  getNomModifie()        { return champNom.getText().trim(); }
+    public double  getPrixModifie()       { return Double.parseDouble(champPrix.getText().trim()); }
+    public int     getStockModifie()      { return Integer.parseInt(champStock.getText().trim()); }
+    public String  getMarqueModifiee()    { return champMarque.getText().trim(); }
+    public String  getCheminImageModifie(){ return cheminImage; }
+    public String  getDescriptionModifie(){ return champDescription.getText().trim(); }
 }
