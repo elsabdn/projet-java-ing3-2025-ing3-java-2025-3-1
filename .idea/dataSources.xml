@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="eCommerce@localhost" uuid="da363301-d683-4b55-86dc-c6e14661d558">
+    <data-source source="LOCAL" name="ecommerce@localhost" uuid="d8abc8a2-c3e1-49be-b645-66a92007ad06">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/eCommerce</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/ecommerce</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

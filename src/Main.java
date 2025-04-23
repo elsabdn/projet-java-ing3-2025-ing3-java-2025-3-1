@@ -27,7 +27,7 @@ public class Main {
 
             // ─── Panneaux de base : accueil et connexion ─────────────────────
             AccueilPanel   accueilPanel   = new AccueilPanel(mainFrame);
-            ConnexionLabel connexionLabel = new ConnexionLabel();
+            ConnexionLabel connexionLabel = new ConnexionLabel(); //test
 
             mainFrame.addPanel(accueilPanel,   "accueil");
             mainFrame.addPanel(connexionLabel, "connexion");
