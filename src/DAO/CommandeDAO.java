@@ -170,7 +170,15 @@ public class CommandeDAO {
                     double prixUnitaire = produits.stream()
                             .filter(p -> p.getId() == e.getKey())
                             .findFirst()
-                            .map(Produit::getPrix)
+                            //.map(Produit::getPrix)
+                            .map(p -> {
+                                int qte = quantites.get(p.getId());
+                                if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                                    return p.getPrixGros();
+                                } else {
+                                    return p.getPrix();
+                                }
+                            })
                             .orElse(0.0);
                     psIt.setDouble(4, prixUnitaire);
                     psIt.addBatch();
