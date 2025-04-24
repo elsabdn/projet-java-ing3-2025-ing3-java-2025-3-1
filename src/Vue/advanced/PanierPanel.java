@@ -13,6 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,9 +146,29 @@ public class PanierPanel extends JPanel {
 
         // Validation de commande
         btnValider.addActionListener(e -> {
+
+            /*
             double totalPrix = panier.stream()
                     .mapToDouble(Produit::getPrix)
                     .sum();
+
+             */
+            //// Modifications pour le prix de gros ////
+
+            Map<Integer, Integer> quantites = new HashMap<>();
+            for (Produit p : panier) {
+                quantites.merge(p.getId(), 1, Integer::sum);
+            }
+
+            double totalPrix = 0;
+            for (Map.Entry<Integer, Integer> entry : quantites.entrySet()) {
+                Produit p = panier.stream().filter(prod -> prod.getId() == entry.getKey()).findFirst().get();
+                int qte = entry.getValue();
+                double prixUnitaire = (p.isPromoEnGros() && qte >= p.getSeuilGros()) ? p.getPrixGros() : p.getPrix();
+                totalPrix += prixUnitaire * qte;
+            }
+            ////
+
 
             PaiementPanel paiement = new PaiementPanel(totalPrix);
 
