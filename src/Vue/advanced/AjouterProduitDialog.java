@@ -16,7 +16,8 @@ public class AjouterProduitDialog extends JDialog {
     private JTextArea   descArea;
     private JLabel      imgLabel;
     private String      cheminImage;// Chemin de l’image sélectionnée
-
+    private JCheckBox promoEnGrosCheck;
+    private JTextField seuilGrosField, prixGrosField;
     /**
      * Constructeur : initialise et affiche tous les composants graphiques du formulaire.
      */
@@ -89,6 +90,17 @@ public class AjouterProduitDialog extends JDialog {
         imgPane.add(choose);
         gbc.gridx = 1; form.add(imgPane, gbc);
 
+        // Promo en gros
+        gbc.gridy++; gbc.gridx=0; form.add(new JLabel("Promo en gros ?"),gbc);
+        promoEnGrosCheck = new JCheckBox(); gbc.gridx=1; form.add(promoEnGrosCheck,gbc);
+        // Seuil gros
+        gbc.gridy++; gbc.gridx=0; form.add(new JLabel("Seuil (qté) :"),gbc);
+        seuilGrosField = new JTextField(); gbc.gridx=1; form.add(seuilGrosField,gbc);
+        // Prix gros
+        gbc.gridy++; gbc.gridx=0; form.add(new JLabel("Prix de gros (€) :"),gbc);
+        prixGrosField = new JTextField(); gbc.gridx=1; form.add(prixGrosField,gbc);
+
+
         add(form, BorderLayout.CENTER);
 
         // ===== Boutons Valider / Annuler =====
@@ -147,4 +159,7 @@ public class AjouterProduitDialog extends JDialog {
     public int     getQuantite()     { return Integer.parseInt(qteField.getText().trim()); }
     public String  getDescription()  { return descArea.getText().trim(); }
     public String  getCheminImage()  { return cheminImage; }
+    public boolean isPromoEnGros() { return promoEnGrosCheck.isSelected(); }
+    public int getSeuilGros() { return Integer.parseInt(seuilGrosField.getText().trim()); }
+    public double getPrixGros() { return Double.parseDouble(prixGrosField.getText().trim()); }
 }

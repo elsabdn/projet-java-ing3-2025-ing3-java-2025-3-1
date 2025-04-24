@@ -44,8 +44,8 @@ public class AcheteurPanel extends JPanel {
         setOpaque(false);
 
         // ─── Header + Search ─────────────────────────────────────
-        JPanel header       = buildHeader();
-        JPanel searchPanel  = buildSearchPanel();
+        JPanel header      = buildHeader();
+        JPanel searchPanel = buildSearchPanel();
 
         JPanel topContainer = new JPanel();
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
@@ -67,8 +67,8 @@ public class AcheteurPanel extends JPanel {
         add(scroll, BorderLayout.CENTER);
 
         // ─── Bas de page : boutons ────────────────────────────────
-        refreshBtn     = createStyledButton("🔄 Rafraîchir");
-        viewPanierBtn  = createStyledButton("🧺 Voir le panier");
+        refreshBtn    = createStyledButton("🔄 Rafraîchir");
+        viewPanierBtn = createStyledButton("🧺 Voir le panier");
         JButton histoBtn = createStyledButton("📜 Historique");
 
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
@@ -81,13 +81,11 @@ public class AcheteurPanel extends JPanel {
 
         // ─── Actions des boutons ──────────────────────────────────
         refreshBtn.addActionListener(e -> updateProduitList(allProduits));
-
         viewPanierBtn.addActionListener(e -> {
             PanierPanel panelPanier = new PanierPanel(mainFrame, panier);
             mainFrame.addPanel(panelPanier, "panier");
             mainFrame.showPanel("panier");
         });
-
         histoBtn.addActionListener(e -> {
             Acheteur acheteur = mainFrame.getAcheteurConnecte();
             if (acheteur == null) {
@@ -135,19 +133,17 @@ public class AcheteurPanel extends JPanel {
         header.setBackground(new Color(255, 228, 235));  // rose pastel
         header.setBorder(BorderFactory.createEmptyBorder(20, 20, 5, 20));
         header.add(leftFiller, BorderLayout.WEST);
-        header.add(titre, BorderLayout.CENTER);
+        header.add(titre,      BorderLayout.CENTER);
         header.add(logoutWrapper, BorderLayout.EAST);
 
         return header;
     }
 
     private JPanel buildSearchPanel() {
-        // wrapper gris plein largeur
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(true);
         wrapper.setBackground(new Color(245, 245, 245));
-        wrapper.setBorder(BorderFactory.createMatteBorder(
-                0, 0, 1, 0, Color.WHITE));  // ligne de séparation blanche
+        wrapper.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.WHITE));
 
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         searchPanel.setOpaque(false);
@@ -157,10 +153,9 @@ public class AcheteurPanel extends JPanel {
         filterCombo = new JComboBox<>(new String[]{"Nom", "Marque", "Prix ≤"});
         searchPanel.add(filterCombo);
 
-        // écouteurs de filtrage
         DocumentListener docL = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { filtrer(); }
-            public void removeUpdate(DocumentEvent e) { filtrer(); }
+            public void insertUpdate(DocumentEvent e)  { filtrer(); }
+            public void removeUpdate(DocumentEvent e)  { filtrer(); }
             public void changedUpdate(DocumentEvent e) { filtrer(); }
         };
         searchField.getDocument().addDocumentListener(docL);
@@ -170,9 +165,6 @@ public class AcheteurPanel extends JPanel {
         return wrapper;
     }
 
-    /**
-     * Filtre allProduits selon le texte et critère sélectionné.
-     */
     private void filtrer() {
         String text = searchField.getText().trim().toLowerCase();
         String crit = (String) filterCombo.getSelectedItem();
@@ -195,9 +187,6 @@ public class AcheteurPanel extends JPanel {
         updateProduitList(filtered);
     }
 
-    /**
-     * Met à jour la grille affichée.
-     */
     public void updateProduitList(List<Produit> produits) {
         produitPanel.removeAll();
         for (Produit p : produits) {
@@ -220,7 +209,7 @@ public class AcheteurPanel extends JPanel {
 
     private JPanel creerCarteProduit(Produit p) {
         JPanel carte = new JPanel(new BorderLayout());
-        carte.setPreferredSize(new Dimension(250, 300));
+        carte.setPreferredSize(new Dimension(250, 330));
         carte.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
         carte.setBackground(Color.WHITE);
 
@@ -237,36 +226,36 @@ public class AcheteurPanel extends JPanel {
         infos.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         infos.setBackground(Color.WHITE);
 
-        JLabel lblNom = new JLabel(p.getNom());
-        lblNom.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblNom.setAlignmentX(Component.CENTER_ALIGNMENT);
-        infos.add(lblNom);
-
-        infos.add(Box.createVerticalStrut(5));
-        JLabel lblPrix = new JLabel(String.format("%.2f €", p.getPrix()));
-        lblPrix.setAlignmentX(Component.CENTER_ALIGNMENT);
-        infos.add(lblPrix);
-
-        infos.add(Box.createVerticalStrut(5));
+        JLabel lblNom    = new JLabel(p.getNom());
+        JLabel lblPrix   = new JLabel(String.format("%.2f €", p.getPrix()));
         JLabel lblMarque = new JLabel("Marque : " + p.getMarque());
-        lblMarque.setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (JLabel l : new JLabel[]{lblNom, lblPrix, lblMarque}) {
+            l.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
+        lblNom.setFont(new Font("SansSerif", Font.BOLD, 14));
+
+        infos.add(lblNom);
+        infos.add(Box.createVerticalStrut(5));
+        infos.add(lblPrix);
+        infos.add(Box.createVerticalStrut(5));
         infos.add(lblMarque);
 
-        //// Modifications pour le prix de gros ////
+        // Affichage du prix de gros si applicable
         if (p.isPromoEnGros()) {
-            JLabel lblPromo = new JLabel(String.format(" %.2f € dès %d unités", p.getPrixGros(), p.getSeuilGros())
+            infos.add(Box.createVerticalStrut(5));
+            JLabel lblPromo = new JLabel(
+                    String.format("Promo gros : %.2f € dès %d achetés", p.getPrixGros(), p.getSeuilGros())
             );
-            lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 13));
-            lblPromo.setForeground(new Color(255, 87, 34)); // orange
+            lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 12));
+            lblPromo.setForeground(new Color(255, 34, 34));
             lblPromo.setAlignmentX(Component.CENTER_ALIGNMENT);
             infos.add(lblPromo);
         }
-        ////
+
         carte.add(infos, BorderLayout.CENTER);
         return carte;
     }
 
-    /** Style pastel rose pour les boutons */
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -282,18 +271,11 @@ public class AcheteurPanel extends JPanel {
         return btn;
     }
 
-    /**
-     * Redimensionne une image à la taille souhaitée.
-     */
     public static Image redimensionnerImage(String chemin, int w, int h) {
         try {
-            if (chemin == null || chemin.isEmpty()) {
-                throw new IOException("Chemin vide");
-            }
             BufferedImage orig = chemin.startsWith("http")
                     ? ImageIO.read(new URL(chemin))
                     : ImageIO.read(new File(chemin));
-            if (orig == null) throw new IOException("Image introuvable ou invalide");
             BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = resized.createGraphics();
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
@@ -302,11 +284,11 @@ public class AcheteurPanel extends JPanel {
             g2d.dispose();
             return resized;
         } catch (IOException ex) {
-            System.err.println("Erreur chargement image : " + chemin);
             return new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         }
     }
 
-    public JButton getRefreshButton()  { return refreshBtn; }
+    // Getters utiles pour les tests ou l’intégration
+    public JButton getRefreshButton()    { return refreshBtn; }
     public JButton getViewPanierButton() { return viewPanierBtn; }
 }

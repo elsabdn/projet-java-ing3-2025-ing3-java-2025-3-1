@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Panneau de détail d’un produit unique, avec description,
- * sélection de quantité et bouton stylisé.
+ * sélection de quantité, bouton stylisé et affichage du prix de gros.
  */
 public class ProduitDetailPanel extends JPanel {
     private final JButton retourBtn;
@@ -20,7 +20,7 @@ public class ProduitDetailPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── En‑tête avec bouton Retour ──────────────────────────────────
+        // ─── En-tête avec bouton Retour ──────────────────────────────────
         retourBtn = createStyledButton("← Retour aux produits");
         retourBtn.setPreferredSize(new Dimension(160, 35));
         retourBtn.addActionListener(e -> mainFrame.showPanel("acheteur"));
@@ -34,7 +34,7 @@ public class ProduitDetailPanel extends JPanel {
         center.setOpaque(false);
         center.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Image agrandie du produit
+        // Image agrandie
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
             Image img = AcheteurPanel.redimensionnerImage(produit.getImagePath(), 300, 300);
             JLabel imgLabel = new JLabel(new ImageIcon(img));
@@ -45,7 +45,7 @@ public class ProduitDetailPanel extends JPanel {
         // Bloc infos + description
         JPanel infos = new JPanel();
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-        infos.setBackground(new Color(255, 255, 255));
+        infos.setBackground(Color.WHITE);
         infos.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200)),
                 BorderFactory.createEmptyBorder(15, 15, 15, 15)
@@ -65,7 +65,7 @@ public class ProduitDetailPanel extends JPanel {
         infos.add(lblMarque);
 
         infos.add(Box.createVerticalStrut(5));
-        // Prix
+        // Prix unitaire
         JLabel lblPrix = new JLabel(String.format("Prix : %.2f €", produit.getPrix()));
         lblPrix.setFont(new Font("SansSerif", Font.PLAIN, 16));
         lblPrix.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -77,6 +77,21 @@ public class ProduitDetailPanel extends JPanel {
         lblStock.setFont(new Font("SansSerif", Font.PLAIN, 16));
         lblStock.setAlignmentX(Component.LEFT_ALIGNMENT);
         infos.add(lblStock);
+
+        // ─── Prix de gros si applicable ─────────────────────────────────
+        if (produit.isPromoEnGros()) {
+            infos.add(Box.createVerticalStrut(10));
+            JLabel lblPromo = new JLabel(
+                    String.format("Prix de gros : %.2f € (dès %d unités)",
+                            produit.getPrixGros(),
+                            produit.getSeuilGros()
+                    )
+            );
+            lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 14));
+            lblPromo.setForeground(new Color(200, 50, 50));
+            lblPromo.setAlignmentX(Component.LEFT_ALIGNMENT);
+            infos.add(lblPromo);
+        }
 
         infos.add(Box.createVerticalStrut(15));
         // Description
@@ -93,7 +108,7 @@ public class ProduitDetailPanel extends JPanel {
         center.add(infos, BorderLayout.CENTER);
         add(center, BorderLayout.CENTER);
 
-        // ─── Sélecteur de quantité + bouton Ajouter ──────────────────────
+        // ─── Bas : quantités + bouton Ajouter ────────────────────────────
         JPanel bottomPanel = new JPanel();
         bottomPanel.setOpaque(false);
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
@@ -131,13 +146,12 @@ public class ProduitDetailPanel extends JPanel {
         ajouterPanierBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         ajouterPanierBtn.setPreferredSize(new Dimension(200, 40));
         ajouterPanierBtn.addActionListener(e -> {
-            // Ajouter 'quantite[0]' exemplaires du produit au panier
             for (int i = 0; i < quantite[0]; i++) {
                 panier.add(produit);
             }
             JOptionPane.showMessageDialog(
                     this,
-                    quantite[0] + " × « " + produit.getNom() + " » ajouté(s) au panier.",
+                    quantite[0] + " × « " + produit.getNom() + " » ajouté(s) au panier.",
                     "Ajout au panier",
                     JOptionPane.INFORMATION_MESSAGE
             );
@@ -171,8 +185,7 @@ public class ProduitDetailPanel extends JPanel {
         return btn;
     }
 
-    // Accesseurs éventuels
-    public JButton getRetourButton()        { return retourBtn; }
-    public JButton getAjouterPanierButton(){ return ajouterPanierBtn; }
+    // === Getters pour les boutons, si besoin ailleurs ===
+    public JButton getRetourButton()         { return retourBtn; }
+    public JButton getAjouterPanierButton()  { return ajouterPanierBtn; }
 }
-

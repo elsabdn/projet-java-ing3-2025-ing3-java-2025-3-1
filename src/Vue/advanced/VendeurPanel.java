@@ -143,7 +143,7 @@ public class VendeurPanel extends JPanel {
                     BorderFactory.createEmptyBorder(10,10,10,10),
                     BorderFactory.createLineBorder(new Color(220,220,220))
             ));
-            carte.setPreferredSize(new Dimension(250, 380));
+            carte.setPreferredSize(new Dimension(250, 400));
 
             // Image
             if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
@@ -178,6 +178,22 @@ public class VendeurPanel extends JPanel {
             JLabel lblMarque = new JLabel("Marque : " + p.getMarque());
             lblMarque.setAlignmentX(Component.CENTER_ALIGNMENT);
             info.add(lblMarque);
+
+            // Affiche le prix de gros si activé
+            if (p.isPromoEnGros()) {
+                JLabel lblPromo = new JLabel(
+                        String.format("Prix de gros : %.2f € dès %d unités",
+                                p.getPrixGros(),
+                                p.getSeuilGros()
+                        )
+                );
+                lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 13));
+                lblPromo.setForeground(new Color(255, 34, 34)); // couleur orange
+                lblPromo.setAlignmentX(Component.CENTER_ALIGNMENT);
+                info.add(Box.createVerticalStrut(5));
+                info.add(lblPromo);
+            }
+
 
             // ── Description tronquée à 100 caractères ──
             info.add(Box.createVerticalStrut(10));
