@@ -12,8 +12,10 @@ import java.awt.*;
  * et créer un compte Acheteur ou Vendeur.
  */
 public class InscriptionPanel extends JPanel {
+    // Enumération pour spécifier le type de compte à créer
     public enum TypeUtilisateur { ACHETEUR, VENDEUR }
 
+    // Références aux composants et contrôleurs
     private final MainFrame mainFrame;
     private final AuthController authController;
     private final TypeUtilisateur type;
@@ -22,6 +24,9 @@ public class InscriptionPanel extends JPanel {
     private final JButton btnValider;
     private final JButton btnRetour;
 
+    /**
+     * Constructeur : gère l'affichage et le comportement de l'interface
+     */
     public InscriptionPanel(MainFrame mainFrame,
                             AuthController authController,
                             TypeUtilisateur type) {
@@ -32,7 +37,7 @@ public class InscriptionPanel extends JPanel {
         setLayout(new GridBagLayout());
         setOpaque(false);
 
-        // ─── Carte blanche avec arrondis ─────────────────────────────
+        // ─── Création d'une carte blanche avec arrondis ─────────────────────────────
         JPanel card = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -52,7 +57,7 @@ public class InscriptionPanel extends JPanel {
         card.setOpaque(false);
         card.setPreferredSize(new Dimension(420, 320));
 
-        // ─── Titre ────────────────────────────────────────────────
+        // ─── Titre selon le type de compte ────────────────────────────────────────────────
         String titreTxt = type == TypeUtilisateur.ACHETEUR
                 ? "Créer un compte Acheteur"
                 : "Créer un compte Vendeur";
@@ -61,7 +66,7 @@ public class InscriptionPanel extends JPanel {
         titre.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         card.add(titre, BorderLayout.NORTH);
 
-        // ─── Formulaire ───────────────────────────────────────────
+        // ─── Formulaire email + mot de passe ───────────────────────────────────────────
         JPanel form = new JPanel(new GridBagLayout());
         form.setOpaque(false);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -88,7 +93,7 @@ public class InscriptionPanel extends JPanel {
 
         card.add(form, BorderLayout.CENTER);
 
-        // ─── Boutons ─────────────────────────────────────────────
+        // ─── Boutons valider et retour ─────────────────────────────────────────────
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         actions.setOpaque(false);
 
@@ -110,6 +115,10 @@ public class InscriptionPanel extends JPanel {
         btnRetour .addActionListener(e -> mainFrame.showPanel("accueil"));
     }
 
+    /**
+     * Action à exécuter lors du clic sur "Valider" :
+     * enregistre un nouvel utilisateur en fonction du type
+     */
     private void onValider() {
         String email = emailField.getText().trim();
         String mdp   = new String(mdpField.getPassword()).trim();
@@ -133,7 +142,9 @@ public class InscriptionPanel extends JPanel {
         }
     }
 
-    /** Copié de vos autres styles : bouton rose pastel */
+    /**
+     * Crée un bouton stylé rose pastel avec effet hover.
+     */
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("SansSerif", Font.BOLD, 14));

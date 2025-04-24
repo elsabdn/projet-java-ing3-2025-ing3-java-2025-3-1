@@ -6,22 +6,25 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * Boîte de dialogue unique pour saisir toutes les infos d’un nouveau produit,
- * avec des boutons stylés en rose.
+ * AjouterProduitDialog : boîte de dialogue permettant à un vendeur d'ajouter un nouveau produit.
+ * Ce formulaire permet de saisir le nom, la marque, le prix, la quantité, la description et l’image.
  */
 public class AjouterProduitDialog extends JDialog {
-    private boolean confirme = false;
+    private boolean confirme = false; // Vrai si l’utilisateur a cliqué sur "Ajouter"
 
     private JTextField  nomField, marqueField, prixField, qteField;
     private JTextArea   descArea;
     private JLabel      imgLabel;
-    private String      cheminImage;
+    private String      cheminImage;// Chemin de l’image sélectionnée
 
+    /**
+     * Constructeur : initialise et affiche tous les composants graphiques du formulaire.
+     */
     public AjouterProduitDialog(JFrame parent) {
         super(parent, "Ajouter un produit", true);
         setLayout(new BorderLayout(10,10));
         setSize(400, 500);
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(parent); // Centre la fenêtre
 
         // ===== Formulaire =====
         JPanel form = new JPanel(new GridBagLayout());
@@ -30,30 +33,30 @@ public class AjouterProduitDialog extends JDialog {
         gbc.fill   = GridBagConstraints.HORIZONTAL;
         gbc.gridx  = 0; gbc.gridy = 0;
 
-        // Nom
+        // Nom du produit
         form.add(new JLabel("Nom :"), gbc);
         nomField = new JTextField();
         gbc.gridx = 1; form.add(nomField, gbc);
 
-        // Marque
+        // Marque du produit
         gbc.gridy++; gbc.gridx = 0;
         form.add(new JLabel("Marque :"), gbc);
         marqueField = new JTextField();
         gbc.gridx = 1; form.add(marqueField, gbc);
 
-        // Prix
+        // Prix du produit
         gbc.gridy++; gbc.gridx = 0;
         form.add(new JLabel("Prix (€) :"), gbc);
         prixField = new JTextField();
         gbc.gridx = 1; form.add(prixField, gbc);
 
-        // Quantité
+        // Quantité en stock
         gbc.gridy++; gbc.gridx = 0;
         form.add(new JLabel("Quantité :"), gbc);
         qteField = new JTextField();
         gbc.gridx = 1; form.add(qteField, gbc);
 
-        // Description
+        // Description du produit
         gbc.gridy++; gbc.gridx = 0;
         form.add(new JLabel("Description :"), gbc);
         descArea = new JTextArea(5, 20);
@@ -62,13 +65,15 @@ public class AjouterProduitDialog extends JDialog {
         JScrollPane sp = new JScrollPane(descArea);
         gbc.gridx = 1; form.add(sp, gbc);
 
-        // Sélecteur d’image
+        // Sélecteur d’image avec label
         gbc.gridy++; gbc.gridx = 0;
         form.add(new JLabel("Image :"), gbc);
         JPanel imgPane = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         imgLabel = new JLabel("Aucune sélection");
         JButton choose = createStyledButton("Parcourir…");
         choose.setFont(choose.getFont().deriveFont(Font.PLAIN, 12f));
+
+        // Action pour ouvrir un sélecteur de fichier image
         choose.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setAcceptAllFileFilterUsed(false);
@@ -91,18 +96,20 @@ public class AjouterProduitDialog extends JDialog {
         JButton ok     = createStyledButton("Ajouter");
         JButton cancel = createStyledButton("Annuler");
 
+        // Action : validation des champs prix et quantité
         ok.addActionListener(e -> {
             // On peut ajouter ici une validation plus poussée si besoin
             try {
                 Double.parseDouble(prixField.getText().trim());
                 Integer.parseInt(qteField.getText().trim());
                 confirme = true;
-                setVisible(false);
+                setVisible(false); // Ferme la boîte de dialogue
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this,
                         "Prix ou quantité invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
+        // Action : bouton Annuler = ferme simplement la boîte
         cancel.addActionListener(e -> setVisible(false));
 
         actions.add(ok);
@@ -110,7 +117,9 @@ public class AjouterProduitDialog extends JDialog {
         add(actions, BorderLayout.SOUTH);
     }
 
-    /** Style pastel rose pour les boutons */
+    /**
+     * Crée un bouton avec style rose pastel + effet hover
+     */
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("SansSerif", Font.BOLD, 14));
@@ -130,7 +139,7 @@ public class AjouterProduitDialog extends JDialog {
         return btn;
     }
 
-    // ===== Getters =====
+    // ===== Getters publics pour récupérer les infos saisies ===
     public boolean isConfirme()      { return confirme; }
     public String  getNom()          { return nomField.getText().trim(); }
     public String  getMarque()       { return marqueField.getText().trim(); }

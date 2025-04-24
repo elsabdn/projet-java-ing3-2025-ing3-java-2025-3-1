@@ -12,8 +12,9 @@ import java.io.File;
  * avec des boutons stylés en rose pastel.
  */
 public class ModifierProduitDialog extends JDialog {
-    private boolean confirme = false;
+    private boolean confirme = false; // indique si l'utilisateur a confirmé la modification
 
+    // Champs du formulaire pour modifier les attributs du produit
     private JTextField champNom;
     private JTextField champPrix;
     private JTextField champStock;
@@ -27,25 +28,28 @@ public class ModifierProduitDialog extends JDialog {
     private JTextField seuilGrosField;
     private JTextField prixGrosField;
 
+    /**
+     * Constructeur qui pré-remplit le formulaire avec les valeurs du produit passé en paramètre.
+     */
     public ModifierProduitDialog(JFrame proprietaire, Produit p) {
         super(proprietaire, "Modifier un produit", true);
         setLayout(new BorderLayout(10,10));
         setSize(450, 620);
         setLocationRelativeTo(proprietaire);
 
-        // ===== FORMULAIRE =====
+        // ===== FORMULAIRE PRINCIPAL =====
         JPanel panneauForm = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5,5,5,5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0;
 
-        // Nom
+        // Nom du produit
         panneauForm.add(new JLabel("Nom :"), gbc);
         champNom = new JTextField(p.getNom());
         gbc.gridx = 1; panneauForm.add(champNom, gbc);
 
-        // Prix
+        // Prix du produit
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Prix (€) :"), gbc);
         champPrix = new JTextField(String.valueOf(p.getPrix()));
@@ -99,7 +103,7 @@ public class ModifierProduitDialog extends JDialog {
         scrollDesc.setPreferredSize(new Dimension(250, 100));
         gbc.gridx = 1; panneauForm.add(scrollDesc, gbc);
 
-        // Promo en gros
+        // Checkbox pour promo en gros
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Promo en gros ?"), gbc);
         gbc.gridx = 1;
@@ -107,13 +111,13 @@ public class ModifierProduitDialog extends JDialog {
         promoEnGrosCheckBox.setSelected(p.isPromoEnGros());
         panneauForm.add(promoEnGrosCheckBox, gbc);
 
-        // Seuil gros
+        // Seuil pour promo en gros
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Seuil (quantité) :"), gbc);
         seuilGrosField = new JTextField(String.valueOf(p.getSeuilGros()));
         gbc.gridx = 1; panneauForm.add(seuilGrosField, gbc);
 
-        // Prix gros
+        // Prix de gros
         gbc.gridx = 0; gbc.gridy++;
         panneauForm.add(new JLabel("Prix de gros (€) :"), gbc);
         prixGrosField = new JTextField(String.valueOf(p.getPrixGros()));
@@ -126,6 +130,7 @@ public class ModifierProduitDialog extends JDialog {
         JButton btnValider = createStyledButton("Valider");
         JButton btnAnnuler = createStyledButton("Annuler");
 
+        // Bouton valider : on vérifie la validité des champs numériques
         btnValider.addActionListener(e -> {
             try {
                 // Validation des champs numériques
@@ -170,7 +175,7 @@ public class ModifierProduitDialog extends JDialog {
         return btn;
     }
 
-    // ===== GETTERS =====
+    // ===== GETTERS pour récupérer les modifications =====
     public boolean isConfirme()           { return confirme; }
     public String  getNomModifie()        { return champNom.getText().trim(); }
     public double  getPrixModifie()       { return Double.parseDouble(champPrix.getText().trim()); }

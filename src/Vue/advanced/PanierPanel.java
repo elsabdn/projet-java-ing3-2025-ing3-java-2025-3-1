@@ -6,9 +6,6 @@ import Vue.advanced.PaiementPanel;
 import DAO.CommandeDAO;
 import Modele.Acheteur;
 
-
-
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,9 +17,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Panel d'affichage et gestion du panier d'achat d'un utilisateur.
+ * Regroupe les produits ajoutés, permet leur suppression, et valide la commande.
+ */
 public class PanierPanel extends JPanel {
-    private final MainFrame mainFrame;
-    private final List<Produit> panier;
+    private final MainFrame mainFrame; // Référence à la frame principale
+    private final List<Produit> panier; // Liste des produits dans le panier
 
     public PanierPanel(MainFrame mainFrame, List<Produit> panier) {
         this.mainFrame = mainFrame;
@@ -31,7 +32,7 @@ public class PanierPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── Bandeau haut ────────────────────────────────────────────────
+        // ─── Bandeau haut: titre + bouton déconnexion ────────────────────────────────────────────────
         JButton btnDeconnexion = createStyledButton("🚪 Déconnexion");
         btnDeconnexion.setPreferredSize(new Dimension(140, 35));
         btnDeconnexion.addActionListener(e -> mainFrame.showPanel("accueil"));
@@ -59,7 +60,7 @@ public class PanierPanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        // ─── Zone centrale paddée ────────────────────────────────────────
+        // ─── Zone centrale paddée: liste des produits ou message si vide ────────────────────────────────────────
         JPanel centerWrapper = new JPanel(new BorderLayout());
         centerWrapper.setOpaque(false);
         centerWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -74,7 +75,7 @@ public class PanierPanel extends JPanel {
             centerWrapper.add(emptyPanel, BorderLayout.CENTER);
 
         } else {
-            // regrouper et compter
+            //Regrouper les produits par ID pour comptabiliser les quantités
             Map<Integer, Integer> quantites = new LinkedHashMap<>();
             Map<Integer, Produit> produitsUniques = new LinkedHashMap<>();
             for (Produit p : panier) {
@@ -142,6 +143,7 @@ public class PanierPanel extends JPanel {
         }
         btnRetour.addActionListener(e -> mainFrame.showPanel("acheteur"));
 
+        // Validation de commande
         btnValider.addActionListener(e -> {
             double totalPrix = panier.stream()
                     .mapToDouble(Produit::getPrix)
@@ -197,8 +199,7 @@ public class PanierPanel extends JPanel {
         carte.setPreferredSize(new Dimension(0,150));
         carte.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
 
-        // Image
-        // Image
+        // Image produit
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
             Image img = redimensionnerImage(produit.getImagePath(), 100, 100);
             if (img != null) {
@@ -215,7 +216,7 @@ public class PanierPanel extends JPanel {
         }
 
 
-        // Infos + quantité
+        // Infos + quantité: nom, prix, stock, quantité
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
@@ -242,7 +243,7 @@ public class PanierPanel extends JPanel {
 
         carte.add(infos, BorderLayout.CENTER);
 
-        // Bouton Supprimer à droite
+        // Bouton Supprimer produit à droite
         JButton btnSupprimer = new JButton("Supprimer");
         btnSupprimer.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnSupprimer.setForeground(Color.WHITE);
@@ -266,6 +267,7 @@ public class PanierPanel extends JPanel {
         return carte;
     }
 
+    // Style graphique des boutons
     private JButton createStyledButton(String texte) {
         JButton btn = new JButton(texte);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -285,6 +287,7 @@ public class PanierPanel extends JPanel {
         return btn;
     }
 
+    // Redimensionne une image à la taille souhaitée
     private static Image redimensionnerImage(String path, int w, int h) {
         try {
             File imageFile = new File(path);

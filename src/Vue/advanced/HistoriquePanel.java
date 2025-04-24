@@ -17,10 +17,18 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
+
+/**
+ * HistoriquePanel : Affiche la liste des commandes passées par l'utilisateur acheteur
+ * avec détails (date, montant, statut, articles).
+ */
 public class HistoriquePanel extends JPanel {
     private final Acheteur acheteur;
     private final CommandeDAO commandeDAO;
 
+    /**
+     * Constructeur : construit dynamiquement l'interface avec les commandes de l'acheteur.
+     */
     public HistoriquePanel(MainFrame mainFrame, Acheteur acheteur) {
         this.acheteur    = acheteur;
         this.commandeDAO = new CommandeDAO();
@@ -28,7 +36,7 @@ public class HistoriquePanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── HEADER ────────────────────────────────────────────────────
+        // ─── HEADER: titre et bouton de déconnexion ────────────────────────────────────────────────────
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -51,7 +59,7 @@ public class HistoriquePanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        // ─── CONTENU: listes de cartes ──────────────────────────────────
+        // ─── CONTENU: récupération des commandes depuis la BDD ──────────────────────────────────
         List<Commande> commandes = commandeDAO.getCommandesByUtilisateurId(acheteur.getId());
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
@@ -70,7 +78,7 @@ public class HistoriquePanel extends JPanel {
 
         } else {
             for (Commande c : commandes) {
-                // ── Carte blanche ─────────────────────────────────────────
+                // ── Création de la "carte blanche" d’une commande ─────────────────────────────────────────
                 JPanel carte = new JPanel(new BorderLayout(10,10));
                 carte.setBackground(Color.WHITE);
                 carte.setOpaque(true);
@@ -81,7 +89,7 @@ public class HistoriquePanel extends JPanel {
                 carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 140));
                 carte.setPreferredSize(new Dimension(0, 140));
 
-                // — Infos à gauche —
+                // — Informations de la commande à gauche —
                 JPanel info = new JPanel();
                 info.setOpaque(false);
                 info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
@@ -120,7 +128,7 @@ public class HistoriquePanel extends JPanel {
 
                 carte.add(info, BorderLayout.WEST);
 
-                // — Carousel d’images à droite —
+                // — Carousel d’images produits à droite —
                 JPanel imgRow = new JPanel(new FlowLayout(FlowLayout.LEFT,10,0));
                 imgRow.setOpaque(false);
                 for (Panier.Item item : c.getItems()) {
@@ -158,7 +166,7 @@ public class HistoriquePanel extends JPanel {
         scroll.setBorder(null);
         add(scroll, BorderLayout.CENTER);
 
-        // ─── FOOTER ───────────────────────────────────────────────
+        // ─── FOOTER: bouton retour ───────────────────────────────────────────────
         JButton retour = createStyledButton("⬅ Retour");
         retour.addActionListener(e -> mainFrame.showPanel("acheteur"));
         JPanel bas = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -168,6 +176,9 @@ public class HistoriquePanel extends JPanel {
         add(bas, BorderLayout.SOUTH);
     }
 
+    /**
+     * Fond d'écran en dégradé rose clair
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -178,6 +189,9 @@ public class HistoriquePanel extends JPanel {
         g2.dispose();
     }
 
+    /**
+     * Redimensionne une image à la taille donnée (avec lissage)
+     */
     private Image redimensionnerImage(String chemin, int w, int h) {
         if (chemin==null||chemin.isBlank()) return null;
         try {
@@ -195,6 +209,9 @@ public class HistoriquePanel extends JPanel {
         }
     }
 
+    /**
+     * Boutons stylés en rose pastel avec effet hover
+     */
     private JButton createStyledButton(String texte) {
         JButton btn = new JButton(texte);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));

@@ -7,16 +7,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PaiementPanel extends JPanel {
+    // Champs de saisie pour les infos de carte et note
     private JTextField cardNumberField;
     private JTextField cardNameField;
     private JTextField expiryDateField;
     private JTextField cvvField;
     private JTextField noteField;
+
+    // Boutons d'action
     private JButton confirmPaymentBtn;
     private JButton cancelBtn;
+
+    // Étiquette pour afficher le montant total
     private JLabel totalAmountLabel;
+
+    // Niveau d'opacité utilisé pour un effet de transition
     private float opacity = 0.0f;
 
+    // Constructeur avec le montant total à payer en paramètre
     public PaiementPanel(double totalAmount) {
         setLayout(new GridBagLayout());
         setOpaque(false);
@@ -32,6 +40,7 @@ public class PaiementPanel extends JPanel {
         });
         timer.start();
 
+        // Carte blanche centrale avec coins arrondis
         JPanel card = new JPanel() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -51,13 +60,14 @@ public class PaiementPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
 
+        // Titre principal
         JLabel title = new JLabel("💳 Paiement");
         title.setFont(new Font("Arial", Font.BOLD, 22));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(new Color(92, 92, 92));
         card.add(title, gbc);
 
-        // Date du paiement
+        // Affichage de la date du paiement
         gbc.gridy++;
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         JLabel dateLabel = new JLabel("Date: " + sdf.format(new Date()));
@@ -65,7 +75,7 @@ public class PaiementPanel extends JPanel {
         dateLabel.setHorizontalAlignment(SwingConstants.CENTER);
         card.add(dateLabel, gbc);
 
-        // Montant total
+        // Montant total à payer
         gbc.gridy++;
         totalAmountLabel = new JLabel("Montant total: " + String.format("%.2f €", totalAmount));
         totalAmountLabel.setFont(new Font("Arial", Font.BOLD, 18));
@@ -100,14 +110,14 @@ public class PaiementPanel extends JPanel {
         cvvField = new JTextField(3);
         card.add(cvvField, gbc);
 
-        // Champ note
+        // Champ note (pour évaluer la commande)
         gbc.gridx = 0; gbc.gridy++;
         card.add(new JLabel("Note sur 10 :"), gbc);
         gbc.gridx = 1;
         noteField = new JTextField(2);
         card.add(noteField, gbc);
 
-        // Boutons
+        // Boutons d'action : annuler ou confirmer
         gbc.gridy++;
         gbc.gridx = 0;
         cancelBtn = createStyledButton("Annuler");
@@ -119,6 +129,7 @@ public class PaiementPanel extends JPanel {
         confirmPaymentBtn.setBackground(new Color(129, 199, 132));
         card.add(confirmPaymentBtn, gbc);
 
+        // On ajoute la carte au panel principal
         add(card);
     }
 
@@ -134,6 +145,7 @@ public class PaiementPanel extends JPanel {
         g2d.dispose();
     }
 
+    // Création de boutons stylisés
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -143,6 +155,7 @@ public class PaiementPanel extends JPanel {
         button.setPreferredSize(new Dimension(200, 45));
         button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
+        // Animation au survol
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(button.getBackground().darker());
@@ -156,14 +169,17 @@ public class PaiementPanel extends JPanel {
         return button;
     }
 
+    // Définition de l'action du bouton de confirmation
     public void setConfirmPaymentAction(ActionListener l) {
         confirmPaymentBtn.addActionListener(l);
     }
 
+    // Définition de l'action du bouton d'annulation
     public void setCancelAction(ActionListener l) {
         cancelBtn.addActionListener(l);
     }
 
+    // Récupère la note entrée par l'utilisateur, ou -1 si invalide
     public int getNote() {
         try {
             return Integer.parseInt(noteField.getText().trim());

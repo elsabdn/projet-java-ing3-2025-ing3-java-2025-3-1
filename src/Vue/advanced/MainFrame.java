@@ -12,10 +12,15 @@ import java.awt.*;
 import java.util.List;
 
 public class MainFrame extends JFrame {
+    // Système de navigation entre les panels
     private CardLayout cardLayout;
     private JPanel container;
+
+    // Contrôleur d'authentification centralisé
     private AuthController authController;
-    private Acheteur acheteurConnecte; // ✅ Pour mémoriser l'utilisateur connecté
+
+    // Pour mémoriser l'utilisateur acheteur connecté
+    private Acheteur acheteurConnecte;
 
     public MainFrame() {
         setTitle("🛒 Shopping App");
@@ -25,6 +30,7 @@ public class MainFrame extends JFrame {
 
         authController = new AuthController();
 
+        // Configuration du layout principal avec fond dégradé
         cardLayout = new CardLayout();
         container = new JPanel(cardLayout) {
             @Override
@@ -45,7 +51,7 @@ public class MainFrame extends JFrame {
         // --- Page d'accueil ---
         AccueilPanel accueil = new AccueilPanel(this);
 
-        // --- Connexion utilisateur ---
+        // --- Connexion utilisateur: ouverture de pop-ups pour saisir les identifiants ---
         accueil.setLoginAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
@@ -56,6 +62,7 @@ public class MainFrame extends JFrame {
                 return;
             }
 
+            // Redirection selon le type d'utilisateur
             if (u instanceof Vendeur) {
                 VendeurPanel vp = new VendeurPanel((Vendeur) u, this);
                 addPanel(vp, "vendeur");
@@ -91,25 +98,30 @@ public class MainFrame extends JFrame {
             showPanel("vendeur");
         });
 
+        // Ajout initial du panel d'accueil
         addPanel(accueil, "accueil");
         showPanel("accueil");
         setVisible(true);
     }
 
+    /** Affiche le panel panier */
     public void showPanier(List<Produit> panier) {
         PanierPanel pp = new PanierPanel(this, panier);
         addPanel(pp, "panier");
         showPanel("panier");
     }
 
+    /** Ajoute un panel au conteneur avec un nom */
     public void addPanel(JPanel panel, String name) {
         container.add(panel, name);
     }
 
+    /** Affiche un panel selon son nom */
     public void showPanel(String name) {
         cardLayout.show(container, name);
     }
 
+    /** Recharge et affiche l'accueil Acheteur */
     public void showAcheteurHome() {
         Acheteur a = getAcheteurConnecte();
         List<Produit> produits = new ProduitController().getAllProduits();
@@ -126,7 +138,7 @@ public class MainFrame extends JFrame {
     }
 
 
-    // ✅ Getter et setter pour l'acheteur connecté
+    // Getters et setters pour le suivi de l'utilisateur connecté
     public Acheteur getAcheteurConnecte() {
         return acheteurConnecte;
     }
