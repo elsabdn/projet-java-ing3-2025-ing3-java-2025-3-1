@@ -34,7 +34,7 @@ public class ProduitDetailPanel extends JPanel {
         center.setOpaque(false);
         center.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Image agrandie
+        // Image agrandie du produit
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
             Image img = AcheteurPanel.redimensionnerImage(produit.getImagePath(), 300, 300);
             JLabel imgLabel = new JLabel(new ImageIcon(img));

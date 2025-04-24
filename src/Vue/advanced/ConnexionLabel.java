@@ -4,17 +4,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
+/**
+ * ConnexionLabel : panneau contenant un formulaire de connexion avec un design pastel et responsive.
+ */
 public class ConnexionLabel extends JPanel {
     private JTextField emailField;
     private JPasswordField mdpField;
     private JButton loginBtn;
     private JButton backBtn;
-    private float opacity = 0.0f;
+    private float opacity = 0.0f; // Gère la transparence pour l'effet d'apparition
 
     public ConnexionLabel() {
         setLayout(new GridBagLayout());
         setOpaque(false);
 
+        // Animation d'apparition douce (fade-in)
         Timer timer = new Timer(15, e -> {
             if (opacity < 1.0f) {
                 opacity += 0.02f;
@@ -25,6 +29,7 @@ public class ConnexionLabel extends JPanel {
         });
         timer.start();
 
+        // Carte centrale avec fond blanc semi-transparent
         JPanel card = new JPanel() {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -39,17 +44,20 @@ public class ConnexionLabel extends JPanel {
         card.setLayout(new GridBagLayout());
         card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
+        // Grille de placement des composants
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
 
+        // Titre de la fenêtre
         JLabel title = new JLabel("Connexion");
         title.setFont(new Font("Arial", Font.BOLD, 18));
         title.setHorizontalAlignment(SwingConstants.CENTER);
         title.setForeground(new Color(92, 92, 92));
         card.add(title, gbc);
 
+        // Champs d'identifiants
         JLabel emailLabel = new JLabel("Email :");
         JLabel mdpLabel = new JLabel("Mot de passe :");
 
@@ -59,6 +67,7 @@ public class ConnexionLabel extends JPanel {
         loginBtn = createStyledButton("Se connecter");
         backBtn = createStyledButton("← Retour");
 
+        // Placement des composants dans la grille
         gbc.gridwidth = 1;
         gbc.gridy++;
         card.add(emailLabel, gbc);
@@ -79,6 +88,9 @@ public class ConnexionLabel extends JPanel {
         add(card);
     }
 
+    /**
+     * Crée un bouton stylé en rose pastel avec effet hover.
+     */
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -101,7 +113,9 @@ public class ConnexionLabel extends JPanel {
         return button;
     }
 
-    // 🌸 Fond 100% rose pâle
+    /**
+     * Arrière-plan en dégradé rose doux.
+     */
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
@@ -113,6 +127,7 @@ public class ConnexionLabel extends JPanel {
         g2d.dispose();
     }
 
+    // === Getters et setters ===
     public String getEmail() {
         return emailField.getText();
     }

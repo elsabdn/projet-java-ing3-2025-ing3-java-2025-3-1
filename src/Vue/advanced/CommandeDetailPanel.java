@@ -12,10 +12,16 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+/**
+ * CommandeDetailPanel : permet d'afficher le détail d'une commande (date, montant, note, articles).
+ */
 public class CommandeDetailPanel extends JPanel {
     private final MainFrame mainFrame;
     private final Commande commande;
 
+    /**
+     * Constructeur : construit dynamiquement la vue avec les données de la commande.
+     */
     public CommandeDetailPanel(MainFrame mainFrame, Commande commande) {
         this.mainFrame = mainFrame;
         this.commande  = commande;
@@ -23,7 +29,7 @@ public class CommandeDetailPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── HEADER ───────────────────────────────────────────────
+        // ─── HEADER (titre + bouton retour) ───────────────────────────────────────────────
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -45,12 +51,12 @@ public class CommandeDetailPanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        // ─── CENTRE : wrapper blanc ─────────────────────────────────
+        // ─── CENTRE : wrapper blanc récap + articles ─────────────────────────────────
         JPanel centreWrapper = new JPanel(new BorderLayout());
         centreWrapper.setBackground(Color.WHITE);
         centreWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // résumé en haut du wrapper
+        // résumé en haut du wrapper: récapitulatif de la commande (date, total, note)
         JPanel summary = new JPanel();
         summary.setOpaque(false);
         summary.setLayout(new BoxLayout(summary, BoxLayout.Y_AXIS));
@@ -74,7 +80,7 @@ public class CommandeDetailPanel extends JPanel {
 
         centreWrapper.add(summary, BorderLayout.NORTH);
 
-        // liste des items en scroll
+        // liste des items en scroll (cartes)
         JPanel itemsPanel = new JPanel();
         itemsPanel.setOpaque(false);
         itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
@@ -108,7 +114,7 @@ public class CommandeDetailPanel extends JPanel {
 
         add(centreWrapper, BorderLayout.CENTER);
 
-        // ─── FOOTER ────────────────────────────────────────────────
+        // ─── FOOTER: bouton retour ────────────────────────────────────────────────
         JButton back = createStyledButton("⬅ Retour");
         back.addActionListener(e -> mainFrame.showPanel("historique"));
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -118,6 +124,9 @@ public class CommandeDetailPanel extends JPanel {
         add(footer, BorderLayout.SOUTH);
     }
 
+    /**
+     * Crée une carte visuelle pour chaque article commandé : image + nom + prix + quantite.
+     */
     private JPanel creerCarteItem(Panier.Item item) {
         JPanel card = new JPanel(new BorderLayout(10,10));
         card.setBackground(Color.WHITE);
@@ -128,7 +137,7 @@ public class CommandeDetailPanel extends JPanel {
         ));
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
-        // image
+        // Image du produit (redimensionnée)
         Image img = redimensionnerImage(item.getProduit().getImagePath(), 80, 80);
         if (img != null) {
             JLabel pic = new JLabel(new ImageIcon(img));
@@ -136,7 +145,7 @@ public class CommandeDetailPanel extends JPanel {
             card.add(pic, BorderLayout.WEST);
         }
 
-        // infos texte
+        // Infos texte
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
@@ -161,6 +170,9 @@ public class CommandeDetailPanel extends JPanel {
         return card;
     }
 
+    /**
+     * Redimensionne l'image du produit pour l'affichage dans la carte.
+     */
     static Image redimensionnerImage(String chemin, int w, int h) {
         if (chemin == null || chemin.isBlank()) return null;
         try {
@@ -178,6 +190,9 @@ public class CommandeDetailPanel extends JPanel {
         }
     }
 
+    /**
+     * Bouton rose pastel avec effet hover.
+     */
     private JButton createStyledButton(String texte) {
         JButton btn = new JButton(texte);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -193,6 +208,9 @@ public class CommandeDetailPanel extends JPanel {
         return btn;
     }
 
+    /**
+     * Fond d'écran dégradé rose clair.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
