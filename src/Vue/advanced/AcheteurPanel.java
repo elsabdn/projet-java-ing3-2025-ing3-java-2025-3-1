@@ -252,6 +252,16 @@ public class AcheteurPanel extends JPanel {
         lblMarque.setAlignmentX(Component.CENTER_ALIGNMENT);
         infos.add(lblMarque);
 
+        //// Modifications pour le prix de gros ////
+        if (p.isPromoEnGros()) {
+            JLabel lblPromo = new JLabel(String.format(" %.2f € dès %d unités", p.getPrixGros(), p.getSeuilGros())
+            );
+            lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 13));
+            lblPromo.setForeground(new Color(255, 87, 34)); // orange
+            lblPromo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            infos.add(lblPromo);
+        }
+        ////
         carte.add(infos, BorderLayout.CENTER);
         return carte;
     }

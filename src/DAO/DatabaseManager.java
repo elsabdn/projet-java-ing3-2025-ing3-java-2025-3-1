@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseManager {
     private static final String URL_BDD          = "jdbc:mysql://localhost:8889/ecommerce";
     private static final String UTILISATEUR_BDD  = "root";
-    private static final String MOT_DE_PASSE_BDD = "";
+    private static final String MOT_DE_PASSE_BDD = "root";
 
     private Connection connexion;
 
