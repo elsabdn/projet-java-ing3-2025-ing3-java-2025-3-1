@@ -25,6 +25,7 @@ import java.util.Map;
 public class PanierPanel extends JPanel {
     private final MainFrame mainFrame; // Référence à la frame principale
     private final List<Produit> panier; // Liste des produits dans le panier
+    private final ProduitController produitController = new ProduitController();
 
     public PanierPanel(MainFrame mainFrame, List<Produit> panier) {
         this.mainFrame = mainFrame;
@@ -178,8 +179,21 @@ public class PanierPanel extends JPanel {
                     JOptionPane.showMessageDialog(mainFrame, "Erreur : aucun utilisateur connecté.");
                     return;
                 }
+
                 CommandeDAO dao = new CommandeDAO();
+
                 dao.enregistrerCommande(panier, note, acheteur);
+
+                // pour chaque produit unique, décrémenter et persister
+                for (Map.Entry<Integer,Integer> entry : qtes.entrySet()) {
+                    Produit p = panier.stream()
+                            .filter(prod -> prod.getId() == entry.getKey())
+                            .findFirst()
+                            .get();
+                    int acheté = entry.getValue();
+                    p.setQuantite(p.getQuantite() - acheté);                 // décrémente l’objet
+                    produitController.updateProduit(p);                      // update en base via DAO
+                }
                 JOptionPane.showMessageDialog(mainFrame, "Commande enregistrée avec la note : " + note);
                 mainFrame.showPanel("accueil");
             });
