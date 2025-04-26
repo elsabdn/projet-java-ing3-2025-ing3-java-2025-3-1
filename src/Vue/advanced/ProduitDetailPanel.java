@@ -22,7 +22,7 @@ public class ProduitDetailPanel extends JPanel {
 
         // ─── En-tête avec bouton Retour ──────────────────────────────────
         retourBtn = createStyledButton("← Retour aux produits");
-        retourBtn.setPreferredSize(new Dimension(160, 35));
+        retourBtn.setPreferredSize(new Dimension(250, 35));
         retourBtn.addActionListener(e -> mainFrame.showPanel("acheteur"));
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         north.setOpaque(false);
@@ -82,7 +82,7 @@ public class ProduitDetailPanel extends JPanel {
         if (produit.isPromoEnGros()) {
             infos.add(Box.createVerticalStrut(10));
             JLabel lblPromo = new JLabel(
-                    String.format("Prix de gros : %.2f € (dès %d unités)",
+                    String.format("Prix de gros : %.2f € (pour %d unités)",
                             produit.getPrixGros(),
                             produit.getSeuilGros()
                     )

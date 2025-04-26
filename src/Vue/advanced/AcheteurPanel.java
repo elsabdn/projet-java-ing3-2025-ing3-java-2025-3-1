@@ -244,7 +244,7 @@ public class AcheteurPanel extends JPanel {
         if (p.isPromoEnGros()) {
             infos.add(Box.createVerticalStrut(5));
             JLabel lblPromo = new JLabel(
-                    String.format("Promo gros : %.2f € dès %d achetés", p.getPrixGros(), p.getSeuilGros())
+                    String.format("Promo gros : %.2f € pour %d achetés", p.getPrixGros(), p.getSeuilGros())
             );
             lblPromo.setFont(new Font("SansSerif", Font.ITALIC, 12));
             lblPromo.setForeground(new Color(255, 34, 34));

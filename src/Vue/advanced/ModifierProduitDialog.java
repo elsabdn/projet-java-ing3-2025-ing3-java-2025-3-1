@@ -1,6 +1,7 @@
 package Vue.advanced;
 
 import Modele.Produit;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -8,7 +9,8 @@ import java.io.File;
 
 /**
  * Boîte de dialogue pour modifier un produit existant,
- * incluant la gestion de la promotion en gros.
+ * incluant la gestion de la promotion en gros,
+ * avec des boutons stylés pastel.
  */
 public class ModifierProduitDialog extends JDialog {
     private boolean confirme = false;
@@ -79,7 +81,7 @@ public class ModifierProduitDialog extends JDialog {
         etiquetteImage = new JLabel(
                 p.getImagePath() != null ? new File(p.getImagePath()).getName() : "Aucune"
         );
-        JButton btnImage = new JButton("Choisir…");
+        JButton btnImage = createStyledButton("Choisir…");
         btnImage.addActionListener(e -> {
             JFileChooser fc = new JFileChooser();
             fc.setAcceptAllFileFilterUsed(false);
@@ -138,8 +140,8 @@ public class ModifierProduitDialog extends JDialog {
 
         // === Boutons Valider / Annuler ===
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton btnValider = new JButton("Valider");
-        JButton btnAnnuler = new JButton("Annuler");
+        JButton btnValider = createStyledButton("Valider");
+        JButton btnAnnuler = createStyledButton("Annuler");
 
         btnValider.addActionListener(e -> {
             try {
@@ -180,44 +182,37 @@ public class ModifierProduitDialog extends JDialog {
         add(actions, BorderLayout.SOUTH);
     }
 
+    // Méthode utilitaire pour créer des boutons stylés pastel
+    private JButton createStyledButton(String text) {
+        JButton btn = new JButton(text);
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setBackground(new Color(248, 187, 208));  // rose pastel
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(244, 143, 177));
+            }
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                btn.setBackground(new Color(248, 187, 208));
+            }
+        });
+        return btn;
+    }
+
     // ===== Getters =====
-    public boolean isConfirme() {
-        return confirme;
-    }
-
-    public String getNomModifie() {
-        return champNom.getText().trim();
-    }
-
-    public double getPrixModifie() {
-        return Double.parseDouble(champPrix.getText().trim());
-    }
-
-    public int getStockModifie() {
-        return Integer.parseInt(champStock.getText().trim());
-    }
-
-    public String getMarqueModifiee() {
-        return champMarque.getText().trim();
-    }
-
-    public String getCheminImageModifie() {
-        return cheminImage;
-    }
-
-    public String getDescriptionModifie() {
-        return champDescription.getText().trim();
-    }
-
-    public boolean isPromoEnGrosModifie() {
-        return promoEnGrosCheck.isSelected();
-    }
-
-    public int getSeuilGrosModifie() {
-        return Integer.parseInt(seuilGrosField.getText().trim());
-    }
-
-    public double getPrixGrosModifie() {
-        return Double.parseDouble(prixGrosField.getText().trim());
-    }
+    public boolean isConfirme()            { return confirme; }
+    public String  getNomModifie()         { return champNom.getText().trim(); }
+    public double  getPrixModifie()        { return Double.parseDouble(champPrix.getText().trim()); }
+    public int     getStockModifie()       { return Integer.parseInt(champStock.getText().trim()); }
+    public String  getMarqueModifiee()     { return champMarque.getText().trim(); }
+    public String  getCheminImageModifie() { return cheminImage; }
+    public String  getDescriptionModifie() { return champDescription.getText().trim(); }
+    public boolean isPromoEnGrosModifie()  { return promoEnGrosCheck.isSelected(); }
+    public int     getSeuilGrosModifie()   { return Integer.parseInt(seuilGrosField.getText().trim()); }
+    public double  getPrixGrosModifie()    { return Double.parseDouble(prixGrosField.getText().trim()); }
 }

@@ -135,10 +135,16 @@ public class PanierPanel extends JPanel {
                         .findFirst()
                         .get();
                 int qte = entry.getValue();
-                double prixUnit = (p.isPromoEnGros() && qte >= p.getSeuilGros())
-                        ? p.getPrixGros()
-                        : p.getPrix();
-                sum += prixUnit * qte;
+                if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                    // nombre de lots pleins
+                    int nbLots = qte / p.getSeuilGros();
+                    // reste hors lots
+                    int reste  = qte % p.getSeuilGros();
+                    sum += nbLots * p.getPrixGros()    // prix en gros pour chaque lot
+                            + reste  * p.getPrix();       // prix unitaire pour le reste
+                } else {
+                    sum += qte * p.getPrix();
+                }
             }
             totalPx = sum;
         }
@@ -213,16 +219,18 @@ public class PanierPanel extends JPanel {
         add(resume, BorderLayout.EAST);
     }
 
-    // Carte produit unique avec bouton Supprimer
+    /**
+     * Crée une carte produit affichant le prix standard et, si applicable, le prix avec promo en gros.
+     */
     private JPanel creerCarteProduit(Produit produit, int quantite) {
         JPanel carte = new JPanel(new BorderLayout());
         carte.setOpaque(false);
         carte.setBackground(Color.WHITE);
-        carte.setBorder(BorderFactory.createMatteBorder(0,0,1,0,new Color(220,220,220)));
-        carte.setPreferredSize(new Dimension(0,150));
-        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
+        carte.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
+        carte.setPreferredSize(new Dimension(0, 150));
+        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-        // Image produit
+        // ─── Image produit ─────────────────────────────────────
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
             Image img = redimensionnerImage(produit.getImagePath(), 100, 100);
             if (img != null) {
@@ -232,58 +240,64 @@ public class PanierPanel extends JPanel {
             }
         }
 
-        // Infos + quantité
+        // ─── Infos texte ───────────────────────────────────────
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-        infos.setBorder(new EmptyBorder(10,10,10,10));
+        infos.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel lblNom   = new JLabel(produit.getNom());
+        // Nom du produit
+        JLabel lblNom = new JLabel(produit.getNom());
         lblNom.setFont(new Font("SansSerif", Font.BOLD, 16));
         lblNom.setAlignmentX(Component.CENTER_ALIGNMENT);
-
         infos.add(lblNom);
         infos.add(Box.createVerticalStrut(5));
 
-        // Affichage du prix avec barre et prix de gros en rouge si applicable
-        if (produit.isPromoEnGros() && quantite >= produit.getSeuilGros()) {
-            JLabel lblPrixInit = new JLabel(
-                    String.format("<html><strike>%.2f €</strike></html>", produit.getPrix())
-            );
-            lblPrixInit.setHorizontalAlignment(SwingConstants.CENTER);
-            lblPrixInit.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            JLabel lblPrixGros = new JLabel(
-                    String.format("<html><font color='red'>%.2f €</font></html>", produit.getPrixGros())
-            );
-            lblPrixGros.setHorizontalAlignment(SwingConstants.CENTER);
-            lblPrixGros.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-
-            infos.add(lblPrixInit);
-            infos.add(Box.createVerticalStrut(3));
-            infos.add(lblPrixGros);
-        } else {
-            JLabel lblPrix  = new JLabel(String.format("%.2f €", produit.getPrix()));
-            lblPrix.setForeground(new Color(100,100,100));
-            lblPrix.setAlignmentX(Component.CENTER_ALIGNMENT);
-            infos.add(lblPrix);
-        }
-
-        infos.add(Box.createVerticalStrut(5));
+        // Stock restant
         JLabel lblStock = new JLabel("Stock : " + produit.getQuantite());
-        lblStock.setForeground(new Color(150,150,150));
+        lblStock.setForeground(new Color(150, 150, 150));
         lblStock.setAlignmentX(Component.CENTER_ALIGNMENT);
         infos.add(lblStock);
-
         infos.add(Box.createVerticalStrut(10));
-        JLabel lblQty   = new JLabel("Quantité : " + quantite);
-        lblQty.setAlignmentX(Component.CENTER_ALIGNMENT);
-        infos.add(lblQty);
+
+        // ─── Calcul des prix ───────────────────────────────────
+        double prixUnitaire  = produit.getPrix();
+        double prixStandard  = quantite * prixUnitaire;
+        double prixPromo     = prixStandard;
+
+        if (produit.isPromoEnGros() && quantite >= produit.getSeuilGros()) {
+            int nbLots = quantite / produit.getSeuilGros();
+            int reste  = quantite % produit.getSeuilGros();
+            prixPromo = nbLots * produit.getPrixGros() + reste * produit.getPrix();
+        }
+
+        // Affichage du prix standard
+        String standardText = String.format("%d × %.2f € = %.2f €", quantite, prixUnitaire, prixStandard);
+        JLabel lblStandard = new JLabel(standardText);
+        lblStandard.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblStandard.setHorizontalAlignment(SwingConstants.CENTER);
+
+        if (prixPromo < prixStandard) {
+            // Barrer le prix standard et afficher le prix promo
+            lblStandard.setText("<html><strike>" + standardText + "</strike></html>");
+            infos.add(lblStandard);
+            infos.add(Box.createVerticalStrut(4));
+
+            JLabel lblPromo = new JLabel(
+                    String.format("Total avec promo : %.2f €", prixPromo)
+            );
+            lblPromo.setForeground(Color.RED);
+            lblPromo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblPromo.setHorizontalAlignment(SwingConstants.CENTER);
+            infos.add(lblPromo);
+        } else {
+            // Pas de promo, on ne montre que le standard
+            infos.add(lblStandard);
+        }
 
         carte.add(infos, BorderLayout.CENTER);
 
-        // Bouton Supprimer
+        // ─── Bouton Supprimer ───────────────────────────────────
         JButton btnSupprimer = new JButton("Supprimer");
         btnSupprimer.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnSupprimer.setForeground(Color.WHITE);
@@ -296,13 +310,15 @@ public class PanierPanel extends JPanel {
             mainFrame.addPanel(new PanierPanel(mainFrame, panier), "panier");
             mainFrame.showPanel("panier");
         });
-        JPanel supprWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
+
+        JPanel supprWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         supprWrapper.setOpaque(false);
         supprWrapper.add(btnSupprimer);
         carte.add(supprWrapper, BorderLayout.EAST);
 
         return carte;
     }
+
 
     // Style graphique des boutons
     private JButton createStyledButton(String texte) {

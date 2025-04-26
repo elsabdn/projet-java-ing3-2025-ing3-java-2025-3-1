@@ -182,7 +182,7 @@ public class VendeurPanel extends JPanel {
             // Affiche le prix de gros si activé
             if (p.isPromoEnGros()) {
                 JLabel lblPromo = new JLabel(
-                        String.format("Prix de gros : %.2f € dès %d unités",
+                        String.format("Prix de gros : %.2f € pour %d unités",
                                 p.getPrixGros(),
                                 p.getSeuilGros()
                         )
