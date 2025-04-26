@@ -26,8 +26,8 @@ public class Main {
             MainFrame mainFrame = new MainFrame();
 
             // ─── Panneaux de base : accueil et connexion ─────────────────────
-            AccueilPanel   accueilPanel   = new AccueilPanel();
-            ConnexionLabel connexionLabel = new ConnexionLabel();
+            AccueilPanel   accueilPanel   = new AccueilPanel(mainFrame);
+            ConnexionLabel connexionLabel = new ConnexionLabel(); //test
 
             mainFrame.addPanel(accueilPanel,   "accueil");
             mainFrame.addPanel(connexionLabel, "connexion");
@@ -35,22 +35,14 @@ public class Main {
             mainFrame.setVisible(true);
 
             // === Actions sur AccueilPanel ===
+            // wiring AccueilPanel
             accueilPanel.setLoginAction(e -> mainFrame.showPanel("connexion"));
-
-            accueilPanel.setAcheteurAction(e -> {
-                String email = JOptionPane.showInputDialog(mainFrame, "Email :");
-                String mdp   = JOptionPane.showInputDialog(mainFrame, "Mot de passe :");
-                auth.registerAcheteur(email, mdp);
-                JOptionPane.showMessageDialog(mainFrame, "Compte acheteur créé !");
-            });
-
-
-            accueilPanel.setVendeurAction(e -> {
-                String email = JOptionPane.showInputDialog(mainFrame, "Email :");
-                String mdp   = JOptionPane.showInputDialog(mainFrame, "Mot de passe :");
-                auth.registerVendeur(email, mdp);
-                JOptionPane.showMessageDialog(mainFrame, "Compte vendeur créé !");
-            });
+            accueilPanel.setAcheteurAction(e ->
+                    mainFrame.showPanel("inscription_acheteur")
+            );
+            accueilPanel.setVendeurAction(e ->
+                    mainFrame.showPanel("inscription_vendeur")
+            );
 
             // === Actions sur ConnexionLabel ===
             connexionLabel.setBackAction(e -> mainFrame.showPanel("accueil"));
@@ -85,43 +77,6 @@ public class Main {
                     vp.getRefreshButton().addActionListener(ev ->
                             vp.updateProduitList(vendeur)
                     );
-
-                    vp.getAddProduitButton().addActionListener(ev -> {
-                        // Saisie des infos produit
-                        String nom        = JOptionPane.showInputDialog(mainFrame, "Nom du produit :");
-                        double prix       = Double.parseDouble(
-                                JOptionPane.showInputDialog(mainFrame, "Prix (€) :")
-                        );
-                        int qte           = Integer.parseInt(
-                                JOptionPane.showInputDialog(mainFrame, "Quantité :")
-                        );
-                        String marque     = JOptionPane.showInputDialog(mainFrame, "Marque :");
-                        String description= JOptionPane.showInputDialog(mainFrame, "Description :");
-
-                        // Choix de l'image
-                        JFileChooser fc = new JFileChooser();
-                        fc.setDialogTitle("Choisir une image pour le produit");
-                        fc.setAcceptAllFileFilterUsed(false);
-                        fc.addChoosableFileFilter(
-                                new FileNameExtensionFilter("Images", "jpg", "png", "jpeg")
-                        );
-                        String imgPath = null;
-                        if (fc.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
-                            imgPath = fc.getSelectedFile().getAbsolutePath();
-                        }
-
-                        // Création et persistance du produit avec description
-                        produitCtrl.addProduit(
-                                vendeur,
-                                nom,
-                                prix,
-                                qte,
-                                imgPath,
-                                marque,
-                                description
-                        );
-                        vp.updateProduitList(vendeur);
-                    });
 
                     mainFrame.showPanel("vendeur");
                 }

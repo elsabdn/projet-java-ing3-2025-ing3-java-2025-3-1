@@ -191,31 +191,35 @@ public class DatabaseManager {
         List<Produit> produits = new ArrayList<>();
         String sql =
                 "SELECT p.id, p.nom, p.prix, p.quantite, p.vendeur_id, " +
-                        "p.image_path, p.marque, p.description, u.email " +
-                        "FROM produit p JOIN utilisateur u ON p.vendeur_id = u.id";
+                        "       p.image_path, p.marque, p.description, " +
+                        "       p.promoEnGros, p.seuilGros, p.prixGros, " +
+                        "       u.email " +
+                        "  FROM produit p " +
+                        "  JOIN utilisateur u ON p.vendeur_id = u.id";
         try (Statement stmt = connexion.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                int    id        = rs.getInt("id");
-                String nom       = rs.getString("nom");
-                double prix      = rs.getDouble("prix");
-                int    quantite  = rs.getInt("quantite");
-                int    vid       = rs.getInt("vendeur_id");
-                String img       = rs.getString("image_path");
-                String marque    = rs.getString("marque");
-                String desc      = rs.getString("description");
-                String emailVend = rs.getString("email");
-
-                Vendeur v = new Vendeur(vid, emailVend, "");
-                Produit p = new Produit(id, nom, prix, quantite, v, img, marque, desc);
+                Produit p = new Produit(
+                        rs.getInt("id"),
+                        rs.getString("nom"),
+                        rs.getDouble("prix"),
+                        rs.getInt("quantite"),
+                        new Vendeur(rs.getInt("vendeur_id"), rs.getString("email"), ""),
+                        rs.getString("image_path"),
+                        rs.getString("marque"),
+                        rs.getString("description")
+                );
+                p.setPromoEnGros( rs.getBoolean("promoEnGros") );
+                p.setSeuilGros(    rs.getInt    ("seuilGros")   );
+                p.setPrixGros(     rs.getDouble ("prixGros")    );
                 produits.add(p);
             }
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la récupération des produits");
             e.printStackTrace();
         }
         return produits;
     }
+
 
     private void chargerProduitsPourVendeur(Vendeur vendeur) {
         String sql = "SELECT * FROM produit WHERE vendeur_id = ?";
@@ -261,22 +265,26 @@ public class DatabaseManager {
     public List<Produit> getProduitsParVendeur(int vendeurId) {
         List<Produit> produits = new ArrayList<>();
         String sql =
-                "SELECT id, nom, prix, quantite, image_path, marque, description " +
+                "SELECT id, nom, prix, quantite, image_path, marque, description, promoEnGros, seuilGros, prixGros " +
                         "FROM produit WHERE vendeur_id = ?";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
             stmt.setInt(1, vendeurId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    int    id       = rs.getInt("id");
-                    String nom      = rs.getString("nom");
-                    double prix     = rs.getDouble("prix");
-                    int    quantite = rs.getInt("quantite");
-                    String img      = rs.getString("image_path");
-                    String marque   = rs.getString("marque");
-                    String desc     = rs.getString("description");
-
                     Vendeur v = new Vendeur(vendeurId, "", "");
-                    Produit p = new Produit(id, nom, prix, quantite, v, img, marque, desc);
+                    Produit p = new Produit(
+                            rs.getInt("id"),
+                            rs.getString("nom"),
+                            rs.getDouble("prix"),
+                            rs.getInt("quantite"),
+                            v,
+                            rs.getString("image_path"),
+                            rs.getString("marque"),
+                            rs.getString("description")
+                    );
+                    p.setPromoEnGros(rs.getBoolean("promoEnGros"));
+                    p.setSeuilGros  (rs.getInt("seuilGros"));
+                    p.setPrixGros   (rs.getDouble("prixGros"));
                     produits.add(p);
                 }
             }

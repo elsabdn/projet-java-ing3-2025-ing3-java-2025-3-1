@@ -10,8 +10,8 @@ import java.util.List;
 public class ProduitDAO {
 
     public void ajouter(Produit p) {
-        String sql = "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque, description) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque, description, promoEnGros, seuilGros, prixGros) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = ConnexionBDD.getConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -22,6 +22,9 @@ public class ProduitDAO {
             stmt.setString(5, p.getImagePath());
             stmt.setString(6, p.getMarque());
             stmt.setString(7, p.getDescription());
+            stmt.setBoolean(8, p.isPromoEnGros());
+            stmt.setInt(9, p.getSeuilGros());
+            stmt.setDouble(10, p.getPrixGros());
 
             stmt.executeUpdate();
 
@@ -43,20 +46,25 @@ public class ProduitDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                int      id          = rs.getInt("id");
-                String   nom         = rs.getString("nom");
-                double   prix        = rs.getDouble("prix");
-                int      quantite    = rs.getInt("quantite");
-                int      vendeurId   = rs.getInt("vendeur_id");
-                String   imagePath   = rs.getString("image_path");
-                String   marque      = rs.getString("marque");
-                String   description = rs.getString("description");
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                double prix = rs.getDouble("prix");
+                int quantite = rs.getInt("quantite");
+                int vendeurId = rs.getInt("vendeur_id");
+                String imagePath = rs.getString("image_path");
+                String marque = rs.getString("marque");
+                String description = rs.getString("description");
+
+                boolean promoEnGros = rs.getBoolean("promoEnGros");
+                int seuilGros = rs.getInt("seuilGros");
+                double prixGros = rs.getDouble("prixGros");
 
                 Vendeur vendeur = new Vendeur(vendeurId, "", "");
-                Produit produit = new Produit(
-                        id, nom, prix, quantite,
-                        vendeur, imagePath, marque, description
-                );
+                Produit produit = new Produit(id, nom, prix, quantite, vendeur, imagePath, marque, description);
+                produit.setPromoEnGros(promoEnGros);
+                produit.setSeuilGros(seuilGros);
+                produit.setPrixGros(prixGros);
+
                 list.add(produit);
             }
         } catch (SQLException e) {
@@ -78,9 +86,7 @@ public class ProduitDAO {
     }
 
     public void mettreAJourProduit(Produit produit) {
-        String sql = "UPDATE produit SET "
-                + "nom = ?, prix = ?, quantite = ?, image_path = ?, marque = ?, description = ? "
-                + "WHERE id = ?";
+        String sql = "UPDATE produit SET nom = ?, prix = ?, quantite = ?, image_path = ?, marque = ?, description = ?, promoEnGros = ?, seuilGros = ?, prixGros = ? WHERE id = ?";
         try (Connection conn = ConnexionBDD.getConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -90,13 +96,16 @@ public class ProduitDAO {
             stmt.setString(4, produit.getImagePath());
             stmt.setString(5, produit.getMarque());
             stmt.setString(6, produit.getDescription());
-            stmt.setInt(7, produit.getId());
+            stmt.setBoolean(7, produit.isPromoEnGros());
+            stmt.setInt(8, produit.getSeuilGros());
+            stmt.setDouble(9, produit.getPrixGros());
+            stmt.setInt(10, produit.getId());
 
             int rowsUpdated = stmt.executeUpdate();
             if (rowsUpdated > 0) {
-                System.out.println("Produit mis à jour avec succès !");
+                System.out.println("✅ Produit mis à jour avec succès !");
             } else {
-                System.out.println("Aucun produit trouvé avec cet ID.");
+                System.out.println("❌ Aucun produit trouvé avec cet ID.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

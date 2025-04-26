@@ -6,7 +6,7 @@ public class Panier {
 
     public static class Item {
         private Produit produit;
-        private int quantite;
+        private int quantite; //quantite
 
         public Item(Produit produit, int quantite) {
             this.produit = produit;
@@ -69,6 +69,7 @@ public class Panier {
         }
         return total;
     }
+
 
 
     @Override

@@ -6,9 +6,6 @@ import Vue.advanced.PaiementPanel;
 import DAO.CommandeDAO;
 import Modele.Acheteur;
 
-
-
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,13 +13,19 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Panel d'affichage et gestion du panier d'achat d'un utilisateur.
+ * Regroupe les produits ajoutés, permet leur suppression, et valide la commande.
+ */
 public class PanierPanel extends JPanel {
-    private final MainFrame mainFrame;
-    private final List<Produit> panier;
+    private final MainFrame mainFrame; // Référence à la frame principale
+    private final List<Produit> panier; // Liste des produits dans le panier
+    private final ProduitController produitController = new ProduitController();
 
     public PanierPanel(MainFrame mainFrame, List<Produit> panier) {
         this.mainFrame = mainFrame;
@@ -31,7 +34,7 @@ public class PanierPanel extends JPanel {
         setLayout(new BorderLayout());
         setOpaque(false);
 
-        // ─── Bandeau haut ────────────────────────────────────────────────
+        // ─── Bandeau haut: titre + bouton déconnexion ────────────────────────────────────────────────
         JButton btnDeconnexion = createStyledButton("🚪 Déconnexion");
         btnDeconnexion.setPreferredSize(new Dimension(140, 35));
         btnDeconnexion.addActionListener(e -> mainFrame.showPanel("accueil"));
@@ -59,7 +62,7 @@ public class PanierPanel extends JPanel {
 
         add(header, BorderLayout.NORTH);
 
-        // ─── Zone centrale paddée ────────────────────────────────────────
+        // ─── Zone centrale paddée: liste des produits ou message si vide ────────────────────────────────────────
         JPanel centerWrapper = new JPanel(new BorderLayout());
         centerWrapper.setOpaque(false);
         centerWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -72,9 +75,8 @@ public class PanierPanel extends JPanel {
             msg.setForeground(new Color(120, 120, 120));
             emptyPanel.add(msg, new GridBagConstraints());
             centerWrapper.add(emptyPanel, BorderLayout.CENTER);
-
         } else {
-            // regrouper et compter
+            // Regrouper et compter chaque produit
             Map<Integer, Integer> quantites = new LinkedHashMap<>();
             Map<Integer, Produit> produitsUniques = new LinkedHashMap<>();
             for (Produit p : panier) {
@@ -98,7 +100,6 @@ public class PanierPanel extends JPanel {
             scroll.setBorder(null);
             scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
             scroll.getVerticalScrollBar().setUnitIncrement(16);
-            // hauteur fixe pour 3 lignes : 3×150 + 2×10 = 470
             scroll.setPreferredSize(new Dimension(0, 470));
 
             centerWrapper.add(scroll, BorderLayout.CENTER);
@@ -119,8 +120,35 @@ public class PanierPanel extends JPanel {
         resume.setMinimumSize(tailleResume);
         resume.setMaximumSize(tailleResume);
 
-        int totalQty   = panier.size();
-        double totalPx = panier.stream().mapToDouble(Produit::getPrix).sum();
+        // ── Calcul du total avec prix de gros si seuil atteint ─────────────────
+        Map<Integer, Integer> qtes = new HashMap<>();
+        for (Produit p : panier) {
+            qtes.merge(p.getId(), 1, Integer::sum);
+        }
+        int totalQty = panier.size();
+        final double totalPx;
+        {
+            double sum = 0;
+            for (Map.Entry<Integer, Integer> entry : qtes.entrySet()) {
+                Produit p = panier.stream()
+                        .filter(prod -> prod.getId() == entry.getKey())
+                        .findFirst()
+                        .get();
+                int qte = entry.getValue();
+                if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                    // nombre de lots pleins
+                    int nbLots = qte / p.getSeuilGros();
+                    // reste hors lots
+                    int reste  = qte % p.getSeuilGros();
+                    sum += nbLots * p.getPrixGros()    // prix en gros pour chaque lot
+                            + reste  * p.getPrix();       // prix unitaire pour le reste
+                } else {
+                    sum += qte * p.getPrix();
+                }
+            }
+            totalPx = sum;
+        }
+        // ─────────────────────────────────────────────────────────────────────
 
         JLabel lblResume   = new JLabel("Résumé de la commande");
         JLabel lblArticles = new JLabel("Articles : " + totalQty);
@@ -142,22 +170,16 @@ public class PanierPanel extends JPanel {
         }
         btnRetour.addActionListener(e -> mainFrame.showPanel("acheteur"));
 
+        // Validation de la commande (ouvre le PaiementPanel)
         btnValider.addActionListener(e -> {
-            double totalPrix = panier.stream()
-                    .mapToDouble(Produit::getPrix)
-                    .sum();
-
-            PaiementPanel paiement = new PaiementPanel(totalPrix);
-
+            PaiementPanel paiement = new PaiementPanel(totalPx);
             paiement.setCancelAction(evt -> mainFrame.showPanel("panier"));
-
             paiement.setConfirmPaymentAction(evt -> {
                 int note = paiement.getNote();
                 if (note < 1 || note > 10) {
                     JOptionPane.showMessageDialog(mainFrame, "Merci de saisir une note entre 1 et 10.");
                     return;
                 }
-
                 Acheteur acheteur = mainFrame.getAcheteurConnecte();
                 if (acheteur == null) {
                     JOptionPane.showMessageDialog(mainFrame, "Erreur : aucun utilisateur connecté.");
@@ -165,16 +187,25 @@ public class PanierPanel extends JPanel {
                 }
 
                 CommandeDAO dao = new CommandeDAO();
+
                 dao.enregistrerCommande(panier, note, acheteur);
 
+                // pour chaque produit unique, décrémenter et persister
+                for (Map.Entry<Integer,Integer> entry : qtes.entrySet()) {
+                    Produit p = panier.stream()
+                            .filter(prod -> prod.getId() == entry.getKey())
+                            .findFirst()
+                            .get();
+                    int acheté = entry.getValue();
+                    p.setQuantite(p.getQuantite() - acheté);                 // décrémente l’objet
+                    produitController.updateProduit(p);                      // update en base via DAO
+                }
                 JOptionPane.showMessageDialog(mainFrame, "Commande enregistrée avec la note : " + note);
                 mainFrame.showPanel("accueil");
             });
-
             mainFrame.addPanel(paiement, "paiement");
             mainFrame.showPanel("paiement");
         });
-
 
         resume.add(lblResume);
         resume.add(Box.createVerticalStrut(10));
@@ -188,61 +219,85 @@ public class PanierPanel extends JPanel {
         add(resume, BorderLayout.EAST);
     }
 
-    // Carte produit unique avec bouton Supprimer
+    /**
+     * Crée une carte produit affichant le prix standard et, si applicable, le prix avec promo en gros.
+     */
     private JPanel creerCarteProduit(Produit produit, int quantite) {
         JPanel carte = new JPanel(new BorderLayout());
         carte.setOpaque(false);
         carte.setBackground(Color.WHITE);
-        carte.setBorder(BorderFactory.createMatteBorder(0,0,1,0,new Color(220,220,220)));
-        carte.setPreferredSize(new Dimension(0,150));
-        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE,150));
+        carte.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(220, 220, 220)));
+        carte.setPreferredSize(new Dimension(0, 150));
+        carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-        // Image
-        // Image
+        // ─── Image produit ─────────────────────────────────────
         if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
             Image img = redimensionnerImage(produit.getImagePath(), 100, 100);
             if (img != null) {
                 JLabel imgLbl = new JLabel(new ImageIcon(img));
                 imgLbl.setBorder(new EmptyBorder(10, 10, 0, 10));
                 carte.add(imgLbl, BorderLayout.WEST);
-            } else {
-                JLabel imgLbl = new JLabel("Image indisponible");
-                imgLbl.setPreferredSize(new Dimension(100, 100));
-                imgLbl.setHorizontalAlignment(SwingConstants.CENTER);
-                imgLbl.setBorder(new EmptyBorder(10, 10, 0, 10));
-                carte.add(imgLbl, BorderLayout.WEST);
             }
         }
 
-
-        // Infos + quantité
+        // ─── Infos texte ───────────────────────────────────────
         JPanel infos = new JPanel();
         infos.setOpaque(false);
         infos.setLayout(new BoxLayout(infos, BoxLayout.Y_AXIS));
-        infos.setBorder(new EmptyBorder(10,10,10,10));
+        infos.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JLabel lblNom   = new JLabel(produit.getNom());
-        JLabel lblPrix  = new JLabel(String.format("%.2f €", produit.getPrix()));
-        JLabel lblStock = new JLabel("Stock : " + produit.getQuantite());
-        JLabel lblQty   = new JLabel("Quantité : " + quantite);
-        for (JLabel l : new JLabel[]{lblNom,lblPrix,lblStock,lblQty}) {
-            l.setAlignmentX(Component.CENTER_ALIGNMENT);
-        }
+        // Nom du produit
+        JLabel lblNom = new JLabel(produit.getNom());
         lblNom.setFont(new Font("SansSerif", Font.BOLD, 16));
-        lblPrix.setForeground(new Color(100,100,100));
-        lblStock.setForeground(new Color(150,150,150));
-
+        lblNom.setAlignmentX(Component.CENTER_ALIGNMENT);
         infos.add(lblNom);
         infos.add(Box.createVerticalStrut(5));
-        infos.add(lblPrix);
-        infos.add(Box.createVerticalStrut(5));
+
+        // Stock restant
+        JLabel lblStock = new JLabel("Stock : " + produit.getQuantite());
+        lblStock.setForeground(new Color(150, 150, 150));
+        lblStock.setAlignmentX(Component.CENTER_ALIGNMENT);
         infos.add(lblStock);
         infos.add(Box.createVerticalStrut(10));
-        infos.add(lblQty);
+
+        // ─── Calcul des prix ───────────────────────────────────
+        double prixUnitaire  = produit.getPrix();
+        double prixStandard  = quantite * prixUnitaire;
+        double prixPromo     = prixStandard;
+
+        if (produit.isPromoEnGros() && quantite >= produit.getSeuilGros()) {
+            int nbLots = quantite / produit.getSeuilGros();
+            int reste  = quantite % produit.getSeuilGros();
+            prixPromo = nbLots * produit.getPrixGros() + reste * produit.getPrix();
+        }
+
+        // Affichage du prix standard
+        String standardText = String.format("%d × %.2f € = %.2f €", quantite, prixUnitaire, prixStandard);
+        JLabel lblStandard = new JLabel(standardText);
+        lblStandard.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblStandard.setHorizontalAlignment(SwingConstants.CENTER);
+
+        if (prixPromo < prixStandard) {
+            // Barrer le prix standard et afficher le prix promo
+            lblStandard.setText("<html><strike>" + standardText + "</strike></html>");
+            infos.add(lblStandard);
+            infos.add(Box.createVerticalStrut(4));
+
+            JLabel lblPromo = new JLabel(
+                    String.format("Total avec promo : %.2f €", prixPromo)
+            );
+            lblPromo.setForeground(Color.RED);
+            lblPromo.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblPromo.setHorizontalAlignment(SwingConstants.CENTER);
+            infos.add(lblPromo);
+        } else {
+            // Pas de promo, on ne montre que le standard
+            infos.add(lblStandard);
+        }
 
         carte.add(infos, BorderLayout.CENTER);
 
-        // Bouton Supprimer à droite
+        // ─── Bouton Supprimer ───────────────────────────────────
         JButton btnSupprimer = new JButton("Supprimer");
         btnSupprimer.setFont(new Font("SansSerif", Font.BOLD, 14));
         btnSupprimer.setForeground(Color.WHITE);
@@ -251,14 +306,12 @@ public class PanierPanel extends JPanel {
         btnSupprimer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnSupprimer.setPreferredSize(new Dimension(150, 35));
         btnSupprimer.addActionListener(e -> {
-            // supprime toutes les occurrences du produit
             panier.removeIf(p -> p.getId() == produit.getId());
-            // rafraîchit le panneau
             mainFrame.addPanel(new PanierPanel(mainFrame, panier), "panier");
             mainFrame.showPanel("panier");
         });
 
-        JPanel supprWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
+        JPanel supprWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         supprWrapper.setOpaque(false);
         supprWrapper.add(btnSupprimer);
         carte.add(supprWrapper, BorderLayout.EAST);
@@ -266,25 +319,28 @@ public class PanierPanel extends JPanel {
         return carte;
     }
 
+
+    // Style graphique des boutons
     private JButton createStyledButton(String texte) {
         JButton btn = new JButton(texte);
         btn.setFont(new Font("SansSerif", Font.BOLD, 16));
-        btn.setBackground(new Color(248,187,208));
+        btn.setBackground(new Color(248, 187, 208));
         btn.setForeground(Color.WHITE);
         btn.setFocusPainted(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBorder(new EmptyBorder(10,20,10,20));
+        btn.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         btn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent e) {
-                btn.setBackground(new Color(244,143,177));
+                btn.setBackground(new Color(244, 143, 177));
             }
             public void mouseExited(java.awt.event.MouseEvent e) {
-                btn.setBackground(new Color(248,187,208));
+                btn.setBackground(new Color(248, 187, 208));
             }
         });
         return btn;
     }
 
+    // Redimensionne une image
     private static Image redimensionnerImage(String path, int w, int h) {
         try {
             File imageFile = new File(path);
@@ -292,20 +348,18 @@ public class PanierPanel extends JPanel {
                 System.err.println("Image non trouvée : " + path);
                 return null;
             }
-
             BufferedImage orig = ImageIO.read(imageFile);
             BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2 = resized.createGraphics();
-            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2.drawImage(orig, 0, 0, w, h, null);
             g2.dispose();
             return resized;
-
         } catch (IOException ex) {
             System.err.println("Erreur chargement image : " + path);
             ex.printStackTrace();
             return null;
         }
     }
-
 }
