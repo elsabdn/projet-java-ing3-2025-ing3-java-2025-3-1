@@ -40,7 +40,10 @@ public class ProduitController {
             int quantite,
             String imagePath,
             String marque,
-            String description
+            String description,
+            boolean promoEnGros,
+            int seuilGros,
+            double prixGros
     ) {
         // Création de l'objet Produit (id = 0 pour auto‑incrément)
         Produit produit = new Produit(
@@ -54,6 +57,9 @@ public class ProduitController {
                 description
         );
         // Liaison au vendeur et insertion en base
+        produit.setPromoEnGros(promoEnGros);
+        produit.setSeuilGros(seuilGros);
+        produit.setPrixGros(prixGros);
         vendeur.addProduit(produit);
         produitDAO.ajouter(produit);
     }

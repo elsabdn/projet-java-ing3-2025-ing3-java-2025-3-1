@@ -110,7 +110,7 @@ public class VendeurPanel extends JPanel {
             String desc    = dlg.getDescription(); // description libre
             String imgPath = dlg.getCheminImage();
 
-            produitController.addProduit(vendeur, nom, prix, qte, imgPath, marque, desc);
+            produitController.addProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.isPromoEnGros(), dlg.getSeuilGros(), dlg.getPrixGros());
             updateProduitList(vendeur);
         });
 

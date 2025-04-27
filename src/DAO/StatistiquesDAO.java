@@ -99,12 +99,12 @@ public class StatistiquesDAO {
     public Map<String, Integer> getOffresBienAccueillies() throws SQLException {
         String sql =
                 "SELECT p.nom,\n" +
-                        "       SUM(CASE WHEN ci.quantite >= p.seuilGros THEN 1 ELSE 0 END) AS nbLots\n" +
+                        "       SUM(ci.quantite DIV p.seuilGros) AS nbLots\n" +
                         "FROM commande_item ci\n" +
                         "JOIN produit p ON ci.produit_id = p.id\n" +
                         "WHERE p.promoEnGros = 1\n" +
                         "GROUP BY p.nom\n" +
-                        "HAVING SUM(CASE WHEN ci.quantite >= p.seuilGros THEN 1 ELSE 0 END) > 0\n" +
+                        "HAVING nbLots > 0\n" +
                         "ORDER BY nbLots DESC";
 
         Map<String,Integer> result = new LinkedHashMap<>();

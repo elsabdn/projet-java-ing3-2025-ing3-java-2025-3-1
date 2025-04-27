@@ -130,6 +130,7 @@ public class StatistiquesPanel extends JPanel {
 
         // Panneau déroulant
         JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(30);
         add(scrollPane, BorderLayout.CENTER);
     }
 
