@@ -116,20 +116,16 @@ public class VendeurPanel extends JPanel {
 
         // Action du bouton "Consulter Rapport"
         consulterRapportBtn.addActionListener(e -> {
-            // Créer et afficher la fenêtre de statistiques
-            StatistiquesPanel statsPanel = null;
             try {
-                statsPanel = new StatistiquesPanel(vendeur);
+                // Passe MainFrame en paramètre pour la navigation
+                StatistiquesPanel statsPanel = new StatistiquesPanel(vendeur, mainFrame);
+                mainFrame.addPanel(statsPanel, "statistiques");
+                mainFrame.showPanel("statistiques");
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
-            JFrame statsFrame = new JFrame("Statistiques des Ventes");
-            statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            statsFrame.setSize(800, 600);
-            statsFrame.setLocationRelativeTo(null); // Centrer la fenêtre
-            statsFrame.add(statsPanel);
-            statsFrame.setVisible(true);
         });
+
 
         // ─── ACTION RAFRAÎCHIR ────────────────────────────────────
         refreshBtn.addActionListener(e -> updateProduitList(vendeur));

@@ -2,6 +2,7 @@ package Vue.advanced;
 
 import DAO.StatistiquesDAO;
 import Modele.Vendeur;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -12,7 +13,14 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 
-//import org.jfree.ui.ApplicationFrame;
+
+
+import javax.swing.border.EmptyBorder;
+import java.awt.GradientPaint;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Font;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,16 +37,35 @@ public class StatistiquesPanel extends JPanel {
     private JComboBox<String> produitComboBox;
     private JTextField clientIdTextField; // Champ de texte pour l'ID du client
     private JPanel detailsPanel; // Panel pour afficher les informations détaillées
+    private final MainFrame mainFrame;
 
-    public StatistiquesPanel(Vendeur vendeur) throws SQLException {
+    public StatistiquesPanel(Vendeur vendeur, MainFrame mainFrame) throws SQLException {
         this.vendeur = vendeur;
+        this.mainFrame = mainFrame;
         setLayout(new BorderLayout());
-        setBackground(new Color(240, 240, 240)); // Couleur de fond douce
+        setBackground(new Color(252, 242, 246)); // Couleur de fond douce
+
+        // HEADER ROSE AVEC BOUTON RETOUR
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JButton retourBtn = createStyledButton("← Retour");
+        retourBtn.addActionListener(e -> mainFrame.showPanel("vendeur"));
+        header.add(retourBtn, BorderLayout.WEST);
+
+        JLabel lblTitle = new JLabel("Statistiques de vente", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 20));
+        lblTitle.setForeground(new Color(92, 92, 92));
+        header.add(lblTitle, BorderLayout.CENTER);
+
+        add(header, BorderLayout.NORTH);
 
         // Connexion à la base de données
         DatabaseManager dbManager = DatabaseManager.getInstance();
         Connection connection = dbManager.getConnection();
         this.statistiquesDAO = new StatistiquesDAO(connection);
+
 
         // Panneau contenant tous les graphiques et informations
         JPanel contentPanel = new JPanel();
