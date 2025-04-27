@@ -8,12 +8,12 @@ public class Commande {
     private double montant;
     private int note;           // note sur 10, 0 = pas de note
     private Date date;          // date de la commande
-    private List<Panier.Item> items;
+    private List<Panier.Articles> items;
 
     /**
      * Constructeur pour une commande sans note.
      */
-    public Commande(int id, double montant, Date date, List<Panier.Item> items) {
+    public Commande(int id, double montant, Date date, List<Panier.Articles> items) {
         this.id      = id;
         this.montant = montant;
         this.date    = date;
@@ -24,7 +24,7 @@ public class Commande {
     /**
      * Constructeur pour une commande avec note.
      */
-    public Commande(int id, double montant, int note, Date date, List<Panier.Item> items) {
+    public Commande(int id, double montant, int note, Date date, List<Panier.Articles> items) {
         this.id      = id;
         this.montant = montant;
         this.note    = note;
@@ -58,11 +58,11 @@ public class Commande {
         this.date = date;
     }
 
-    public List<Panier.Item> getItems() {
+    public List<Panier.Articles> getItems() {
         return items;
     }
 
-    public void setItems(List<Panier.Item> items) {
+    public void setItems(List<Panier.Articles> items) {
         this.items = items;
     }
 }

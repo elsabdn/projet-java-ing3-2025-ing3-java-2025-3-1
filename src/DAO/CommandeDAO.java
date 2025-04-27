@@ -22,7 +22,7 @@ public class CommandeDAO {
      */
     public int creerCommande(int utilisateurId, double total) {
         String sql = "INSERT INTO commande (utilisateur_id, montant_total) VALUES (?, ?)";
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, utilisateurId);
@@ -44,12 +44,12 @@ public class CommandeDAO {
     /**
      * Insère les items d'une commande dans la table commande_item.
      */
-    public void ajouterItemsCommande(int commandeId, List<Panier.Item> items) {
+    public void ajouterArticlesCommande(int commandeId, List<Panier.Articles> items) {
         String sql = "INSERT INTO commande_item (commande_id, produit_id, quantite, prix) VALUES (?, ?, ?, ?)";
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            for (Panier.Item item : items) {
+            for (Panier.Articles item : items) {
                 stmt.setInt(1, commandeId);
                 stmt.setInt(2, item.getProduit().getId());
                 stmt.setInt(3, item.getQuantite());
@@ -66,7 +66,7 @@ public class CommandeDAO {
     /**
      * Récupère la liste des commandes d'un utilisateur, avec note, date et détails des items.
      */
-    public List<Commande> getCommandesByUtilisateurId(int utilisateurId) {
+    public List<Commande> recupererCommandesParUtilisateurId(int utilisateurId) {
         List<Commande> commandes = new ArrayList<>();
 
         // on sélectionne note et date_commande
@@ -81,7 +81,7 @@ public class CommandeDAO {
                 + "  JOIN produit p ON ci.produit_id = p.id "
                 + " WHERE ci.commande_id = ?";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement psCmd = conn.prepareStatement(sqlCommandes)) {
 
             psCmd.setInt(1, utilisateurId);
@@ -94,7 +94,7 @@ public class CommandeDAO {
                     java.util.Date date = ts != null ? new java.util.Date(ts.getTime()) : null;
 
                     // Chargement des items
-                    List<Panier.Item> items = new ArrayList<>();
+                    List<Panier.Articles> items = new ArrayList<>();
                     try (PreparedStatement psItems = conn.prepareStatement(sqlItems)) {
                         psItems.setInt(1, commandeId);
                         try (ResultSet rsIt = psItems.executeQuery()) {
@@ -109,7 +109,7 @@ public class CommandeDAO {
                                         rsIt.getString("marque")
                                 );
                                 int quantite = rsIt.getInt("quantite");
-                                items.add(new Panier.Item(p, quantite));
+                                items.add(new Panier.Articles(p, quantite));
                             }
                         }
                     }
@@ -134,7 +134,7 @@ public class CommandeDAO {
                 "INSERT INTO commande (utilisateur_id, montant_total, statut, note) "
                         + "VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement psCmd = conn.prepareStatement(sqlInsertCommande, Statement.RETURN_GENERATED_KEYS)) {
 
             psCmd.setInt(1, acheteur.getId());

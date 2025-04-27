@@ -12,7 +12,7 @@ public class UtilisateurDAO {
     public void ajouter(Utilisateur u) {
         String sql = "INSERT INTO utilisateur (email, mot_de_passe, role) VALUES (?, ?, ?)";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, u.getEmail());
@@ -33,7 +33,7 @@ public class UtilisateurDAO {
         List<Utilisateur> list = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -56,10 +56,10 @@ public class UtilisateurDAO {
         return list;
     }
 
-    public Utilisateur getByEmailAndMdp(String email, String mdp) {
+    public Utilisateur getParEmailEtMdp(String email, String mdp) {
         String sql = "SELECT * FROM utilisateur WHERE email = ? AND mot_de_passe = ?";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email);

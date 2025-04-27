@@ -6,7 +6,6 @@ import Controller.ProduitController;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -110,7 +109,7 @@ public class VendeurPanel extends JPanel {
             String desc    = dlg.getDescription(); // description libre
             String imgPath = dlg.getCheminImage();
 
-            produitController.addProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.isPromoEnGros(), dlg.getSeuilGros(), dlg.getPrixGros());
+            produitController.ajouterProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.isPromoEnGros(), dlg.getSeuilGros(), dlg.getPrixGros());
             updateProduitList(vendeur);
         });
 
@@ -152,11 +151,11 @@ public class VendeurPanel extends JPanel {
      */
     public void updateProduitList(Vendeur vendeur) {
         produitDisplayPanel.removeAll();
-        vendeur.setProduitList(
+        vendeur.setProduitListe(
                 produitController.getProduitsParVendeur(vendeur.getId())
         );
 
-        for (Produit p : vendeur.getProduitList()) {
+        for (Produit p : vendeur.getProduitListe()) {
             JPanel carte = new JPanel(new BorderLayout());
             carte.setBackground(Color.WHITE);
             carte.setBorder(BorderFactory.createCompoundBorder(
@@ -166,8 +165,8 @@ public class VendeurPanel extends JPanel {
             carte.setPreferredSize(new Dimension(250, 400));
 
             // Image
-            if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-                ImageIcon ico = new ImageIcon(redimensionnerImage(p.getImagePath(), 150,150));
+            if (p.getImageChemin() != null && !p.getImageChemin().isEmpty()) {
+                ImageIcon ico = new ImageIcon(redimensionnerImage(p.getImageChemin(), 150,150));
                 JLabel imgLbl = new JLabel(ico, SwingConstants.CENTER);
                 imgLbl.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
                 carte.add(imgLbl, BorderLayout.NORTH);
@@ -247,7 +246,7 @@ public class VendeurPanel extends JPanel {
                 p.setPrix(dlg.getPrixModifie());
                 p.setQuantite(dlg.getStockModifie());
                 p.setMarque(dlg.getMarqueModifiee());
-                if (dlg.getCheminImageModifie() != null) p.setImagePath(dlg.getCheminImageModifie());
+                if (dlg.getCheminImageModifie() != null) p.setImageChemin(dlg.getCheminImageModifie());
                 if (dlg.getDescriptionModifie() != null) p.setDescription(dlg.getDescriptionModifie());
 
                 produitController.updateProduit(p);

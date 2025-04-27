@@ -3,9 +3,7 @@ package Vue.advanced;
 import Modele.Produit;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.io.File;
 import java.util.List;
 
 /**
@@ -35,8 +33,8 @@ public class ProduitDetailPanel extends JPanel {
         center.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Image agrandie
-        if (produit.getImagePath() != null && !produit.getImagePath().isEmpty()) {
-            Image img = AcheteurPanel.redimensionnerImage(produit.getImagePath(), 300, 300);
+        if (produit.getImageChemin() != null && !produit.getImageChemin().isEmpty()) {
+            Image img = AcheteurPanel.redimensionnerImage(produit.getImageChemin(), 300, 300);
             JLabel imgLabel = new JLabel(new ImageIcon(img));
             imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
             center.add(imgLabel, BorderLayout.WEST);

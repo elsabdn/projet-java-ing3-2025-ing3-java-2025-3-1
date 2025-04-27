@@ -139,7 +139,7 @@ public class DatabaseManager {
 
                     Vendeur v = new Vendeur(vid, "", "");
                     Produit p = new Produit(produitId, nom, prix, stock, v, img, marque, desc);
-                    acheteur.getPanier().addItem(p, quantite);
+                    acheteur.getPanier().ajouterArticle(p, quantite);
                 }
             }
         } catch (SQLException e) {
@@ -165,7 +165,7 @@ public class DatabaseManager {
 
     // === PRODUITS ===
 
-    public void addProduit(Produit produit) {
+    public void ajouterProduit(Produit produit) {
         String sql =
                 "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque, description) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -174,7 +174,7 @@ public class DatabaseManager {
             stmt.setDouble(2, produit.getPrix());
             stmt.setInt(3, produit.getQuantite());
             stmt.setInt(4, produit.getVendeur().getId());
-            stmt.setString(5, produit.getImagePath());
+            stmt.setString(5, produit.getImageChemin());
             stmt.setString(6, produit.getMarque());
             stmt.setString(7, produit.getDescription());
             stmt.executeUpdate();
@@ -187,7 +187,7 @@ public class DatabaseManager {
         }
     }
 
-    public void removeProduit(Produit produit) {
+    public void supprimerProduit(Produit produit) {
         String sql = "DELETE FROM produit WHERE id = ?";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
             stmt.setInt(1, produit.getId());
@@ -248,7 +248,7 @@ public class DatabaseManager {
                     String desc     = rs.getString("description");
 
                     Produit p = new Produit(id, nom, prix, quantite, vendeur, img, marque, desc);
-                    vendeur.addProduit(p);
+                    vendeur.ajouterProduit(p);
                 }
                 vp.updateProduitList(vendeur);
             }
@@ -306,7 +306,7 @@ public class DatabaseManager {
         return produits;
     }
 
-    public Produit getProduitById(int idRecherche) {
+    public Produit obtenirProduitParId(int idRecherche) {
         String sql =
                 "SELECT p.nom, p.prix, p.quantite, p.vendeur_id, p.image_path, " +
                         "p.marque, p.description, u.email " +
@@ -430,10 +430,10 @@ public class DatabaseManager {
         return -1;
     }
 
-    public void ajouterItemsALaCommande(int commandeId, List<Panier.Item> items) {
+    public void ajouterItemsALaCommande(int commandeId, List<Panier.Articles> items) {
         String sql = "INSERT INTO commande_item (commande_id, produit_id, quantite, prix) VALUES (?, ?, ?, ?)";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
-            for (Panier.Item item : items) {
+            for (Panier.Articles item : items) {
                 stmt.setInt(1, commandeId);
                 stmt.setInt(2, item.getProduit().getId());
                 stmt.setInt(3, item.getQuantite());

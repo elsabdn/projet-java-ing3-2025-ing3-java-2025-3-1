@@ -94,7 +94,7 @@ public class AcheteurPanel extends JPanel {
                 return;
             }
             CommandeDAO dao = new CommandeDAO();
-            List<Commande> commandes = dao.getCommandesByUtilisateurId(acheteur.getId());
+            List<Commande> commandes = dao.recupererCommandesParUtilisateurId(acheteur.getId());
             if (commandes.isEmpty()) {
                 JOptionPane.showMessageDialog(mainFrame,
                         "😅 Vous n'avez encore rien commandé !");
@@ -213,8 +213,8 @@ public class AcheteurPanel extends JPanel {
         carte.setBorder(BorderFactory.createLineBorder(new Color(220, 220, 220)));
         carte.setBackground(Color.WHITE);
 
-        if (p.getImagePath() != null && !p.getImagePath().isEmpty()) {
-            ImageIcon ico = new ImageIcon(redimensionnerImage(p.getImagePath(), 150, 150));
+        if (p.getImageChemin() != null && !p.getImageChemin().isEmpty()) {
+            ImageIcon ico = new ImageIcon(redimensionnerImage(p.getImageChemin(), 150, 150));
             JLabel imgLbl = new JLabel(ico);
             imgLbl.setHorizontalAlignment(SwingConstants.CENTER);
             imgLbl.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));

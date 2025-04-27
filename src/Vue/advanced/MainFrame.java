@@ -69,7 +69,7 @@ public class MainFrame extends JFrame {
                 showPanel("vendeur");
             } else {
                 setAcheteurConnecte((Acheteur) u); // ✅ Stockage de l'acheteur connecté
-                List<Produit> produits = new ProduitController().getAllProduits();
+                List<Produit> produits = new ProduitController().recupererTousLesProduits();
                 AcheteurPanel ap = new AcheteurPanel(this, produits);
                 addPanel(ap, "acheteur");
                 showPanel("acheteur");
@@ -80,9 +80,9 @@ public class MainFrame extends JFrame {
         accueil.setAcheteurAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
-            Acheteur a   = authController.registerAcheteur(email, mdp);
+            Acheteur a   = authController.inscrireAcheteur(email, mdp);
             setAcheteurConnecte(a); // ✅ Stockage après inscription
-            List<Produit> produits = new ProduitController().getAllProduits();
+            List<Produit> produits = new ProduitController().recupererTousLesProduits();
             AcheteurPanel ap = new AcheteurPanel(this, produits);
             addPanel(ap, "acheteur");
             showPanel("acheteur");
@@ -92,7 +92,7 @@ public class MainFrame extends JFrame {
         accueil.setVendeurAction(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
-            Vendeur v    = authController.registerVendeur(email, mdp);
+            Vendeur v    = authController.inscrireVendeur(email, mdp);
             VendeurPanel vp = new VendeurPanel(v, this);
             addPanel(vp, "vendeur");
             showPanel("vendeur");
@@ -124,7 +124,7 @@ public class MainFrame extends JFrame {
     /** Recharge et affiche l'accueil Acheteur */
     public void showAcheteurHome() {
         Acheteur a = getAcheteurConnecte();
-        List<Produit> produits = new ProduitController().getAllProduits();
+        List<Produit> produits = new ProduitController().recupererTousLesProduits();
         AcheteurPanel ap = new AcheteurPanel(this, produits);
         addPanel(ap, "acheteur");
         showPanel("acheteur");

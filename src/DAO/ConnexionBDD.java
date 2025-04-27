@@ -9,7 +9,7 @@ public class ConnexionBDD {
     private static final String USER = "root";
     private static final String PASSWORD = "";
 
-    public static Connection getConnexion() throws SQLException {
+    public static Connection obtenirConnexion() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {

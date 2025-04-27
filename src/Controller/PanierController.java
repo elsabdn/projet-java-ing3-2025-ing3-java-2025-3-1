@@ -26,7 +26,7 @@ public class PanierController {
             acheteur.getPanier().addItem(produit, quantite);
             produit.setQuantite(produit.getQuantite() - quantite);
             produitDAO.mettreAJourProduit(produit);
-            panierDAO.ajouterItem(acheteur.getId(), produit, quantite);
+            panierDAO.ajouterArticle(acheteur.getId(), produit, quantite);
             return true;
         }
         return false;
@@ -46,13 +46,13 @@ public class PanierController {
         } else {
             // Si le panier n'est pas vide, affiche les produits
             System.out.println("Contenu du panier :");
-            for (Panier.Item item : panier.getItems()) {
+            for (Panier.Articles item : panier.getItems()) {
                 System.out.println("Produit: " + item.getProduit().getNom() + ", Quantité: " + item.getQuantite());
             }
         }
     }
 
-    public void checkout() {
+    public void validerPanier() {
         Panier panier = acheteur.getPanier();
         if (panier.getItems().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Votre panier est vide !");
@@ -61,7 +61,7 @@ public class PanierController {
 
         // ✅ Nouveau calcul du total avec gestion du prix en gros
         double total = 0.0;
-        for (Panier.Item item : panier.getItems()) {
+        for (Panier.Articles item : panier.getItems()) {
             Produit p = item.getProduit();
             int qte = item.getQuantite();
 
@@ -78,24 +78,24 @@ public class PanierController {
 
         if (confirm == JOptionPane.YES_OPTION) {
             int commandeId = commandeDAO.creerCommande(acheteur.getId(), total);
-            commandeDAO.ajouterItemsCommande(commandeId, panier.getItems());
+            commandeDAO.ajouterArticlesCommande(commandeId, panier.getItems());
             panierDAO.viderPanier(acheteur.getId());
             panier.clear();
 
-            JTextArea textArea = new JTextArea(generateReceipt());
+            JTextArea textArea = new JTextArea(genererTicket());
             textArea.setEditable(false);
             textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
             JOptionPane.showMessageDialog(null, new JScrollPane(textArea), "Ticket de Commande", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    private String generateReceipt() {
+    private String genererTicket() {
         StringBuilder sb = new StringBuilder();
         sb.append("🧾 Ticket de Commande\n");
         sb.append("Acheteur : ").append(acheteur.getEmail()).append("\n\n");
 
         double total = 0.0;
-        for (Panier.Item item : acheteur.getPanier().getItems()) {
+        for (Panier.Articles item : acheteur.getPanier().getItems()) {
             Produit produit = item.getProduit();
             int qte = item.getQuantite();
 

@@ -79,7 +79,7 @@ public class ModifierProduitDialog extends JDialog {
         formulaire.add(new JLabel("Image :"), gbc);
         JPanel panneauImage = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         etiquetteImage = new JLabel(
-                p.getImagePath() != null ? new File(p.getImagePath()).getName() : "Aucune"
+                p.getImageChemin() != null ? new File(p.getImageChemin()).getName() : "Aucune"
         );
         JButton btnImage = createStyledButton("Choisir…");
         btnImage.addActionListener(e -> {
@@ -158,7 +158,7 @@ public class ModifierProduitDialog extends JDialog {
                 p.setPrix(Double.parseDouble(champPrix.getText().trim()));
                 p.setQuantite(Integer.parseInt(champStock.getText().trim()));
                 p.setMarque(champMarque.getText().trim());
-                if (cheminImage != null) p.setImagePath(cheminImage);
+                if (cheminImage != null) p.setImageChemin(cheminImage);
                 p.setDescription(champDescription.getText().trim());
                 p.setPromoEnGros(promoEnGrosCheck.isSelected());
                 p.setSeuilGros(Integer.parseInt(seuilGrosField.getText().trim()));

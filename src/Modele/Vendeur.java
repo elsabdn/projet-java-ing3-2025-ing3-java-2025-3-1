@@ -5,23 +5,23 @@ import java.util.List;
 import DAO.DatabaseManager;
 
 public class Vendeur extends Utilisateur {
-    private List<Produit> produitList;
+    private List<Produit> produitListe;
 
     public Vendeur(int id, String email, String mdp) {
         super(id, email, mdp, "vendeur");
-        this.produitList = new ArrayList<>();
+        this.produitListe = new ArrayList<>();
     }
 
-    public List<Produit> getProduitList() { return produitList; }
+    public List<Produit> getProduitListe() { return produitListe; }
 
-    public void setProduitList(List<Produit> produitList) { this.produitList = produitList;}
+    public void setProduitListe(List<Produit> produitListe) { this.produitListe = produitListe;}
 
-    public void addProduit(Produit produit) {
-        produitList.add(produit);
+    public void ajouterProduit(Produit produit) {
+        produitListe.add(produit);
     }
 
-    public void removeProduit(Produit produit) {
-        produitList.remove(produit);
+    public void supprimerProduit(Produit produit) {
+        produitListe.remove(produit);
     }
 
     // Ajout de la méthode pour obtenir la connexion à la base de données

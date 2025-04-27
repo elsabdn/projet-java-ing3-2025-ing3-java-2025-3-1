@@ -14,10 +14,6 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 
 
-
-import javax.swing.border.EmptyBorder;
-import java.awt.GradientPaint;
-import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Font;
 
@@ -271,7 +267,7 @@ public class StatistiquesPanel extends JPanel {
             detailsPanel.removeAll();
 
             // Afficher les informations du produit sélectionné
-            int produitId = statistiquesDAO.getProduitIdByName(selectedProduit);
+            int produitId = statistiquesDAO.getProduitIdParName(selectedProduit);
             int montantVentesProduit = statistiquesDAO.getMontantVenteProduit(produitId);
             JLabel ventesProduitLabel = new JLabel("Montant total des ventes pour le produit \"" + selectedProduit + "\": " + montantVentesProduit + " €");
             ventesProduitLabel.setFont(new Font("Arial", Font.PLAIN, 20));

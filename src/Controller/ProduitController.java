@@ -21,24 +21,24 @@ public class ProduitController {
     }
 
     /** Récupère tous les produits existants. */
-    public List<Produit> getAllProduits() {
-        return produitDAO.getAll();
+    public List<Produit> recupererTousLesProduits() {
+        return produitDAO.recupererTousLesProduits();
     }
 
     /** Récupère les produits correspondant à un vendeur. */
-    public List<Produit> getProduitsParVendeur(int vendeurId) {
+    public List<Produit> recupererProduitsParVendeur(int vendeurId) {
         return databaseManager.getProduitsParVendeur(vendeurId);
     }
 
     /**
      * Crée et enregistre un nouveau produit, en incluant sa description.
      */
-    public void addProduit(
+    public void ajouterProduit(
             Vendeur vendeur,
             String nom,
             double prix,
             int quantite,
-            String imagePath,
+            String cheminImage,
             String marque,
             String description,
             boolean promoEnGros,
@@ -52,7 +52,7 @@ public class ProduitController {
                 prix,
                 quantite,
                 vendeur,
-                imagePath,
+                cheminImage,
                 marque,
                 description
         );
@@ -60,16 +60,16 @@ public class ProduitController {
         produit.setPromoEnGros(promoEnGros);
         produit.setSeuilGros(seuilGros);
         produit.setPrixGros(prixGros);
-        vendeur.addProduit(produit);
+        vendeur.ajouterProduit(produit);
         produitDAO.ajouter(produit);
     }
 
     /**
      * Supprime un produit existant si son ID est valide.
      */
-    public void removeProduit(Vendeur vendeur, Produit produit) {
+    public void supprimerProduit(Vendeur vendeur, Produit produit) {
         if (produit.getId() != 0) {
-            vendeur.removeProduit(produit);
+            vendeur.supprimerProduit(produit);
             produitDAO.supprimer(produit);
         } else {
             System.out.println("Impossible de supprimer : ID invalide.");
@@ -79,7 +79,7 @@ public class ProduitController {
     /**
      * Met à jour un produit, y compris sa description.
      */
-    public void updateProduit(Produit produit) {
+    public void mettreAJourProduit(Produit produit) {
         if (produit.getId() != 0) {
             produitDAO.mettreAJourProduit(produit);
         } else {

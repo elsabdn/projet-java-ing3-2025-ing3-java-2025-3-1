@@ -5,7 +5,7 @@ public class Produit {
     private String nom;
     private double prix;
     private int quantite;
-    private String imagePath;
+    private String imageChemin;
     private Vendeur vendeur;
     private String marque;
     private String description;
@@ -30,7 +30,7 @@ public class Produit {
         this.prix = prix;
         this.quantite = quantite;
         this.vendeur = vendeur;
-        this.imagePath = imagePath;
+        this.imageChemin = imagePath;
         this.marque = marque;
         this.description = description;
     }
@@ -83,12 +83,12 @@ public class Produit {
         this.quantite = quantite;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getImageChemin() {
+        return imageChemin;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setImageChemin(String imageChemin) {
+        this.imageChemin = imageChemin;
     }
 
     public Vendeur getVendeur() {

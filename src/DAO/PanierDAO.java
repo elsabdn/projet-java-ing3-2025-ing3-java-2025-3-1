@@ -17,25 +17,25 @@ public class PanierDAO {
         WHERE pa.utilisateur_id = ?
     """;
 
-        try (Connection conn = ConnexionBDD.getConnexion();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, acheteur.getId());
-            ResultSet rs = stmt.executeQuery();
+            ResultSet resultat = stmt.executeQuery();
 
-            while (rs.next()) {
-                String imagePath = rs.getString("image_path");
-                String marque = rs.getString("marque");
+            while (resultat.next()) {
+                String CheminImage = resultat.getString("image_path");
+                String marque = resultat.getString("marque");
 
                 Produit produit = new Produit(
-                        rs.getInt("produit_id"),
-                        rs.getString("nom"),
-                        rs.getDouble("prix"),
-                        rs.getInt("stock"),
-                        new Vendeur(rs.getInt("vendeur_id"), "", ""),
-                        imagePath, marque);
-                int quantite = rs.getInt("quantite");
-                acheteur.getPanier().addItem(produit, quantite);
+                        resultat.getInt("produit_id"),
+                        resultat.getString("nom"),
+                        resultat.getDouble("prix"),
+                        resultat.getInt("stock"),
+                        new Vendeur(resultat.getInt("vendeur_id"), "", ""),
+                        CheminImage, marque);
+                int quantite = resultat.getInt("quantite");
+                acheteur.getPanier().ajouterArticle(produit, quantite);
 
             }
 
@@ -47,11 +47,11 @@ public class PanierDAO {
 
     public int creerPanier(int utilisateurId) {
         String sql = "INSERT INTO panier (utilisateur_id) VALUES (?)";
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, utilisateurId);
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            instruction.setInt(1, utilisateurId);
+            instruction.executeUpdate();
+            ResultSet rs = instruction.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -62,31 +62,31 @@ public class PanierDAO {
     }
 
 
-    public void ajouterItem(int utilisateurId, Produit produit, int quantite) {
-        int panierId = getIdPanier(utilisateurId);
+    public void ajouterArticle(int utilisateurId, Produit produit, int quantite) {
+        int panierId = obtenirIdPanier(utilisateurId);
 
         if (panierId == -1) {
             panierId = creerPanier(utilisateurId);  // Crée un panier pour l'utilisateur si nécessaire
         }
         if (panierId == -1) return;  // Si la création du panier échoue, on arrête
 
-        try (Connection conn = ConnexionBDD.getConnexion()) {
+        try (Connection connexion = ConnexionBDD.obtenirConnexion()) {
             // vérifier si produit déjà dans le panier
-            String verif = "SELECT id, quantite FROM panier_item WHERE panier_id = ? AND produit_id = ?";
-            PreparedStatement check = conn.prepareStatement(verif);
-            check.setInt(1, panierId);
-            check.setInt(2, produit.getId());
-            ResultSet rs = check.executeQuery();
+            String verification = "SELECT id, quantite FROM panier_item WHERE panier_id = ? AND produit_id = ?";
+            PreparedStatement verif = connexion.prepareStatement(verification);
+            verif.setInt(1, panierId);
+            verif.setInt(2, produit.getId());
+            ResultSet resultat = verif.executeQuery();
 
-            if (rs.next()) {
-                int itemId = rs.getInt("id");
-                int newQuantite = rs.getInt("quantite") + quantite;
-                PreparedStatement update = conn.prepareStatement("UPDATE panier_item SET quantite = ? WHERE id = ?");
-                update.setInt(1, newQuantite);
-                update.setInt(2, itemId);
-                update.executeUpdate();
+            if (resultat.next()) {
+                int itemId = resultat.getInt("id");
+                int newQuantite = resultat.getInt("quantite") + quantite;
+                PreparedStatement miseAJour = connexion.prepareStatement("UPDATE panier_item SET quantite = ? WHERE id = ?");
+                miseAJour.setInt(1, newQuantite);
+                miseAJour.setInt(2, itemId);
+                miseAJour.executeUpdate();
             } else {
-                PreparedStatement insert = conn.prepareStatement("INSERT INTO panier_item (panier_id, produit_id, quantite) VALUES (?, ?, ?)");
+                PreparedStatement insert = connexion.prepareStatement("INSERT INTO panier_item (panier_id, produit_id, quantite) VALUES (?, ?, ?)");
                 insert.setInt(1, panierId);
                 insert.setInt(2, produit.getId());
                 insert.setInt(3, quantite);
@@ -99,33 +99,33 @@ public class PanierDAO {
     }
 
     public void viderPanier(int utilisateurId) {
-        int panierId = getIdPanier(utilisateurId);
+        int panierId = obtenirIdPanier(utilisateurId);
 
         if (panierId == -1) return;
 
         String sql = "DELETE FROM panier_item WHERE panier_id = ?";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, panierId);
-            stmt.executeUpdate();
+            instruction.setInt(1, panierId);
+            instruction.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private int getIdPanier(int utilisateurId) {
+    private int obtenirIdPanier(int utilisateurId) {
         String sql = "SELECT id FROM panier WHERE utilisateur_id = ?";
 
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, utilisateurId);
-            ResultSet rs = stmt.executeQuery();
+            instruction.setInt(1, utilisateurId);
+            ResultSet resultat = instruction.executeQuery();
 
-            if (rs.next()) return rs.getInt("id");
+            if (resultat.next()) return resultat.getInt("id");
 
         } catch (SQLException e) {
             e.printStackTrace();

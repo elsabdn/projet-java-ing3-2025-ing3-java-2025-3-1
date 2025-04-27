@@ -133,11 +133,11 @@ public class InscriptionPanel extends JPanel {
         }
 
         if (type == TypeUtilisateur.ACHETEUR) {
-            Acheteur a = authController.registerAcheteur(email, mdp);
+            Acheteur a = authController.inscrireAcheteur(email, mdp);
             mainFrame.setAcheteurConnecte(a);
             mainFrame.showAcheteurHome();
         } else {
-            Vendeur v = authController.registerVendeur(email, mdp);
+            Vendeur v = authController.inscrireVendeur(email, mdp);
             mainFrame.showVendeurHome(v);
         }
     }

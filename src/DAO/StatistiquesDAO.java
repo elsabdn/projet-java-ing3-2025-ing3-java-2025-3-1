@@ -149,7 +149,7 @@ public class StatistiquesDAO {
     }
 
     // --- 7. Obtenir l'ID d'un produit par son nom ---
-    public int getProduitIdByName(String nomProduit) {
+    public int getProduitIdParName(String nomProduit) {
         String query = "SELECT id FROM produit WHERE nom = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, nomProduit);
@@ -165,7 +165,7 @@ public class StatistiquesDAO {
     }
 
     // --- 8. Obtenir l'ID d'un client par son nom ---
-    public int getClientIdByName(String nomClient) {
+    public int getClientIdParName(String nomClient) {
         String query = "SELECT id FROM utilisateur WHERE nom = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, nomClient);

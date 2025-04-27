@@ -12,23 +12,23 @@ public class ProduitDAO {
     public void ajouter(Produit p) {
         String sql = "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque, description, promoEnGros, seuilGros, prixGros) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setString(1, p.getNom());
-            stmt.setDouble(2, p.getPrix());
-            stmt.setInt(3, p.getQuantite());
-            stmt.setInt(4, p.getVendeur().getId());
-            stmt.setString(5, p.getImagePath());
-            stmt.setString(6, p.getMarque());
-            stmt.setString(7, p.getDescription());
-            stmt.setBoolean(8, p.isPromoEnGros());
-            stmt.setInt(9, p.getSeuilGros());
-            stmt.setDouble(10, p.getPrixGros());
+            instruction.setString(1, p.getNom());
+            instruction.setDouble(2, p.getPrix());
+            instruction.setInt(3, p.getQuantite());
+            instruction.setInt(4, p.getVendeur().getId());
+            instruction.setString(5, p.getImageChemin());
+            instruction.setString(6, p.getMarque());
+            instruction.setString(7, p.getDescription());
+            instruction.setBoolean(8, p.isPromoEnGros());
+            instruction.setInt(9, p.getSeuilGros());
+            instruction.setDouble(10, p.getPrixGros());
 
-            stmt.executeUpdate();
+            instruction.executeUpdate();
 
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
+            try (ResultSet rs = instruction.getGeneratedKeys()) {
                 if (rs.next()) {
                     p.setId(rs.getInt(1));
                 }
@@ -38,12 +38,12 @@ public class ProduitDAO {
         }
     }
 
-    public List<Produit> getAll() {
+    public List<Produit> recupererTousLesProduits() {
         List<Produit> list = new ArrayList<>();
         String sql = "SELECT * FROM produit";
-        try (Connection conn = ConnexionBDD.getConnexion();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             Statement instruction = conn.createStatement();
+             ResultSet rs = instruction.executeQuery(sql)) {
 
             while (rs.next()) {
                 int id = rs.getInt("id");
@@ -75,11 +75,11 @@ public class ProduitDAO {
 
     public void supprimer(Produit produit) {
         String sql = "DELETE FROM produit WHERE id = ?";
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, produit.getId());
-            stmt.executeUpdate();
+            instruction.setInt(1, produit.getId());
+            instruction.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -87,22 +87,22 @@ public class ProduitDAO {
 
     public void mettreAJourProduit(Produit produit) {
         String sql = "UPDATE produit SET nom = ?, prix = ?, quantite = ?, image_path = ?, marque = ?, description = ?, promoEnGros = ?, seuilGros = ?, prixGros = ? WHERE id = ?";
-        try (Connection conn = ConnexionBDD.getConnexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnexionBDD.obtenirConnexion();
+             PreparedStatement instruction = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, produit.getNom());
-            stmt.setDouble(2, produit.getPrix());
-            stmt.setInt(3, produit.getQuantite());
-            stmt.setString(4, produit.getImagePath());
-            stmt.setString(5, produit.getMarque());
-            stmt.setString(6, produit.getDescription());
-            stmt.setBoolean(7, produit.isPromoEnGros());
-            stmt.setInt(8, produit.getSeuilGros());
-            stmt.setDouble(9, produit.getPrixGros());
-            stmt.setInt(10, produit.getId());
+            instruction.setString(1, produit.getNom());
+            instruction.setDouble(2, produit.getPrix());
+            instruction.setInt(3, produit.getQuantite());
+            instruction.setString(4, produit.getImageChemin());
+            instruction.setString(5, produit.getMarque());
+            instruction.setString(6, produit.getDescription());
+            instruction.setBoolean(7, produit.isPromoEnGros());
+            instruction.setInt(8, produit.getSeuilGros());
+            instruction.setDouble(9, produit.getPrixGros());
+            instruction.setInt(10, produit.getId());
 
-            int rowsUpdated = stmt.executeUpdate();
-            if (rowsUpdated > 0) {
+            int lignesModifiees = instruction.executeUpdate();
+            if (lignesModifiees > 0) {
                 System.out.println("✅ Produit mis à jour avec succès !");
             } else {
                 System.out.println("❌ Aucun produit trouvé avec cet ID.");

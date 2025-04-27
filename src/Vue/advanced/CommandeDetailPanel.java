@@ -86,7 +86,7 @@ public class CommandeDetailPanel extends JPanel {
         itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
         itemsPanel.setBorder(new EmptyBorder(10, 0, 0, 0));
 
-        for (Panier.Item item : commande.getItems()) {
+        for (Panier.Articles item : commande.getItems()) {
             itemsPanel.add(creerCarteItem(item));
             itemsPanel.add(Box.createVerticalStrut(10));
         }
@@ -127,7 +127,7 @@ public class CommandeDetailPanel extends JPanel {
     /**
      * Crée une carte visuelle pour chaque article commandé : image + nom + prix + quantite.
      */
-    private JPanel creerCarteItem(Panier.Item item) {
+    private JPanel creerCarteItem(Panier.Articles item) {
         JPanel card = new JPanel(new BorderLayout(10,10));
         card.setBackground(Color.WHITE);
         card.setOpaque(true);
@@ -138,7 +138,7 @@ public class CommandeDetailPanel extends JPanel {
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
 
         // Image du produit (redimensionnée)
-        Image img = redimensionnerImage(item.getProduit().getImagePath(), 80, 80);
+        Image img = redimensionnerImage(item.getProduit().getImageChemin(), 80, 80);
         if (img != null) {
             JLabel pic = new JLabel(new ImageIcon(img));
             pic.setBorder(new EmptyBorder(0,0,0,10));

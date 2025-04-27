@@ -60,7 +60,7 @@ public class HistoriquePanel extends JPanel {
         add(header, BorderLayout.NORTH);
 
         // ─── CONTENU: récupération des commandes depuis la BDD ──────────────────────────────────
-        List<Commande> commandes = commandeDAO.getCommandesByUtilisateurId(acheteur.getId());
+        List<Commande> commandes = commandeDAO.recupererCommandesParUtilisateurId(acheteur.getId());
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setOpaque(false);
@@ -131,8 +131,8 @@ public class HistoriquePanel extends JPanel {
                 // — Carousel d’images produits à droite —
                 JPanel imgRow = new JPanel(new FlowLayout(FlowLayout.LEFT,10,0));
                 imgRow.setOpaque(false);
-                for (Panier.Item item : c.getItems()) {
-                    String path = item.getProduit().getImagePath();
+                for (Panier.Articles item : c.getItems()) {
+                    String path = item.getProduit().getImageChemin();
                     Image img = redimensionnerImage(path, 80, 80);
                     if (img != null) {
                         JLabel pic = new JLabel(new ImageIcon(img));

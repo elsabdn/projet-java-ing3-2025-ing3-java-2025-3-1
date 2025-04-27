@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Panier {
 
-    public static class Item {
+    public static class Articles {
         private Produit produit;
         private int quantite; //quantite
 
-        public Item(Produit produit, int quantite) {
+        public Articles(Produit produit, int quantite) {
             this.produit = produit;
             this.quantite = quantite;
         }
@@ -23,29 +23,29 @@ public class Panier {
     }
 
     private Acheteur acheteur;
-    private List<Item> items = new ArrayList<>();
+    private List<Articles> items = new ArrayList<>();
 
     public Panier(Acheteur acheteur) {
         this.acheteur = acheteur;
     }
 
-    public List<Item> getItems() {
+    public List<Articles> getItems() {
         return items;
     }
 
 
 
-    public void addItem(Produit produit, int quantite) {
-        for (Item item : items) {
+    public void ajouterArticle(Produit produit, int quantite) {
+        for (Articles item : items) {
             if (item.getProduit().equals(produit)) {
                 item.quantite += quantite;
                 return;
             }
         }
-        items.add(new Item(produit, quantite));
+        items.add(new Articles(produit, quantite));
     }
 
-    public void removeItem(Produit produit) {
+    public void supprimerItem(Produit produit) {
         items.removeIf(item -> item.getProduit().equals(produit));
     }
 
@@ -55,7 +55,7 @@ public class Panier {
 
     public double getPrixTot() {
         double total = 0.0;
-        for (Item item : items) {
+        for (Articles item : items) {
             Produit p = item.getProduit();
             int qte = item.getQuantite();
 
@@ -80,7 +80,7 @@ public class Panier {
         if (items.isEmpty()) {
             sb.append("Le panier est vide.\n");
         } else {
-            for (Item item : items) {
+            for (Articles item : items) {
                 sb.append(item.getProduit().getNom())
                         .append(" x").append(item.getQuantite())
                         .append(" @ ").append(item.getProduit().getPrix())

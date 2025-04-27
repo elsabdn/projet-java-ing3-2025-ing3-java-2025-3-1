@@ -2,7 +2,6 @@ package Vue.advanced;
 
 import Modele.Produit;
 import Controller.ProduitController;
-import Vue.advanced.PaiementPanel;
 import DAO.CommandeDAO;
 import Modele.Acheteur;
 
@@ -180,7 +179,7 @@ public class PanierPanel extends JPanel {
                             .filter(prod -> prod.getId()==ent.getKey())
                             .findFirst().get();
                     p.setQuantite(p.getQuantite() - ent.getValue());
-                    produitController.updateProduit(p);
+                    produitController.mettreAJourProduit(p);
                 }
 
                 panier.clear();
@@ -217,8 +216,8 @@ public class PanierPanel extends JPanel {
         carte.setPreferredSize(new Dimension(0,150));
         carte.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-        if (produit.getImagePath()!=null && !produit.getImagePath().isEmpty()) {
-            Image img = redimensionnerImage(produit.getImagePath(), 100,100);
+        if (produit.getImageChemin()!=null && !produit.getImageChemin().isEmpty()) {
+            Image img = redimensionnerImage(produit.getImageChemin(), 100,100);
             if (img != null) {
                 JLabel imgLbl = new JLabel(new ImageIcon(img));
                 imgLbl.setBorder(new EmptyBorder(10,10,0,10));
