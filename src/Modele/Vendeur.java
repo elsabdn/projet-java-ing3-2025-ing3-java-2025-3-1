@@ -2,6 +2,7 @@ package Modele;
 
 import java.util.ArrayList;
 import java.util.List;
+import DAO.DatabaseManager;
 
 public class Vendeur extends Utilisateur {
     private List<Produit> produitList;
@@ -22,4 +23,10 @@ public class Vendeur extends Utilisateur {
     public void removeProduit(Produit produit) {
         produitList.remove(produit);
     }
+
+    // Ajout de la méthode pour obtenir la connexion à la base de données
+    public DatabaseManager getConnection() {
+        return DatabaseManager.getInstance();  // Utilise DatabaseManager pour obtenir la connexion
+    }
+
 }

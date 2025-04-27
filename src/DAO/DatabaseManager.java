@@ -9,19 +9,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseManager {
-    private static final String URL_BDD          = "jdbc:mysql://localhost:8889/ecommerce";
+    private static final String URL_BDD          = "jdbc:mysql://localhost:3306/ecommerce";
     private static final String UTILISATEUR_BDD  = "root";
-    private static final String MOT_DE_PASSE_BDD = "root";
+    private static final String MOT_DE_PASSE_BDD = "";
 
-    private Connection connexion;
+    private Connection connexion; // <= On garde SEULEMENT celle-ci
+
+    private static DatabaseManager instance;
 
     public DatabaseManager() {
         try {
-            // Chargement du driver JDBC pour MySQL
             Class.forName("com.mysql.cj.jdbc.Driver");
-            // Établissement de la connexion
             connexion = DriverManager.getConnection(URL_BDD, UTILISATEUR_BDD, MOT_DE_PASSE_BDD);
-            System.out.println("Connexion à la base de données établie avec succès !");
+            System.out.println("Connexion à la base de données établie avec succès !");
         } catch (ClassNotFoundException e) {
             System.err.println("Driver MySQL introuvable");
             e.printStackTrace();
@@ -29,6 +29,17 @@ public class DatabaseManager {
             System.err.println("Erreur de connexion à la base de données");
             e.printStackTrace();
         }
+    }
+
+    public static DatabaseManager getInstance() {
+        if (instance == null) {
+            instance = new DatabaseManager();
+        }
+        return instance;
+    }
+
+    public Connection getConnection() {
+        return connexion; // <= ON RÉPOND AVEC connexion, pas "connection" !
     }
 
     public void fermerConnexion() {

@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 
 /**
  * Panneau principal pour les vendeurs, affichant leurs produits
@@ -26,6 +27,8 @@ public class VendeurPanel extends JPanel {
     private final JButton        deconnexionBtn;
     private final MainFrame      mainFrame;
     private float                opacity = 0.0f;
+
+    private final JButton consulterRapportBtn; // Nouveau bouton
 
     public VendeurPanel(Vendeur vendeur, MainFrame mainFrame) {
         this.produitController = new ProduitController();
@@ -50,7 +53,7 @@ public class VendeurPanel extends JPanel {
 
         JLabel title = new JLabel("Tableau de bord vendeur", SwingConstants.CENTER);
         title.setFont(new Font("SansSerif", Font.BOLD,20));
-        title.setForeground(new Color(92,92,92));
+        title.setForeground(new Color(92, 92, 92));
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
@@ -85,11 +88,13 @@ public class VendeurPanel extends JPanel {
         // ─── FOOTER : boutons ─────────────────────────────────────
         addProduitBtn = createStyledButton("➕ Ajouter un produit");
         refreshBtn    = createStyledButton("🔄 Rafraîchir");
+        consulterRapportBtn = createStyledButton("📊 Consulter Rapport"); // Nouveau bouton
         JPanel bottom = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
         bottom.setOpaque(false);
         bottom.setBorder(BorderFactory.createEmptyBorder(0,0,20,0));
         bottom.add(addProduitBtn);
         bottom.add(refreshBtn);
+        bottom.add(consulterRapportBtn); // Ajout du bouton
         add(bottom, BorderLayout.SOUTH);
 
         // ─── ACTION AJOUT ─────────────────────────────────────────
@@ -109,12 +114,31 @@ public class VendeurPanel extends JPanel {
             updateProduitList(vendeur);
         });
 
+        // Action du bouton "Consulter Rapport"
+        consulterRapportBtn.addActionListener(e -> {
+            // Créer et afficher la fenêtre de statistiques
+            StatistiquesPanel statsPanel = null;
+            try {
+                statsPanel = new StatistiquesPanel(vendeur);
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            JFrame statsFrame = new JFrame("Statistiques des Ventes");
+            statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            statsFrame.setSize(800, 600);
+            statsFrame.setLocationRelativeTo(null); // Centrer la fenêtre
+            statsFrame.add(statsPanel);
+            statsFrame.setVisible(true);
+        });
+
         // ─── ACTION RAFRAÎCHIR ────────────────────────────────────
         refreshBtn.addActionListener(e -> updateProduitList(vendeur));
 
         // Chargement initial
         updateProduitList(vendeur);
     }
+
+
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -141,7 +165,7 @@ public class VendeurPanel extends JPanel {
             carte.setBackground(Color.WHITE);
             carte.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createEmptyBorder(10,10,10,10),
-                    BorderFactory.createLineBorder(new Color(220,220,220))
+                    BorderFactory.createLineBorder(new Color(245, 245, 245))
             ));
             carte.setPreferredSize(new Dimension(250, 400));
 
