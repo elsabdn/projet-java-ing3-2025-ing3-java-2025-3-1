@@ -152,7 +152,7 @@ public class VendeurPanel extends JPanel {
     public void updateProduitList(Vendeur vendeur) {
         produitDisplayPanel.removeAll();
         vendeur.setProduitListe(
-                produitController.getProduitsParVendeur(vendeur.getId())
+                produitController.recupererProduitsParVendeur(vendeur.getId())
         );
 
         for (Produit p : vendeur.getProduitListe()) {
@@ -249,14 +249,14 @@ public class VendeurPanel extends JPanel {
                 if (dlg.getCheminImageModifie() != null) p.setImageChemin(dlg.getCheminImageModifie());
                 if (dlg.getDescriptionModifie() != null) p.setDescription(dlg.getDescriptionModifie());
 
-                produitController.updateProduit(p);
+                produitController.mettreAJourProduit(p);
                 updateProduitList(vendeur);
             });
 
             JButton supBtn = createStyledButton("Supprimer");
             supBtn.setPreferredSize(new Dimension(100,30));
             supBtn.addActionListener(e -> {
-                produitController.removeProduit(vendeur, p);
+                produitController.supprimerProduit(vendeur, p);
                 updateProduitList(vendeur);
             });
 

@@ -23,7 +23,7 @@ public class PanierController {
 
     public boolean ajouterAuPanier(Produit produit, int quantite) {
         if (produit.getQuantite() >= quantite) {
-            acheteur.getPanier().addItem(produit, quantite);
+            acheteur.getPanier().ajouterArticle(produit, quantite);
             produit.setQuantite(produit.getQuantite() - quantite);
             produitDAO.mettreAJourProduit(produit);
             panierDAO.ajouterArticle(acheteur.getId(), produit, quantite);
