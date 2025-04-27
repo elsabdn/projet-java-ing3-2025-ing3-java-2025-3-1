@@ -36,7 +36,7 @@ public class PanierPanel extends JPanel {
         //----------------------------- HEADER ---------------------------------
         JButton btnDeconnexion = createStyledButton("🚪 Déconnexion");
         btnDeconnexion.setPreferredSize(new Dimension(140, 35));
-        btnDeconnexion.addActionListener(e -> mainFrame.showPanel("accueil"));
+        btnDeconnexion.addActionListener(e -> mainFrame.afficherPanel("accueil"));
 
         JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         logoutWrapper.setOpaque(false);
@@ -128,7 +128,7 @@ public class PanierPanel extends JPanel {
                         .filter(prod -> prod.getId()==e.getKey())
                         .findFirst().get();
                 int qte = e.getValue();
-                if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                if (p.estPromoEnGros() && qte >= p.getSeuilGros()) {
                     int lots  = qte / p.getSeuilGros();
                     int reste = qte % p.getSeuilGros();
                     sum += lots * p.getPrixGros() + reste * p.getPrix();
@@ -153,19 +153,19 @@ public class PanierPanel extends JPanel {
             b.setMinimumSize(btnSize);
             b.setAlignmentX(Component.CENTER_ALIGNMENT);
         }
-        btnRetour.addActionListener(e -> mainFrame.showPanel("acheteur"));
+        btnRetour.addActionListener(e -> mainFrame.afficherPanel("acheteur"));
 
         //----------------------- Action validation ---------------------------
         btnValider.addActionListener(e -> {
             final PaiementPanel paiement = new PaiementPanel(totalPx);
-            paiement.setCancelAction(evt -> mainFrame.showPanel("panier"));
-            paiement.setConfirmPaymentAction(evt -> {
-                int note = paiement.getNote();
+            paiement.definirCancelAction(evt -> mainFrame.afficherPanel("panier"));
+            paiement.definirConfirmPaymentAction(evt -> {
+                int note = paiement.obtenirNote();
                 if (note < 1 || note > 10) {
                     JOptionPane.showMessageDialog(mainFrame, "Merci de saisir une note entre 1 et 10.");
                     return;
                 }
-                Acheteur acheteur = mainFrame.getAcheteurConnecte();
+                Acheteur acheteur = mainFrame.obtenirAcheteurConnecte();
                 if (acheteur == null) {
                     JOptionPane.showMessageDialog(mainFrame,"Erreur : aucun utilisateur connecté.");
                     return;
@@ -189,10 +189,10 @@ public class PanierPanel extends JPanel {
                         "Confirmation",
                         JOptionPane.INFORMATION_MESSAGE);
 
-                mainFrame.showPanel("acheteur");
+                mainFrame.afficherPanel("acheteur");
             });
-            mainFrame.addPanel(paiement, "paiement");
-            mainFrame.showPanel("paiement");
+            mainFrame.ajouterPanel(paiement, "paiement");
+            mainFrame.afficherPanel("paiement");
         });
 
         resume.add(lblResume);
@@ -245,7 +245,7 @@ public class PanierPanel extends JPanel {
         double prixUnitaire = produit.getPrix();
         double prixStandard = quantite * prixUnitaire;
         double prixPromo    = prixStandard;
-        if (produit.isPromoEnGros() && quantite >= produit.getSeuilGros()) {
+        if (produit.estPromoEnGros() && quantite >= produit.getSeuilGros()) {
             int lots  = quantite / produit.getSeuilGros();
             int reste = quantite % produit.getSeuilGros();
             prixPromo = lots * produit.getPrixGros() + reste * produit.getPrix();
@@ -277,8 +277,8 @@ public class PanierPanel extends JPanel {
         btnSupprimer.setPreferredSize(new Dimension(150,35));
         btnSupprimer.addActionListener(e -> {
             panier.removeIf(p -> p.getId()==produit.getId());
-            mainFrame.addPanel(new PanierPanel(mainFrame, panier), "panier");
-            mainFrame.showPanel("panier");
+            mainFrame.ajouterPanel(new PanierPanel(mainFrame, panier), "panier");
+            mainFrame.afficherPanel("panier");
         });
         JPanel supprWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
         supprWrapper.setOpaque(false);

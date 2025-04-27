@@ -9,7 +9,6 @@ import Modele.Produit;
 import Vue.advanced.*;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.List;
 
 public class Main {
@@ -29,27 +28,27 @@ public class Main {
             AccueilPanel   accueilPanel   = new AccueilPanel(mainFrame);
             ConnexionLabel connexionLabel = new ConnexionLabel(); //test
 
-            mainFrame.addPanel(accueilPanel,   "accueil");
-            mainFrame.addPanel(connexionLabel, "connexion");
-            mainFrame.showPanel("accueil");
+            mainFrame.ajouterPanel(accueilPanel,   "accueil");
+            mainFrame.ajouterPanel(connexionLabel, "connexion");
+            mainFrame.afficherPanel("accueil");
             mainFrame.setVisible(true);
 
             // === Actions sur AccueilPanel ===
             // wiring AccueilPanel
-            accueilPanel.setLoginAction(e -> mainFrame.showPanel("connexion"));
-            accueilPanel.setAcheteurAction(e ->
-                    mainFrame.showPanel("inscription_acheteur")
+            accueilPanel.definirActionConnexio(e -> mainFrame.afficherPanel("connexion"));
+            accueilPanel.definirActionAcheteur(e ->
+                    mainFrame.afficherPanel("inscription_acheteur")
             );
-            accueilPanel.setVendeurAction(e ->
-                    mainFrame.showPanel("inscription_vendeur")
+            accueilPanel.definirActionVendeur(e ->
+                    mainFrame.afficherPanel("inscription_vendeur")
             );
 
             // === Actions sur ConnexionLabel ===
-            connexionLabel.setBackAction(e -> mainFrame.showPanel("accueil"));
+            connexionLabel.definirActionRetour(e -> mainFrame.afficherPanel("accueil"));
 
-            connexionLabel.setLoginAction(e -> {
-                String email = connexionLabel.getEmail();
-                String mdp   = connexionLabel.getMdp();
+            connexionLabel.definirActionConnexion(e -> {
+                String email = connexionLabel.obtenirEmail();
+                String mdp   = connexionLabel.obtenirMdp();
                 Utilisateur u = auth.connexion(email, mdp);
                 if (u == null) {
                     JOptionPane.showMessageDialog(mainFrame, "Identifiants incorrects !");
@@ -58,27 +57,27 @@ public class Main {
 
                 // --- Si c'est un acheteur ---
                 if (u instanceof Acheteur acheteur) {
-                    mainFrame.setAcheteurConnecte(acheteur); // ✅ ajoute cette ligne
+                    mainFrame.definirAcheteurConnecte(acheteur); // ✅ ajoute cette ligne
 
-                    List<Produit> produits = db.getProduits();
+                    List<Produit> produits = db.obtenirProduits();
                     AcheteurPanel ap = new AcheteurPanel(mainFrame, produits);
-                    mainFrame.addPanel(ap, "acheteur");
+                    mainFrame.ajouterPanel(ap, "acheteur");
 
-                    ap.getRefreshButton().addActionListener(ev ->
-                            ap.updateProduitList(db.getProduits())
+                    ap.obtenirBoutonRafraichir().addActionListener(ev ->
+                            ap.mettreAJourListeProduits(db.obtenirProduits())
                     );
 
-                    mainFrame.showPanel("acheteur");
+                    mainFrame.afficherPanel("acheteur");
                 }
                 else if (u instanceof Vendeur vendeur) {
                     VendeurPanel vp = new VendeurPanel(vendeur, mainFrame);
-                    mainFrame.addPanel(vp, "vendeur");
+                    mainFrame.ajouterPanel(vp, "vendeur");
 
-                    vp.getRefreshButton().addActionListener(ev ->
-                            vp.updateProduitList(vendeur)
+                    vp.obtenirRefreshButton().addActionListener(ev ->
+                            vp.mettreAJourProduitList(vendeur)
                     );
 
-                    mainFrame.showPanel("vendeur");
+                    mainFrame.afficherPanel("vendeur");
                 }
             });
         });

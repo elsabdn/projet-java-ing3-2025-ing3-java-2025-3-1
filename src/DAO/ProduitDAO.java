@@ -22,7 +22,7 @@ public class ProduitDAO {
             instruction.setString(5, p.getImageChemin());
             instruction.setString(6, p.getMarque());
             instruction.setString(7, p.getDescription());
-            instruction.setBoolean(8, p.isPromoEnGros());
+            instruction.setBoolean(8, p.estPromoEnGros());
             instruction.setInt(9, p.getSeuilGros());
             instruction.setDouble(10, p.getPrixGros());
 
@@ -96,7 +96,7 @@ public class ProduitDAO {
             instruction.setString(4, produit.getImageChemin());
             instruction.setString(5, produit.getMarque());
             instruction.setString(6, produit.getDescription());
-            instruction.setBoolean(7, produit.isPromoEnGros());
+            instruction.setBoolean(7, produit.estPromoEnGros());
             instruction.setInt(8, produit.getSeuilGros());
             instruction.setDouble(9, produit.getPrixGros());
             instruction.setInt(10, produit.getId());

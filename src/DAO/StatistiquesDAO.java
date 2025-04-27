@@ -23,7 +23,7 @@ public class StatistiquesDAO {
             while (rs.next()) {
                 int mois = rs.getInt("mois");
                 int totalVentes = rs.getInt("total_ventes");
-                String moisNom = getNomMois(mois);
+                String moisNom = obtenirNomMois(mois);
                 ventesParMois.put(moisNom, totalVentes);
             }
         } catch (SQLException e) {
@@ -33,7 +33,7 @@ public class StatistiquesDAO {
     }
 
     // --- 2. Récupérer les produits les plus vendus ---
-    public Map<String, Integer> getTopProduits() {
+    public Map<String, Integer> obtenirTopProduits() {
         Map<String, Integer> topProduits = new HashMap<>();
         String query = "SELECT p.nom, SUM(ci.quantite) AS total_vendus " +
                 "FROM produit p " +
@@ -53,7 +53,7 @@ public class StatistiquesDAO {
     }
 
     // --- 3. Montant total des ventes pour un produit donné ---
-    public int getMontantVenteProduit(int produitId) {
+    public int obtenirMontantVenteProduit(int produitId) {
         String query = "SELECT SUM(ci.quantite * p.prix) AS total_ventes " +
                 "FROM commande_item ci " +
                 "JOIN produit p ON ci.produit_id = p.id " +
@@ -72,7 +72,7 @@ public class StatistiquesDAO {
     }
 
     // --- 4. Nombre de commandes pour un client sur les 3 derniers mois ---
-    public int getNombreCommandesClient3Mois(int clientId) {
+    public int obtenirNombreCommandesClient3Mois(int clientId) {
         String query = "SELECT COUNT(*) AS nb_commandes FROM commande " +
                 "WHERE utilisateur_id = ? AND date_commande >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -96,7 +96,7 @@ public class StatistiquesDAO {
      * @return Map<nomProduit, nombreDeLotsVendues>
      * @throws SQLException
      */
-    public Map<String, Integer> getOffresBienAccueillies() throws SQLException {
+    public Map<String, Integer> obtenirOffresBienAccueillies() throws SQLException {
         String sql =
                 "SELECT p.nom,\n" +
                         "       SUM(ci.quantite DIV p.seuilGros) AS nbLots\n" +
@@ -121,7 +121,7 @@ public class StatistiquesDAO {
     }
 
     // --- 5. Liste des produits ---
-    public Map<Integer, String> getListeProduits() {
+    public Map<Integer, String> obtenirListeProduits() {
         Map<Integer, String> produits = new HashMap<>();
         String query = "SELECT id, nom FROM produit";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
@@ -135,7 +135,7 @@ public class StatistiquesDAO {
     }
 
     // --- 6. Liste des clients ---
-    public Map<Integer, String> getListeClients() {
+    public Map<Integer, String> obtenirListeClients() {
         Map<Integer, String> clients = new HashMap<>();
         String query = "SELECT id, nom FROM utilisateur WHERE role = 'client'";
         try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
@@ -149,7 +149,7 @@ public class StatistiquesDAO {
     }
 
     // --- 7. Obtenir l'ID d'un produit par son nom ---
-    public int getProduitIdParName(String nomProduit) {
+    public int obtenirProduitIdParName(String nomProduit) {
         String query = "SELECT id FROM produit WHERE nom = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, nomProduit);
@@ -165,7 +165,7 @@ public class StatistiquesDAO {
     }
 
     // --- 8. Obtenir l'ID d'un client par son nom ---
-    public int getClientIdParName(String nomClient) {
+    public int obtenirClientIdParName(String nomClient) {
         String query = "SELECT id FROM utilisateur WHERE nom = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, nomClient);
@@ -180,7 +180,7 @@ public class StatistiquesDAO {
         return -1;
     }
 
-    private String getNomMois(int mois) {
+    private String obtenirNomMois(int mois) {
         String[] moisNom = {"Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"};
         return moisNom[mois - 1];
     }

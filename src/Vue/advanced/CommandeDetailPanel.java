@@ -46,7 +46,7 @@ public class CommandeDetailPanel extends JPanel {
         // bouton déconnexion
         JButton btnLogout = createStyledButton("🚪 Déconnexion");
         btnLogout.setPreferredSize(new Dimension(140, 35));
-        btnLogout.addActionListener(e -> mainFrame.showPanel("historique"));
+        btnLogout.addActionListener(e -> mainFrame.afficherPanel("historique"));
         header.add(btnLogout, BorderLayout.EAST);
 
         add(header, BorderLayout.NORTH);
@@ -116,7 +116,7 @@ public class CommandeDetailPanel extends JPanel {
 
         // ─── FOOTER: bouton retour ────────────────────────────────────────────────
         JButton back = createStyledButton("⬅ Retour");
-        back.addActionListener(e -> mainFrame.showPanel("historique"));
+        back.addActionListener(e -> mainFrame.afficherPanel("historique"));
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER));
         footer.setOpaque(false);
         footer.setBorder(new EmptyBorder(10,0,20,0));

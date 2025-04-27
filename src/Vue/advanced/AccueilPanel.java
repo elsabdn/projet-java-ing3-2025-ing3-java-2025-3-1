@@ -92,8 +92,8 @@ public class AccueilPanel extends JPanel {
             // ici on utilise mainFrame pour ouvrir HistoriquePanel
             historiqueBtn.addActionListener(e -> {
                 HistoriquePanel hp = new HistoriquePanel(mainFrame, acheteurConnecte);
-                mainFrame.addPanel(hp, "historique");
-                mainFrame.showPanel("historique");
+                mainFrame.ajouterPanel(hp, "historique");
+                mainFrame.afficherPanel("historique");
             });
             card.add(historiqueBtn, gbc);
         }
@@ -104,21 +104,21 @@ public class AccueilPanel extends JPanel {
         acheteurBtn.addActionListener(e -> {
             InscriptionPanel p = new InscriptionPanel(
                     mainFrame,
-                    mainFrame.getAuthController(),
+                    mainFrame.obtenirAuthController(),
                     InscriptionPanel.TypeUtilisateur.ACHETEUR
             );
-            mainFrame.addPanel(p, "inscriptionAcheteur");
-            mainFrame.showPanel("inscriptionAcheteur");
+            mainFrame.ajouterPanel(p, "inscriptionAcheteur");
+            mainFrame.afficherPanel("inscriptionAcheteur");
         });
 
         vendeurBtn.addActionListener(e -> {
             InscriptionPanel p = new InscriptionPanel(
                     mainFrame,
-                    mainFrame.getAuthController(),
+                    mainFrame.obtenirAuthController(),
                     InscriptionPanel.TypeUtilisateur.VENDEUR
             );
-            mainFrame.addPanel(p, "inscriptionVendeur");
-            mainFrame.showPanel("inscriptionVendeur");
+            mainFrame.ajouterPanel(p, "inscriptionVendeur");
+            mainFrame.afficherPanel("inscriptionVendeur");
         });
 
     }
@@ -154,7 +154,7 @@ public class AccueilPanel extends JPanel {
     }
 
     // Seulment pour la page non‑connectée
-    public void setLoginAction(ActionListener l)    { if (loginBtn    != null) loginBtn.addActionListener(l); }
-    public void setAcheteurAction(ActionListener l){ if (acheteurBtn != null) acheteurBtn.addActionListener(l); }
-    public void setVendeurAction(ActionListener l) { if (vendeurBtn  != null) vendeurBtn.addActionListener(l); }
+    public void definirActionConnexio(ActionListener l)    { if (loginBtn    != null) loginBtn.addActionListener(l); }
+    public void definirActionAcheteur(ActionListener l){ if (acheteurBtn != null) acheteurBtn.addActionListener(l); }
+    public void definirActionVendeur(ActionListener l) { if (vendeurBtn  != null) vendeurBtn.addActionListener(l); }
 }

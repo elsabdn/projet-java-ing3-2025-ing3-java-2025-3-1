@@ -152,14 +152,14 @@ public class AjouterProduitDialog extends JDialog {
     }
 
     // ===== Getters publics pour récupérer les infos saisies ===
-    public boolean isConfirme()      { return confirme; }
-    public String  getNom()          { return nomField.getText().trim(); }
-    public String  getMarque()       { return marqueField.getText().trim(); }
-    public double  getPrix()         { return Double.parseDouble(prixField.getText().trim()); }
-    public int     getQuantite()     { return Integer.parseInt(qteField.getText().trim()); }
-    public String  getDescription()  { return descArea.getText().trim(); }
-    public String  getCheminImage()  { return cheminImage; }
-    public boolean isPromoEnGros() { return promoEnGrosCheck.isSelected(); }
-    public int getSeuilGros() { return Integer.parseInt(seuilGrosField.getText().trim()); }
-    public double getPrixGros() { return Double.parseDouble(prixGrosField.getText().trim()); }
+    public boolean estConfirme()      { return confirme; }
+    public String obtenirNom()          { return nomField.getText().trim(); }
+    public String obtenirMarque()       { return marqueField.getText().trim(); }
+    public double obtenirPrix()         { return Double.parseDouble(prixField.getText().trim()); }
+    public int obtenirQuantite()     { return Integer.parseInt(qteField.getText().trim()); }
+    public String obtenirDescription()  { return descArea.getText().trim(); }
+    public String obtenirCheminImage()  { return cheminImage; }
+    public boolean estPromoEnGros() { return promoEnGrosCheck.isSelected(); }
+    public int obtenirSeuilGros() { return Integer.parseInt(seuilGrosField.getText().trim()); }
+    public double obtenirPrixGros() { return Double.parseDouble(prixGrosField.getText().trim()); }
 }

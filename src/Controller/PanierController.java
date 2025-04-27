@@ -65,7 +65,7 @@ public class PanierController {
             Produit p = item.getProduit();
             int qte = item.getQuantite();
 
-            if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+            if (p.estPromoEnGros() && qte >= p.getSeuilGros()) {
                 total += p.getPrixGros() * qte;
             } else {
                 total += p.getPrix() * qte;
@@ -100,7 +100,7 @@ public class PanierController {
             int qte = item.getQuantite();
 
             double prixUnitaire;
-            if (produit.isPromoEnGros() && qte >= produit.getSeuilGros()) {
+            if (produit.estPromoEnGros() && qte >= produit.getSeuilGros()) {
                 prixUnitaire = produit.getPrixGros();
             } else {
                 prixUnitaire = produit.getPrix();

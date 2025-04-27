@@ -112,7 +112,7 @@ public class InscriptionPanel extends JPanel {
 
         // ─── Listeners ───────────────────────────────────────────
         btnValider.addActionListener(e -> onValider());
-        btnRetour .addActionListener(e -> mainFrame.showPanel("accueil"));
+        btnRetour .addActionListener(e -> mainFrame.afficherPanel("accueil"));
     }
 
     /**
@@ -134,11 +134,11 @@ public class InscriptionPanel extends JPanel {
 
         if (type == TypeUtilisateur.ACHETEUR) {
             Acheteur a = authController.inscrireAcheteur(email, mdp);
-            mainFrame.setAcheteurConnecte(a);
-            mainFrame.showAcheteurHome();
+            mainFrame.definirAcheteurConnecte(a);
+            mainFrame.afficherAcheteurHome();
         } else {
             Vendeur v = authController.inscrireVendeur(email, mdp);
-            mainFrame.showVendeurHome(v);
+            mainFrame.afficherVendeurHome(v);
         }
     }
 

@@ -47,7 +47,7 @@ public class StatistiquesPanel extends JPanel {
         header.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JButton retourBtn = createStyledButton("← Retour");
-        retourBtn.addActionListener(e -> mainFrame.showPanel("vendeur"));
+        retourBtn.addActionListener(e -> mainFrame.afficherPanel("vendeur"));
         header.add(retourBtn, BorderLayout.WEST);
 
         JLabel lblTitle = new JLabel("Statistiques de vente", SwingConstants.CENTER);
@@ -58,8 +58,8 @@ public class StatistiquesPanel extends JPanel {
         add(header, BorderLayout.NORTH);
 
         // Connexion à la base de données
-        DatabaseManager dbManager = DatabaseManager.getInstance();
-        Connection connection = dbManager.getConnection();
+        DatabaseManager dbManager = DatabaseManager.obtenirInstance();
+        Connection connection = dbManager.obtenirConnection();
         this.statistiquesDAO = new StatistiquesDAO(connection);
 
 
@@ -83,7 +83,7 @@ public class StatistiquesPanel extends JPanel {
         }
 
         // Graphique top produits vendus
-        Map<String, Integer> topProduits = statistiquesDAO.getTopProduits();
+        Map<String, Integer> topProduits = statistiquesDAO.obtenirTopProduits();
         if (!topProduits.isEmpty()) {
             JFreeChart barChart = createTopProduitsChart(topProduits);
             ChartPanel barChartPanel = new ChartPanel(barChart);
@@ -94,7 +94,7 @@ public class StatistiquesPanel extends JPanel {
             contentPanel.add(noDataLabel);
         }
 
-        Map<String,Integer> offres = statistiquesDAO.getOffresBienAccueillies();
+        Map<String,Integer> offres = statistiquesDAO.obtenirOffresBienAccueillies();
         if (!offres.isEmpty()) {
             JFreeChart offresChart = createOffresBienAccueilliesChart(offres);
             ChartPanel cp = new ChartPanel(offresChart);
@@ -116,7 +116,7 @@ public class StatistiquesPanel extends JPanel {
         selectionPanel.setBackground(Color.white);
 
         // JComboBox pour sélectionner le produit
-        produitComboBox = new JComboBox<>(statistiquesDAO.getListeProduits().values().toArray(new String[0]));
+        produitComboBox = new JComboBox<>(statistiquesDAO.obtenirListeProduits().values().toArray(new String[0]));
         produitComboBox.setPreferredSize(new Dimension(200, 30));
         produitComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
 
@@ -136,7 +136,7 @@ public class StatistiquesPanel extends JPanel {
         // Bouton pour afficher plus d'infos
         JButton detailsButton = createStyledButton("Afficher plus d'infos");
         detailsButton.setPreferredSize(new Dimension(200, 40));
-        detailsButton.addActionListener(e -> showMoreInfo());
+        detailsButton.addActionListener(e -> afficherPlusInfo());
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.white);
@@ -247,7 +247,7 @@ public class StatistiquesPanel extends JPanel {
 
 
 
-    private void showMoreInfo() {
+    private void afficherPlusInfo() {
         // Récupérer les sélections faites dans les composants
         String selectedProduit = (String) produitComboBox.getSelectedItem();
         String clientIdText = clientIdTextField.getText().trim(); // Récupère l'ID client saisi
@@ -267,8 +267,8 @@ public class StatistiquesPanel extends JPanel {
             detailsPanel.removeAll();
 
             // Afficher les informations du produit sélectionné
-            int produitId = statistiquesDAO.getProduitIdParName(selectedProduit);
-            int montantVentesProduit = statistiquesDAO.getMontantVenteProduit(produitId);
+            int produitId = statistiquesDAO.obtenirProduitIdParName(selectedProduit);
+            int montantVentesProduit = statistiquesDAO.obtenirMontantVenteProduit(produitId);
             JLabel ventesProduitLabel = new JLabel("Montant total des ventes pour le produit \"" + selectedProduit + "\": " + montantVentesProduit + " €");
             ventesProduitLabel.setFont(new Font("Arial", Font.PLAIN, 20));
             ventesProduitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -276,7 +276,7 @@ public class StatistiquesPanel extends JPanel {
             detailsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
 // Afficher les informations du client sélectionné
-            int nombreCommandesClient = statistiquesDAO.getNombreCommandesClient3Mois(clientId);
+            int nombreCommandesClient = statistiquesDAO.obtenirNombreCommandesClient3Mois(clientId);
             JLabel commandesClientLabel = new JLabel("Nombre de commandes du client sur les 3 derniers mois: " + nombreCommandesClient);
             commandesClientLabel.setFont(new Font("Arial", Font.PLAIN, 20));
             commandesClientLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

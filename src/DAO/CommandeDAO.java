@@ -175,7 +175,7 @@ public class CommandeDAO {
                             //// Modifications pour le prix de gros ////
                             .map(p -> {
                                 int qte = quantites.get(p.getId());
-                                if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+                                if (p.estPromoEnGros() && qte >= p.getSeuilGros()) {
                                     return p.getPrixGros();
                                 } else {
                                     return p.getPrix();

@@ -11,7 +11,7 @@ import java.util.List;
 public class DatabaseManager {
     private static final String URL_BDD          = "jdbc:mysql://localhost:8889/ecommerce";
     private static final String UTILISATEUR_BDD  = "root";
-    private static final String MOT_DE_PASSE_BDD = "";
+    private static final String MOT_DE_PASSE_BDD = "root";
 
     private Connection connexion; // <= On garde SEULEMENT celle-ci
 
@@ -31,14 +31,14 @@ public class DatabaseManager {
         }
     }
 
-    public static DatabaseManager getInstance() {
+    public static DatabaseManager obtenirInstance() {
         if (instance == null) {
             instance = new DatabaseManager();
         }
         return instance;
     }
 
-    public Connection getConnection() {
+    public Connection obtenirConnection() {
         return connexion; // <= ON RÉPOND AVEC connexion, pas "connection" !
     }
 
@@ -198,7 +198,7 @@ public class DatabaseManager {
         }
     }
 
-    public List<Produit> getProduits() {
+    public List<Produit> obtenirProduits() {
         List<Produit> produits = new ArrayList<>();
         String sql =
                 "SELECT p.id, p.nom, p.prix, p.quantite, p.vendeur_id, " +
@@ -250,7 +250,7 @@ public class DatabaseManager {
                     Produit p = new Produit(id, nom, prix, quantite, vendeur, img, marque, desc);
                     vendeur.ajouterProduit(p);
                 }
-                vp.updateProduitList(vendeur);
+                vp.mettreAJourProduitList(vendeur);
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors du chargement des produits du vendeur");
@@ -273,7 +273,7 @@ public class DatabaseManager {
         return idMax + 1;
     }
 
-    public List<Produit> getProduitsParVendeur(int vendeurId) {
+    public List<Produit> obtenirProduitsParVendeur(int vendeurId) {
         List<Produit> produits = new ArrayList<>();
         String sql =
                 "SELECT id, nom, prix, quantite, image_path, marque, description, promoEnGros, seuilGros, prixGros " +
@@ -294,8 +294,8 @@ public class DatabaseManager {
                             rs.getString("description")
                     );
                     p.setPromoEnGros(rs.getBoolean("promoEnGros"));
-                    p.setSeuilGros  (rs.getInt("seuilGros"));
-                    p.setPrixGros   (rs.getDouble("prixGros"));
+                    p.setSeuilGros(rs.getInt("seuilGros"));
+                    p.setPrixGros(rs.getDouble("prixGros"));
                     produits.add(p);
                 }
             }
@@ -349,7 +349,7 @@ public class DatabaseManager {
     }
 
     public void ajouterItemAuPanier(int utilisateurId, int produitId, int quantite) {
-        int panierId = getIdPanier(utilisateurId);
+        int panierId = obtenirIdPanier(utilisateurId);
         if (panierId == -1) return;
 
         String verif = "SELECT id, quantite FROM panier_item WHERE panier_id = ? AND produit_id = ?";
@@ -382,7 +382,7 @@ public class DatabaseManager {
         }
     }
 
-    private int getIdPanier(int utilisateurId) {
+    private int obtenirIdPanier(int utilisateurId) {
         String sql = "SELECT id FROM panier WHERE utilisateur_id = ?";
         try (PreparedStatement stmt = connexion.prepareStatement(sql)) {
             stmt.setInt(1, utilisateurId);
@@ -399,7 +399,7 @@ public class DatabaseManager {
     }
 
     public void viderPanier(int utilisateurId) {
-        int panierId = getIdPanier(utilisateurId);
+        int panierId = obtenirIdPanier(utilisateurId);
         if (panierId == -1) return;
 
         String sql = "DELETE FROM panier_item WHERE panier_id = ?";

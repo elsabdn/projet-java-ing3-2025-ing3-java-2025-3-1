@@ -44,8 +44,8 @@ public class AcheteurPanel extends JPanel {
         setOpaque(false);
 
         // ─── Header + Search ─────────────────────────────────────
-        JPanel header      = buildHeader();
-        JPanel searchPanel = buildSearchPanel();
+        JPanel header      = construireEnTete();
+        JPanel searchPanel = construirePanneauRecherche();
 
         JPanel topContainer = new JPanel();
         topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
@@ -80,14 +80,14 @@ public class AcheteurPanel extends JPanel {
         add(bottom, BorderLayout.SOUTH);
 
         // ─── Actions des boutons ──────────────────────────────────
-        refreshBtn.addActionListener(e -> updateProduitList(allProduits));
+        refreshBtn.addActionListener(e -> mettreAJourListeProduits(allProduits));
         viewPanierBtn.addActionListener(e -> {
             PanierPanel panelPanier = new PanierPanel(mainFrame, panier);
-            mainFrame.addPanel(panelPanier, "panier");
-            mainFrame.showPanel("panier");
+            mainFrame.ajouterPanel(panelPanier, "panier");
+            mainFrame.afficherPanel("panier");
         });
         histoBtn.addActionListener(e -> {
-            Acheteur acheteur = mainFrame.getAcheteurConnecte();
+            Acheteur acheteur = mainFrame.obtenirAcheteurConnecte();
             if (acheteur == null) {
                 JOptionPane.showMessageDialog(mainFrame,
                         "❌ Erreur : aucun utilisateur connecté.");
@@ -100,19 +100,19 @@ public class AcheteurPanel extends JPanel {
                         "😅 Vous n'avez encore rien commandé !");
             } else {
                 HistoriquePanel historiquePanel = new HistoriquePanel(mainFrame, acheteur);
-                mainFrame.addPanel(historiquePanel, "historique");
-                mainFrame.showPanel("historique");
+                mainFrame.ajouterPanel(historiquePanel, "historique");
+                mainFrame.afficherPanel("historique");
             }
         });
 
         // ─── Chargement initial des produits ──────────────────────
-        updateProduitList(allProduits);
+        mettreAJourListeProduits(allProduits);
     }
 
-    private JPanel buildHeader() {
+    private JPanel construireEnTete() {
         deconnexionBtn = createStyledButton("🚪 Déconnexion");
         deconnexionBtn.setPreferredSize(new Dimension(140, 35));
-        deconnexionBtn.addActionListener(e -> mainFrame.showPanel("accueil"));
+        deconnexionBtn.addActionListener(e -> mainFrame.afficherPanel("accueil"));
 
         JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         logoutWrapper.setOpaque(false);
@@ -139,7 +139,7 @@ public class AcheteurPanel extends JPanel {
         return header;
     }
 
-    private JPanel buildSearchPanel() {
+    private JPanel construirePanneauRecherche() {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(true);
         wrapper.setBackground(new Color(245, 245, 245));
@@ -184,10 +184,10 @@ public class AcheteurPanel extends JPanel {
                     return true;
             }
         }).collect(Collectors.toList());
-        updateProduitList(filtered);
+        mettreAJourListeProduits(filtered);
     }
 
-    public void updateProduitList(List<Produit> produits) {
+    public void mettreAJourListeProduits(List<Produit> produits) {
         produitPanel.removeAll();
         for (Produit p : produits) {
             JPanel carte = creerCarteProduit(p);
@@ -197,8 +197,8 @@ public class AcheteurPanel extends JPanel {
                 public void mouseClicked(MouseEvent e) {
                     ProduitDetailPanel detail = new ProduitDetailPanel(mainFrame, p, panier);
                     String key = "detail" + p.getId();
-                    mainFrame.addPanel(detail, key);
-                    mainFrame.showPanel(key);
+                    mainFrame.ajouterPanel(detail, key);
+                    mainFrame.afficherPanel(key);
                 }
             });
             produitPanel.add(carte);
@@ -241,7 +241,7 @@ public class AcheteurPanel extends JPanel {
         infos.add(lblMarque);
 
         // Affichage du prix de gros si applicable
-        if (p.isPromoEnGros()) {
+        if (p.estPromoEnGros()) {
             infos.add(Box.createVerticalStrut(5));
             JLabel lblPromo = new JLabel(
                     String.format("Promo gros : %.2f € pour %d achetés", p.getPrixGros(), p.getSeuilGros())
@@ -289,6 +289,6 @@ public class AcheteurPanel extends JPanel {
     }
 
     // Getters utiles pour les tests ou l’intégration
-    public JButton getRefreshButton()    { return refreshBtn; }
-    public JButton getViewPanierButton() { return viewPanierBtn; }
+    public JButton obtenirBoutonRafraichir()    { return refreshBtn; }
+    public JButton obtenirBoutonVoirPanier() { return viewPanierBtn; }
 }

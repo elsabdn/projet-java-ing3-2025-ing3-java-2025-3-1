@@ -26,7 +26,7 @@ public class Vendeur extends Utilisateur {
 
     // Ajout de la méthode pour obtenir la connexion à la base de données
     public DatabaseManager getConnection() {
-        return DatabaseManager.getInstance();  // Utilise DatabaseManager pour obtenir la connexion
+        return DatabaseManager.obtenirInstance();  // Utilise DatabaseManager pour obtenir la connexion
     }
 
 }

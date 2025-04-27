@@ -39,7 +39,7 @@ public class VendeurPanel extends JPanel {
         // ─── HEADER ───────────────────────────────────────────────
         deconnexionBtn = createStyledButton("🚪 Déconnexion");
         deconnexionBtn.setPreferredSize(new Dimension(140,35));
-        deconnexionBtn.addActionListener(e -> mainFrame.showPanel("accueil"));
+        deconnexionBtn.addActionListener(e -> mainFrame.afficherPanel("accueil"));
 
         JPanel logoutWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT,0,0));
         logoutWrapper.setOpaque(false);
@@ -100,17 +100,17 @@ public class VendeurPanel extends JPanel {
         addProduitBtn.addActionListener(ev -> {
             AjouterProduitDialog dlg = new AjouterProduitDialog(mainFrame);
             dlg.setVisible(true);
-            if (!dlg.isConfirme()) return;
+            if (!dlg.estConfirme()) return;
 
-            String nom     = dlg.getNom();
-            String marque  = dlg.getMarque();
-            double prix    = dlg.getPrix();
-            int qte        = dlg.getQuantite();
-            String desc    = dlg.getDescription(); // description libre
-            String imgPath = dlg.getCheminImage();
+            String nom     = dlg.obtenirNom();
+            String marque  = dlg.obtenirMarque();
+            double prix    = dlg.obtenirPrix();
+            int qte        = dlg.obtenirQuantite();
+            String desc    = dlg.obtenirDescription(); // description libre
+            String imgPath = dlg.obtenirCheminImage();
 
-            produitController.ajouterProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.isPromoEnGros(), dlg.getSeuilGros(), dlg.getPrixGros());
-            updateProduitList(vendeur);
+            produitController.ajouterProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.estPromoEnGros(), dlg.obtenirSeuilGros(), dlg.obtenirPrixGros());
+            mettreAJourProduitList(vendeur);
         });
 
         // Action du bouton "Consulter Rapport"
@@ -118,8 +118,8 @@ public class VendeurPanel extends JPanel {
             try {
                 // Passe MainFrame en paramètre pour la navigation
                 StatistiquesPanel statsPanel = new StatistiquesPanel(vendeur, mainFrame);
-                mainFrame.addPanel(statsPanel, "statistiques");
-                mainFrame.showPanel("statistiques");
+                mainFrame.ajouterPanel(statsPanel, "statistiques");
+                mainFrame.afficherPanel("statistiques");
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -127,10 +127,10 @@ public class VendeurPanel extends JPanel {
 
 
         // ─── ACTION RAFRAÎCHIR ────────────────────────────────────
-        refreshBtn.addActionListener(e -> updateProduitList(vendeur));
+        refreshBtn.addActionListener(e -> mettreAJourProduitList(vendeur));
 
         // Chargement initial
-        updateProduitList(vendeur);
+        mettreAJourProduitList(vendeur);
     }
 
 
@@ -149,7 +149,7 @@ public class VendeurPanel extends JPanel {
      * Met à jour la grille de produits du vendeur.
      * Description tronquée à 100 caractères max.
      */
-    public void updateProduitList(Vendeur vendeur) {
+    public void mettreAJourProduitList(Vendeur vendeur) {
         produitDisplayPanel.removeAll();
         vendeur.setProduitListe(
                 produitController.recupererProduitsParVendeur(vendeur.getId())
@@ -199,7 +199,7 @@ public class VendeurPanel extends JPanel {
             info.add(lblMarque);
 
             // Affiche le prix de gros si activé
-            if (p.isPromoEnGros()) {
+            if (p.estPromoEnGros()) {
                 JLabel lblPromo = new JLabel(
                         String.format("Prix de gros : %.2f € pour %d unités",
                                 p.getPrixGros(),
@@ -242,22 +242,22 @@ public class VendeurPanel extends JPanel {
                 dlg.setVisible(true);
                 if (!dlg.isConfirme()) return;
 
-                p.setNom(dlg.getNomModifie());
-                p.setPrix(dlg.getPrixModifie());
-                p.setQuantite(dlg.getStockModifie());
-                p.setMarque(dlg.getMarqueModifiee());
-                if (dlg.getCheminImageModifie() != null) p.setImageChemin(dlg.getCheminImageModifie());
-                if (dlg.getDescriptionModifie() != null) p.setDescription(dlg.getDescriptionModifie());
+                p.setNom(dlg.obtenirNomModifie());
+                p.setPrix(dlg.obtenirPrixModifie());
+                p.setQuantite(dlg.obtenirStockModifie());
+                p.setMarque(dlg.obtenirMarqueModifiee());
+                if (dlg.obtenirCheminImageModifie() != null) p.setImageChemin(dlg.obtenirCheminImageModifie());
+                if (dlg.obtenirDescriptionModifie() != null) p.setDescription(dlg.obtenirDescriptionModifie());
 
                 produitController.mettreAJourProduit(p);
-                updateProduitList(vendeur);
+                mettreAJourProduitList(vendeur);
             });
 
             JButton supBtn = createStyledButton("Supprimer");
             supBtn.setPreferredSize(new Dimension(100,30));
             supBtn.addActionListener(e -> {
                 produitController.supprimerProduit(vendeur, p);
-                updateProduitList(vendeur);
+                mettreAJourProduitList(vendeur);
             });
 
             btnPanel.add(modBtn);
@@ -315,7 +315,7 @@ public class VendeurPanel extends JPanel {
     }
 
     // Getters pour tests ou utilisation extérieure
-    public JButton getAddProduitButton()  { return addProduitBtn; }
-    public JButton getRefreshButton()     { return refreshBtn; }
-    public JButton getDeconnexionButton() { return deconnexionBtn; }
+    public JButton obtenirAjoutProduitButton()  { return addProduitBtn; }
+    public JButton obtenirRefreshButton()     { return refreshBtn; }
+    public JButton obtenirDeconnexionButton() { return deconnexionBtn; }
 }

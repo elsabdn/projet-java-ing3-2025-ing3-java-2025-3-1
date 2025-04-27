@@ -54,7 +54,7 @@ public class HistoriquePanel extends JPanel {
 
         JButton deconnexion = createStyledButton("🚪 Déconnexion");
         deconnexion.setPreferredSize(new Dimension(140,35));
-        deconnexion.addActionListener(e -> mainFrame.showPanel("acheteur"));
+        deconnexion.addActionListener(e -> mainFrame.afficherPanel("acheteur"));
         header.add(deconnexion, BorderLayout.EAST);
 
         add(header, BorderLayout.NORTH);
@@ -119,8 +119,8 @@ public class HistoriquePanel extends JPanel {
                     public void mouseClicked(MouseEvent e) {
                         String key = "detail" + c.getId();
                         CommandeDetailPanel detail = new CommandeDetailPanel(mainFrame, c);
-                        mainFrame.addPanel(detail, key);
-                        mainFrame.showPanel(key);
+                        mainFrame.ajouterPanel(detail, key);
+                        mainFrame.afficherPanel(key);
 
                     }
                 });
@@ -168,7 +168,7 @@ public class HistoriquePanel extends JPanel {
 
         // ─── FOOTER: bouton retour ───────────────────────────────────────────────
         JButton retour = createStyledButton("⬅ Retour");
-        retour.addActionListener(e -> mainFrame.showPanel("acheteur"));
+        retour.addActionListener(e -> mainFrame.afficherPanel("acheteur"));
         JPanel bas = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bas.setOpaque(false);
         bas.setBorder(BorderFactory.createEmptyBorder(10,0,20,0));

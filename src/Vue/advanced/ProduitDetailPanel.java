@@ -21,7 +21,7 @@ public class ProduitDetailPanel extends JPanel {
         // ─── En-tête avec bouton Retour ──────────────────────────────────
         retourBtn = createStyledButton("← Retour aux produits");
         retourBtn.setPreferredSize(new Dimension(250, 35));
-        retourBtn.addActionListener(e -> mainFrame.showPanel("acheteur"));
+        retourBtn.addActionListener(e -> mainFrame.afficherPanel("acheteur"));
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
         north.setOpaque(false);
         north.add(retourBtn);
@@ -77,7 +77,7 @@ public class ProduitDetailPanel extends JPanel {
         infos.add(lblStock);
 
         // ─── Prix de gros si applicable ─────────────────────────────────
-        if (produit.isPromoEnGros()) {
+        if (produit.estPromoEnGros()) {
             infos.add(Box.createVerticalStrut(10));
             JLabel lblPromo = new JLabel(
                     String.format("Prix de gros : %.2f € (pour %d unités)",
@@ -184,6 +184,6 @@ public class ProduitDetailPanel extends JPanel {
     }
 
     // === Getters pour les boutons, si besoin ailleurs ===
-    public JButton getRetourButton()         { return retourBtn; }
-    public JButton getAjouterPanierButton()  { return ajouterPanierBtn; }
+    public JButton obtenirRetourButton()         { return retourBtn; }
+    public JButton obtenirAjouterPanierButton()  { return ajouterPanierBtn; }
 }

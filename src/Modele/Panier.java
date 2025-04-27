@@ -59,7 +59,7 @@ public class Panier {
             Produit p = item.getProduit();
             int qte = item.getQuantite();
 
-            if (p.isPromoEnGros() && qte >= p.getSeuilGros()) {
+            if (p.estPromoEnGros() && qte >= p.getSeuilGros()) {
                 int nbLots = qte / p.getSeuilGros();
                 int reste = qte % p.getSeuilGros();
                 total += nbLots * p.getPrixGros() + reste * p.getPrix();

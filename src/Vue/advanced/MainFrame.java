@@ -52,7 +52,7 @@ public class MainFrame extends JFrame {
         AccueilPanel accueil = new AccueilPanel(this);
 
         // --- Connexion utilisateur: ouverture de pop-ups pour saisir les identifiants ---
-        accueil.setLoginAction(e -> {
+        accueil.definirActionConnexio(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Utilisateur u = authController.connexion(email, mdp);
@@ -65,89 +65,89 @@ public class MainFrame extends JFrame {
             // Redirection selon le type d'utilisateur
             if (u instanceof Vendeur) {
                 VendeurPanel vp = new VendeurPanel((Vendeur) u, this);
-                addPanel(vp, "vendeur");
-                showPanel("vendeur");
+                ajouterPanel(vp, "vendeur");
+                afficherPanel("vendeur");
             } else {
-                setAcheteurConnecte((Acheteur) u); // ✅ Stockage de l'acheteur connecté
+                definirAcheteurConnecte((Acheteur) u); // ✅ Stockage de l'acheteur connecté
                 List<Produit> produits = new ProduitController().recupererTousLesProduits();
                 AcheteurPanel ap = new AcheteurPanel(this, produits);
-                addPanel(ap, "acheteur");
-                showPanel("acheteur");
+                ajouterPanel(ap, "acheteur");
+                afficherPanel("acheteur");
             }
         });
 
         // --- Inscription acheteur ---
-        accueil.setAcheteurAction(e -> {
+        accueil.definirActionAcheteur(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Acheteur a   = authController.inscrireAcheteur(email, mdp);
-            setAcheteurConnecte(a); // ✅ Stockage après inscription
+            definirAcheteurConnecte(a); // ✅ Stockage après inscription
             List<Produit> produits = new ProduitController().recupererTousLesProduits();
             AcheteurPanel ap = new AcheteurPanel(this, produits);
-            addPanel(ap, "acheteur");
-            showPanel("acheteur");
+            ajouterPanel(ap, "acheteur");
+            afficherPanel("acheteur");
         });
 
         // --- Inscription vendeur ---
-        accueil.setVendeurAction(e -> {
+        accueil.definirActionVendeur(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Vendeur v    = authController.inscrireVendeur(email, mdp);
             VendeurPanel vp = new VendeurPanel(v, this);
-            addPanel(vp, "vendeur");
-            showPanel("vendeur");
+            ajouterPanel(vp, "vendeur");
+            afficherPanel("vendeur");
         });
 
         // Ajout initial du panel d'accueil
-        addPanel(accueil, "accueil");
-        showPanel("accueil");
+        ajouterPanel(accueil, "accueil");
+        afficherPanel("accueil");
         setVisible(true);
     }
 
     /** Affiche le panel panier */
     public void showPanier(List<Produit> panier) {
         PanierPanel pp = new PanierPanel(this, panier);
-        addPanel(pp, "panier");
-        showPanel("panier");
+        ajouterPanel(pp, "panier");
+        afficherPanel("panier");
     }
 
     /** Ajoute un panel au conteneur avec un nom */
-    public void addPanel(JPanel panel, String name) {
+    public void ajouterPanel(JPanel panel, String name) {
         container.add(panel, name);
     }
 
     /** Affiche un panel selon son nom */
-    public void showPanel(String name) {
+    public void afficherPanel(String name) {
         cardLayout.show(container, name);
     }
 
     /** Recharge et affiche l'accueil Acheteur */
-    public void showAcheteurHome() {
-        Acheteur a = getAcheteurConnecte();
+    public void afficherAcheteurHome() {
+        Acheteur a = obtenirAcheteurConnecte();
         List<Produit> produits = new ProduitController().recupererTousLesProduits();
         AcheteurPanel ap = new AcheteurPanel(this, produits);
-        addPanel(ap, "acheteur");
-        showPanel("acheteur");
+        ajouterPanel(ap, "acheteur");
+        afficherPanel("acheteur");
     }
 
     /** Affiche l’accueil Vendeur une fois connecté/inscrit */
-    public void showVendeurHome(Vendeur v) {
+    public void afficherVendeurHome(Vendeur v) {
         VendeurPanel vp = new VendeurPanel(v, this);
-        addPanel(vp, "vendeur");
-        showPanel("vendeur");
+        ajouterPanel(vp, "vendeur");
+        afficherPanel("vendeur");
     }
 
 
     // Getters et setters pour le suivi de l'utilisateur connecté
-    public Acheteur getAcheteurConnecte() {
+    public Acheteur obtenirAcheteurConnecte() {
         return acheteurConnecte;
     }
 
-    public void setAcheteurConnecte(Acheteur acheteurConnecte) {
+    public void definirAcheteurConnecte(Acheteur acheteurConnecte) {
         this.acheteurConnecte = acheteurConnecte;
     }
 
-    public AuthController getAuthController() {
+    public AuthController obtenirAuthController() {
         return authController;
     }
 

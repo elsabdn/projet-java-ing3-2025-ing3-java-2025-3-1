@@ -27,7 +27,7 @@ public class ProduitController {
 
     /** Récupère les produits correspondant à un vendeur. */
     public List<Produit> recupererProduitsParVendeur(int vendeurId) {
-        return databaseManager.getProduitsParVendeur(vendeurId);
+        return databaseManager.obtenirProduitsParVendeur(vendeurId);
     }
 
     /**

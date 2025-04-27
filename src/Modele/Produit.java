@@ -115,7 +115,7 @@ public class Produit {
         this.description = description;
     }
 
-    public boolean isPromoEnGros() {
+    public boolean estPromoEnGros() {
         return promoEnGros;
     }
 
