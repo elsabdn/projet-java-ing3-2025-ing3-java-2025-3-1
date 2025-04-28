@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * StatistiquesDAO est une classe dédiée à la récupération de statistiques commerciales
+ * depuis la base de données : ventes, produits les plus vendus, commandes clients, etc.
+ */
 public class StatistiquesDAO {
 
     private Connection conn;

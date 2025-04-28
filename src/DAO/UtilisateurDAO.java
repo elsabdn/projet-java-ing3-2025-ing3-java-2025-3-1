@@ -8,7 +8,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * UtilisateurDAO gère les opérations d'accès à la base de données concernant les utilisateurs :
+ * ajout, récupération de tous les utilisateurs, connexion par email et mot de passe.
+ */
 public class UtilisateurDAO {
+
+    /**
+     * Ajoute un nouvel utilisateur (acheteur ou vendeur) dans la base de données.
+     * Remplit l'identifiant généré automatiquement par la base.
+     */
     public void ajouter(Utilisateur u) {
         String sql = "INSERT INTO utilisateur (email, mot_de_passe, role) VALUES (?, ?, ?)";
 
@@ -29,6 +38,10 @@ public class UtilisateurDAO {
         }
     }
 
+    /**
+     * Récupère tous les utilisateurs enregistrés dans la base de données.
+     * @return Liste d'objets Utilisateur (type Acheteur ou Vendeur)
+     */
     public List<Utilisateur> getAll() {
         List<Utilisateur> list = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur";
@@ -56,6 +69,12 @@ public class UtilisateurDAO {
         return list;
     }
 
+    /**
+     * Récupère un utilisateur par son email et son mot de passe (connexion).
+     * @param email Email fourni
+     * @param mdp Mot de passe fourni
+     * @return Utilisateur correspondant ou null si aucun trouvé
+     */
     public Utilisateur getParEmailEtMdp(String email, String mdp) {
         String sql = "SELECT * FROM utilisateur WHERE email = ? AND mot_de_passe = ?";
 

@@ -8,6 +8,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * DatabaseManager est une classe de gestion centralisée de l'accès à la base de données.
+ * Elle suit le pattern Singleton pour garantir une seule connexion active à la base.
+ */
 public class DatabaseManager {
     private static final String URL_BDD          = "jdbc:mysql://localhost:8889/ecommerce";
     private static final String UTILISATEUR_BDD  = "root";
@@ -55,7 +60,10 @@ public class DatabaseManager {
     }
 
     // === UTILISATEURS ===
-
+    /**
+     * Ajoute un nouvel utilisateur dans la base de données.
+     * Si c'est un acheteur, crée aussi son panier.
+     */
     public void addUtilisateur(Utilisateur utilisateur) {
         String sql = "INSERT INTO utilisateur (email, mot_de_passe, role) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -88,6 +96,10 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Récupère tous les utilisateurs de la base de données.
+     * Recharge leur panier (pour les acheteurs) ou leurs produits (pour les vendeurs).
+     */
     public List<Utilisateur> getUtilisateurs() {
         List<Utilisateur> utilisateurs = new ArrayList<>();
         String sql = "SELECT * FROM utilisateur";
@@ -198,6 +210,9 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Récupère tous les produits de la base de données, avec leurs vendeurs.
+     */
     public List<Produit> obtenirProduits() {
         List<Produit> produits = new ArrayList<>();
         String sql =

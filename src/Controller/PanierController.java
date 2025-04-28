@@ -10,6 +10,10 @@ import DAO.ProduitDAO;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * PanierController gère toutes les actions liées au panier d'un acheteur,
+ * telles que l'ajout d'articles, l'affichage du panier, et la validation de la commande.
+ */
 public class PanierController {
     private final Acheteur acheteur;
     private final PanierDAO panierDAO = new PanierDAO();
@@ -20,6 +24,14 @@ public class PanierController {
         this.acheteur = acheteur;
         panierDAO.chargerPanier(acheteur);
     }
+
+    /**
+     * Ajoute un produit au panier de l'acheteur, en vérifiant que la quantité demandée est disponible.
+     * Met aussi à jour les stocks du produit.
+     * @param produit Produit à ajouter
+     * @param quantite Quantité désirée
+     * @return true si l'ajout est réussi, false sinon
+     */
 
     public boolean ajouterAuPanier(Produit produit, int quantite) {
         if (produit.getQuantite() >= quantite) {
@@ -32,7 +44,10 @@ public class PanierController {
         return false;
     }
 
-    // Méthode pour afficher le contenu du panier
+    /**
+     * Affiche en console le contenu du panier de l'acheteur.
+     * @param acheteur Acheteur dont on veut afficher le panier
+     */
     public void afficherPanier(Acheteur acheteur) {
         // Charge les produits dans le panier de l'acheteur
         panierDAO.chargerPanier(acheteur);
@@ -52,6 +67,10 @@ public class PanierController {
         }
     }
 
+    /**
+     * Valide le panier : calcule le total, propose à l'utilisateur de confirmer l'achat,
+     * crée la commande si confirmé, vide le panier, et affiche un ticket.
+     */
     public void validerPanier() {
         Panier panier = acheteur.getPanier();
         if (panier.getItems().isEmpty()) {
@@ -89,6 +108,11 @@ public class PanierController {
         }
     }
 
+    /**
+     * Génère sous forme de texte le ticket de la commande,
+     * avec détail des articles achetés, quantités, prix unitaire, et total.
+     * @return Chaîne de caractères représentant le ticket
+     */
     private String genererTicket() {
         StringBuilder sb = new StringBuilder();
         sb.append("🧾 Ticket de Commande\n");

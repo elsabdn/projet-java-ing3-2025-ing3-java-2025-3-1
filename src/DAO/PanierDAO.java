@@ -6,8 +6,16 @@ import Modele.Vendeur;
 
 import java.sql.*;
 
+/**
+ * PanierDAO gère les opérations d'accès à la base de données concernant les paniers :
+ * chargement, création, ajout d'articles, suppression d'articles.
+ */
 public class PanierDAO {
 
+    /**
+     * Charge le contenu du panier d'un acheteur depuis la base de données
+     * et le remplit dans l'objet Acheteur.
+     */
     public void chargerPanier(Acheteur acheteur) {
         String sql = """
         SELECT pi.produit_id, pi.quantite, p.nom, p.prix, p.quantite AS stock, p.vendeur_id, p.image_path, p.marque
@@ -45,6 +53,10 @@ public class PanierDAO {
     }
 
 
+    /**
+     * Crée un nouveau panier pour un utilisateur donné en base de données.
+     * @return L'identifiant du panier créé, ou -1 en cas d'erreur.
+     */
     public int creerPanier(int utilisateurId) {
         String sql = "INSERT INTO panier (utilisateur_id) VALUES (?)";
         try (Connection conn = ConnexionBDD.obtenirConnexion();
@@ -62,6 +74,10 @@ public class PanierDAO {
     }
 
 
+    /**
+     * Ajoute un article au panier d'un utilisateur.
+     * Si le produit est déjà présent, augmente la quantité existante.
+     */
     public void ajouterArticle(int utilisateurId, Produit produit, int quantite) {
         int panierId = obtenirIdPanier(utilisateurId);
 
@@ -98,6 +114,9 @@ public class PanierDAO {
         }
     }
 
+    /**
+     * Vide complètement le panier d'un utilisateur donné.
+     */
     public void viderPanier(int utilisateurId) {
         int panierId = obtenirIdPanier(utilisateurId);
 
@@ -116,6 +135,10 @@ public class PanierDAO {
         }
     }
 
+    /**
+     * Récupère l'identifiant du panier d'un utilisateur à partir de son ID utilisateur.
+     * @return L'identifiant du panier, ou -1 s'il n'existe pas.
+     */
     private int obtenirIdPanier(int utilisateurId) {
         String sql = "SELECT id FROM panier WHERE utilisateur_id = ?";
 

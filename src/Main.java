@@ -12,6 +12,11 @@ import javax.swing.*;
 import java.util.List;
 
 public class Main {
+
+    /**
+     * Classe Main, point d'entrée de l'application.
+     * Lance l'interface graphique (Swing) et initialise les contrôleurs, modèles et vues.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // ─── Initialisation des contrôleurs et de la base ───────────────

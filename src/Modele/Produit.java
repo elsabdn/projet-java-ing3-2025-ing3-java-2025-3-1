@@ -49,7 +49,8 @@ public class Produit {
         this(id, nom, prix, quantite, vendeur, imagePath, marque, null);
     }
 
-    // Getters et setters
+    // ----------- Getters et setters ------------
+    // Fournissent l'accès et la modification des attributs privés
 
     public int getId() {
         return id;
@@ -115,6 +116,10 @@ public class Produit {
         this.description = description;
     }
 
+    /**
+     * Indique si le produit bénéficie d'une promotion en gros.
+     * @return true si promotion active, sinon false
+     */
     public boolean estPromoEnGros() {
         return promoEnGros;
     }

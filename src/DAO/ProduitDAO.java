@@ -7,8 +7,17 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * ProduitDAO est la classe de gestion des accès aux données pour les produits.
+ * Elle permet d'ajouter, récupérer, supprimer et mettre à jour des produits dans la base de données.
+ */
 public class ProduitDAO {
 
+    /**
+     * Ajoute un produit dans la base de données.
+     * Remplit ensuite son identifiant (auto-généré par la base).
+     */
     public void ajouter(Produit p) {
         String sql = "INSERT INTO produit (nom, prix, quantite, vendeur_id, image_path, marque, description, promoEnGros, seuilGros, prixGros) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -38,6 +47,10 @@ public class ProduitDAO {
         }
     }
 
+    /**
+     * Récupère tous les produits stockés dans la base de données.
+     * @return Une liste de produits
+     */
     public List<Produit> recupererTousLesProduits() {
         List<Produit> list = new ArrayList<>();
         String sql = "SELECT * FROM produit";
@@ -73,6 +86,10 @@ public class ProduitDAO {
         return list;
     }
 
+    /**
+     * Supprime un produit spécifique de la base de données.
+     * @param produit Le produit à supprimer
+     */
     public void supprimer(Produit produit) {
         String sql = "DELETE FROM produit WHERE id = ?";
         try (Connection conn = ConnexionBDD.obtenirConnexion();
@@ -85,6 +102,10 @@ public class ProduitDAO {
         }
     }
 
+    /**
+     * Met à jour les informations d'un produit existant dans la base de données.
+     * @param produit Le produit mis à jour
+     */
     public void mettreAJourProduit(Produit produit) {
         String sql = "UPDATE produit SET nom = ?, prix = ?, quantite = ?, image_path = ?, marque = ?, description = ?, promoEnGros = ?, seuilGros = ?, prixGros = ? WHERE id = ?";
         try (Connection conn = ConnexionBDD.obtenirConnexion();
