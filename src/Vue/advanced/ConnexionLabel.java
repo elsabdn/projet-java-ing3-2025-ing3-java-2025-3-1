@@ -128,19 +128,19 @@ public class ConnexionLabel extends JPanel {
     }
 
     // === Getters et setters ===
-    public String obtenirEmail() {
+    public String getEmail() {
         return emailField.getText();
     }
 
-    public String obtenirMdp() {
+    public String getMdp() {
         return new String(mdpField.getPassword());
     }
 
-    public void definirActionConnexion(ActionListener l) {
+    public void setActionConnexion(ActionListener l) {
         loginBtn.addActionListener(l);
     }
 
-    public void definirActionRetour(ActionListener l) {
+    public void setActionRetour(ActionListener l) {
         backBtn.addActionListener(l);
     }
 }

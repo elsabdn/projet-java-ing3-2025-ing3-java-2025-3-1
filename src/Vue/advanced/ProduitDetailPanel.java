@@ -184,6 +184,6 @@ public class ProduitDetailPanel extends JPanel {
     }
 
     // === Getters pour les boutons, si besoin ailleurs ===
-    public JButton obtenirRetourButton()         { return retourBtn; }
-    public JButton obtenirAjouterPanierButton()  { return ajouterPanierBtn; }
+    public JButton getRetourButton()         { return retourBtn; }
+    public JButton getAjouterPanierButton()  { return ajouterPanierBtn; }
 }

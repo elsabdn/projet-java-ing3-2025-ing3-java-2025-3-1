@@ -158,9 +158,9 @@ public class PanierPanel extends JPanel {
         //----------------------- Action validation ---------------------------
         btnValider.addActionListener(e -> {
             final PaiementPanel paiement = new PaiementPanel(totalPx);
-            paiement.definirCancelAction(evt -> mainFrame.afficherPanel("panier"));
-            paiement.definirConfirmPaymentAction(evt -> {
-                int note = paiement.obtenirNote();
+            paiement.setCancelAction(evt -> mainFrame.afficherPanel("panier"));
+            paiement.setConfirmPaymentAction(evt -> {
+                int note = paiement.getNote();
                 if (note < 1 || note > 10) {
                     JOptionPane.showMessageDialog(mainFrame, "Merci de saisir une note entre 1 et 10.");
                     return;

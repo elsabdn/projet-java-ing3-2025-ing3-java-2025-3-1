@@ -154,7 +154,7 @@ public class AccueilPanel extends JPanel {
     }
 
     // Seulment pour la page non‑connectée
-    public void definirActionConnexio(ActionListener l)    { if (loginBtn    != null) loginBtn.addActionListener(l); }
+    public void definirActionConnexion(ActionListener l)    { if (loginBtn    != null) loginBtn.addActionListener(l); }
     public void definirActionAcheteur(ActionListener l){ if (acheteurBtn != null) acheteurBtn.addActionListener(l); }
     public void definirActionVendeur(ActionListener l) { if (vendeurBtn  != null) vendeurBtn.addActionListener(l); }
 }

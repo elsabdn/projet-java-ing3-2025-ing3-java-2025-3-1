@@ -102,14 +102,14 @@ public class VendeurPanel extends JPanel {
             dlg.setVisible(true);
             if (!dlg.estConfirme()) return;
 
-            String nom     = dlg.obtenirNom();
-            String marque  = dlg.obtenirMarque();
-            double prix    = dlg.obtenirPrix();
-            int qte        = dlg.obtenirQuantite();
-            String desc    = dlg.obtenirDescription(); // description libre
-            String imgPath = dlg.obtenirCheminImage();
+            String nom     = dlg.getNom();
+            String marque  = dlg.getMarque();
+            double prix    = dlg.getPrix();
+            int qte        = dlg.getQuantite();
+            String desc    = dlg.getDescription(); // description libre
+            String imgPath = dlg.getCheminImage();
 
-            produitController.ajouterProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.estPromoEnGros(), dlg.obtenirSeuilGros(), dlg.obtenirPrixGros());
+            produitController.ajouterProduit(vendeur, nom, prix, qte, imgPath, marque, desc, dlg.estPromoEnGros(), dlg.getSeuilGros(), dlg.getPrixGros());
             mettreAJourProduitList(vendeur);
         });
 
@@ -242,12 +242,12 @@ public class VendeurPanel extends JPanel {
                 dlg.setVisible(true);
                 if (!dlg.isConfirme()) return;
 
-                p.setNom(dlg.obtenirNomModifie());
-                p.setPrix(dlg.obtenirPrixModifie());
-                p.setQuantite(dlg.obtenirStockModifie());
-                p.setMarque(dlg.obtenirMarqueModifiee());
-                if (dlg.obtenirCheminImageModifie() != null) p.setImageChemin(dlg.obtenirCheminImageModifie());
-                if (dlg.obtenirDescriptionModifie() != null) p.setDescription(dlg.obtenirDescriptionModifie());
+                p.setNom(dlg.getNomModifie());
+                p.setPrix(dlg.getPrixModifie());
+                p.setQuantite(dlg.getStockModifie());
+                p.setMarque(dlg.getMarqueModifiee());
+                if (dlg.getCheminImageModifie() != null) p.setImageChemin(dlg.getCheminImageModifie());
+                if (dlg.getDescriptionModifie() != null) p.setDescription(dlg.getDescriptionModifie());
 
                 produitController.mettreAJourProduit(p);
                 mettreAJourProduitList(vendeur);
@@ -315,7 +315,7 @@ public class VendeurPanel extends JPanel {
     }
 
     // Getters pour tests ou utilisation extérieure
-    public JButton obtenirAjoutProduitButton()  { return addProduitBtn; }
-    public JButton obtenirRefreshButton()     { return refreshBtn; }
-    public JButton obtenirDeconnexionButton() { return deconnexionBtn; }
+    public JButton getAjoutProduitButton()  { return addProduitBtn; }
+    public JButton getRefreshButton()     { return refreshBtn; }
+    public JButton getDeconnexionButton() { return deconnexionBtn; }
 }

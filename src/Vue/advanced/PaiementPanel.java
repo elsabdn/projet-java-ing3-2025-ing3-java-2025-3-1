@@ -170,17 +170,17 @@ public class PaiementPanel extends JPanel {
     }
 
     // Définition de l'action du bouton de confirmation
-    public void definirConfirmPaymentAction(ActionListener l) {
+    public void setConfirmPaymentAction(ActionListener l) {
         confirmPaymentBtn.addActionListener(l);
     }
 
     // Définition de l'action du bouton d'annulation
-    public void definirCancelAction(ActionListener l) {
+    public void setCancelAction(ActionListener l) {
         cancelBtn.addActionListener(l);
     }
 
     // Récupère la note entrée par l'utilisateur, ou -1 si invalide
-    public int obtenirNote() {
+    public int getNote() {
         try {
             return Integer.parseInt(noteField.getText().trim());
         } catch (NumberFormatException e) {

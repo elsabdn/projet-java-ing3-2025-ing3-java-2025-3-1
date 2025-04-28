@@ -35,7 +35,7 @@ public class Main {
 
             // === Actions sur AccueilPanel ===
             // wiring AccueilPanel
-            accueilPanel.definirActionConnexio(e -> mainFrame.afficherPanel("connexion"));
+            accueilPanel.definirActionConnexion(e -> mainFrame.afficherPanel("connexion"));
             accueilPanel.definirActionAcheteur(e ->
                     mainFrame.afficherPanel("inscription_acheteur")
             );
@@ -44,11 +44,11 @@ public class Main {
             );
 
             // === Actions sur ConnexionLabel ===
-            connexionLabel.definirActionRetour(e -> mainFrame.afficherPanel("accueil"));
+            connexionLabel.setActionRetour(e -> mainFrame.afficherPanel("accueil"));
 
-            connexionLabel.definirActionConnexion(e -> {
-                String email = connexionLabel.obtenirEmail();
-                String mdp   = connexionLabel.obtenirMdp();
+            connexionLabel.setActionConnexion(e -> {
+                String email = connexionLabel.getEmail();
+                String mdp   = connexionLabel.getMdp();
                 Utilisateur u = auth.connexion(email, mdp);
                 if (u == null) {
                     JOptionPane.showMessageDialog(mainFrame, "Identifiants incorrects !");
@@ -73,7 +73,7 @@ public class Main {
                     VendeurPanel vp = new VendeurPanel(vendeur, mainFrame);
                     mainFrame.ajouterPanel(vp, "vendeur");
 
-                    vp.obtenirRefreshButton().addActionListener(ev ->
+                    vp.getRefreshButton().addActionListener(ev ->
                             vp.mettreAJourProduitList(vendeur)
                     );
 

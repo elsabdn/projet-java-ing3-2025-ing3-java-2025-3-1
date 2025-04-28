@@ -206,12 +206,12 @@ public class ModifierProduitDialog extends JDialog {
 
     // ===== Getters =====
     public boolean isConfirme()            { return confirme; }
-    public String obtenirNomModifie()         { return champNom.getText().trim(); }
-    public double obtenirPrixModifie()        { return Double.parseDouble(champPrix.getText().trim()); }
-    public int obtenirStockModifie()       { return Integer.parseInt(champStock.getText().trim()); }
-    public String obtenirMarqueModifiee()     { return champMarque.getText().trim(); }
-    public String obtenirCheminImageModifie() { return cheminImage; }
-    public String obtenirDescriptionModifie() { return champDescription.getText().trim(); }
+    public String getNomModifie()         { return champNom.getText().trim(); }
+    public double getPrixModifie()        { return Double.parseDouble(champPrix.getText().trim()); }
+    public int getStockModifie()       { return Integer.parseInt(champStock.getText().trim()); }
+    public String getMarqueModifiee()     { return champMarque.getText().trim(); }
+    public String getCheminImageModifie() { return cheminImage; }
+    public String getDescriptionModifie() { return champDescription.getText().trim(); }
     public boolean isPromoEnGrosModifie()  { return promoEnGrosCheck.isSelected(); }
     public int     getSeuilGrosModifie()   { return Integer.parseInt(seuilGrosField.getText().trim()); }
     public double  getPrixGrosModifie()    { return Double.parseDouble(prixGrosField.getText().trim()); }

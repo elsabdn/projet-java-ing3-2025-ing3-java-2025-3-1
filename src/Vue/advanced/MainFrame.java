@@ -52,7 +52,7 @@ public class MainFrame extends JFrame {
         AccueilPanel accueil = new AccueilPanel(this);
 
         // --- Connexion utilisateur: ouverture de pop-ups pour saisir les identifiants ---
-        accueil.definirActionConnexio(e -> {
+        accueil.definirActionConnexion(e -> {
             String email = JOptionPane.showInputDialog(this, "Email :");
             String mdp   = JOptionPane.showInputDialog(this, "Mot de passe :");
             Utilisateur u = authController.connexion(email, mdp);

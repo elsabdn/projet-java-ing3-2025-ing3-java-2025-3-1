@@ -72,7 +72,7 @@ public class StatistiquesPanel extends JPanel {
         // Graphique ventes par mois
         Map<String, Integer> ventesParMois = statistiquesDAO.getVentesParMois();
         if (!ventesParMois.isEmpty()) {
-            JFreeChart pieChart = createVentesParMoisChart(ventesParMois);
+            JFreeChart pieChart = creerVentesParMoisChart(ventesParMois);
             ChartPanel chartPanel = new ChartPanel(pieChart);
             chartPanel.setBackground(Color.WHITE);
             chartPanel.setPreferredSize(new Dimension(800, 600));
@@ -85,7 +85,7 @@ public class StatistiquesPanel extends JPanel {
         // Graphique top produits vendus
         Map<String, Integer> topProduits = statistiquesDAO.obtenirTopProduits();
         if (!topProduits.isEmpty()) {
-            JFreeChart barChart = createTopProduitsChart(topProduits);
+            JFreeChart barChart = creerTopProduitsChart(topProduits);
             ChartPanel barChartPanel = new ChartPanel(barChart);
             barChartPanel.setPreferredSize(new Dimension(800, 600));
             contentPanel.add(barChartPanel);
@@ -96,7 +96,7 @@ public class StatistiquesPanel extends JPanel {
 
         Map<String,Integer> offres = statistiquesDAO.obtenirOffresBienAccueillies();
         if (!offres.isEmpty()) {
-            JFreeChart offresChart = createOffresBienAccueilliesChart(offres);
+            JFreeChart offresChart = creerOffresBienAccueilliesChart(offres);
             ChartPanel cp = new ChartPanel(offresChart);
             cp.setPreferredSize(new Dimension(800, 400));
             cp.setBackground(Color.WHITE);
@@ -157,7 +157,7 @@ public class StatistiquesPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private JFreeChart createVentesParMoisChart(Map<String, Integer> ventesParMois) {
+    private JFreeChart creerVentesParMoisChart(Map<String, Integer> ventesParMois) {
         DefaultPieDataset dataset = new DefaultPieDataset();
         for (Map.Entry<String, Integer> entry : ventesParMois.entrySet()) {
             dataset.setValue(entry.getKey(), entry.getValue());
@@ -180,7 +180,7 @@ public class StatistiquesPanel extends JPanel {
         return chart;
     }
 
-    private JFreeChart createTopProduitsChart(Map<String, Integer> topProduits) {
+    private JFreeChart creerTopProduitsChart(Map<String, Integer> topProduits) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (Map.Entry<String, Integer> entry : topProduits.entrySet()) {
             dataset.addValue(entry.getValue(), "Produits", entry.getKey());
@@ -212,7 +212,7 @@ public class StatistiquesPanel extends JPanel {
     /**
      * Crée un bar chart pour les offres en gros les plus bien accueillies.
      */
-    private JFreeChart createOffresBienAccueilliesChart(Map<String, Integer> offres) {
+    private JFreeChart creerOffresBienAccueilliesChart(Map<String, Integer> offres) {
         // On construit le dataset
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (Map.Entry<String,Integer> e : offres.entrySet()) {
